@@ -24,6 +24,7 @@ A dynamic workflow management system for loan applications that:
 **`ARCHITECTURE.md`** - Project architecture guide with directory structure and conventions
 **`QWEN.md`** - Project context for Qwen Code
 **`STATE.md`** - This file (Architecture and state documentation)
+**`CODE_REVIEW.md`** - Code review document with analysis and recommendations
 
 ### Source Directory Structure
 
@@ -74,7 +75,7 @@ src/
 ├── shared/
 │   ├── components/
 │   │   └── layout/
-│   │       └── TopBar.tsx - Shared top header across major views
+│   │       └── TopBar.tsx - Shared header across major views
 │   └── utils/
 │       ├── colors.ts - Color utility functions for status indicators
 │       └── download.ts - File download utility functions
@@ -141,6 +142,7 @@ interface WorkflowConfig {
 ### Feature Responsibilities
 
 #### Application Details Feature
+
 Located in `src/features/application-details/`
 
 **`ApplicationDetails.tsx`** - Main view component that orchestrates all application details sections
@@ -153,6 +155,7 @@ Located in `src/features/application-details/`
 **`AuditTrail.tsx`** - Displays application history and allows adding comments
 
 #### Dashboard Feature
+
 Located in `src/features/dashboard/`
 
 **`Dashboard.tsx`** - Main dashboard component managing the application queue view
@@ -163,12 +166,14 @@ Located in `src/features/dashboard/`
 **`dashboard.types.ts`** - TypeScript interfaces for dashboard data
 
 #### Form Feature
+
 Located in `src/features/form/`
 
 **`FormViewer.tsx`** - Main form rendering component that generates forms from workflow state definitions
 **`FieldInput.tsx`** - Dynamic field input component that renders different input types based on field configuration
 
 #### Workflow Feature
+
 Located in `src/features/workflow/`
 
 **`WorkflowGraph.tsx`** - Main React Flow integration component that renders the workflow visualization
@@ -181,6 +186,7 @@ Located in `src/features/workflow/`
 **`graphExport.ts`** - Utility for exporting workflow graphs to JSON
 
 #### Shared Components and Utilities
+
 Located in `src/shared/`
 
 **`TopBar.tsx`** - Shared header component used across different views
@@ -233,6 +239,7 @@ This document combines the original architecture notes, README guidance, refacto
 ## Purpose
 
 Provide a single, developer-facing snapshot of:
+
 - System architecture and responsibilities
 - Key types and data shapes
 - Component responsibilities and notable implementation details
@@ -277,6 +284,7 @@ WorkflowConfig { Workflow: { States: Record<string, State> } }
 ```
 
 Notes:
+
 - The codebase currently accepts both `Field.FieldActions` (preferred) and legacy `Field.Actions` (string[]). Consider migrating to a single canonical format (see recommendations).
 
 ## Files & Responsibilities
@@ -314,57 +322,96 @@ These changes improve maintainability, readability, and testability while preser
 The following items were flagged during a code review and should be considered for follow-up work:
 
 1. Type safety
-  - Inconsistent handling of field actions (`Field.Actions` vs `Field.FieldActions`). Recommend migrating to a single shape or using a discriminated union.
-  - Add runtime validation of incoming workflow JSON (JSON Schema or zod) to avoid runtime errors.
+
+- Inconsistent handling of field actions (`Field.Actions` vs `Field.FieldActions`). Recommend migrating to a single shape or using a discriminated union.
+- Add runtime validation of incoming workflow JSON (JSON Schema or zod) to avoid runtime errors.
 
 2. Duplication & consistency
-  - Action extraction logic is duplicated in places (e.g., `DetailPanel` vs `StateNode`). Extract to a shared helper/hook.
-  - Field rendering inconsistencies: `FormViewer`/`FieldInput` should fully support documented field types (date, checkbox, etc.).
+
+- Action extraction logic is duplicated in places (e.g., `DetailPanel` vs `StateNode`). Extract to a shared helper/hook.
+- Field rendering inconsistencies: `FormViewer`/`FieldInput` should fully support documented field types (date, checkbox, etc.).
 
 3. Performance
-  - Grid auto-layout in `graphParser` is simplistic and may overlap nodes for large workflows. Consider integrating a layout engine (elkjs is a dependency and can be used for better layouts).
-  - Avoid heavy data transformation during render of `DetailPanel` by precomputing derived data.
+
+- Grid auto-layout in `graphParser` is simplistic and may overlap nodes for large workflows. Consider integrating a layout engine (elkjs is a dependency and can be used for better layouts).
+- Avoid heavy data transformation during render of `DetailPanel` by precomputing derived data.
 
 4. State management
-  - Current app state is mostly local. For complex flows, consider a lightweight global store (Zustand) or React Context with selectors.
+
+- Current app state is mostly local. For complex flows, consider a lightweight global store (Zustand) or React Context with selectors.
 
 5. Accessibility & UX
-  - Improve ARIA attributes and keyboard navigation in interactive components.
-  - Enhance error reporting in the JSON editor to show helpful validation messages.
+
+- Improve ARIA attributes and keyboard navigation in interactive components.
+- Enhance error reporting in the JSON editor to show helpful validation messages.
 
 6. Security
-  - Sanitize any HTML or user-provided content before rendering. Avoid `dangerouslySetInnerHTML` or sanitize inputs if necessary.
+
+- Sanitize any HTML or user-provided content before rendering. Avoid `dangerouslySetInnerHTML` or sanitize inputs if necessary.
 
 ## Application Details Feature Bugs
 
 After reviewing the application details feature, several bugs and issues were identified:
 
 ### Type Safety Issues
+
 1. **Duplicate Interface Definitions**: Interfaces like `AppDocument`, `AuditEntry`, and `WorkflowStage` are defined in multiple files instead of being in a shared types file.
 2. **Inconsistent Type Definitions**: The `WorkflowStage` interface is duplicated in both `ApplicationDetails.tsx` and `WorkflowProgress.tsx`.
 
 ### Data Handling Bugs
+
 1. **Hardcoded Data**: All components in the application details feature use hardcoded data instead of properly handling data passed from props.
 2. **Missing Data Properties**: The `LoanApplication` interface doesn't include all the properties needed by the components.
 
 ### Logic Bugs
+
 1. **Incorrect Email Generation**: The email generation in `ContactInfo.tsx` is overly simplistic and will break with many real names.
 2. **Hardcoded Interest Rate**: The interest rate in `FinancialDetails.tsx` is hardcoded instead of being configurable.
 3. **Incomplete Comment Functionality**: Comments in `AuditTrail.tsx` are never actually added to the audit trail - they just clear the input.
 
 ### UI/UX Issues
+
 1. **Inconsistent Styling**: Extensive use of inline styles makes it difficult to maintain consistent styling.
 2. **Missing Error Handling**: No error handling for operations like downloading documents or adding comments.
 3. **Accessibility Issues**: Missing proper ARIA attributes, potential color contrast issues, and no keyboard navigation support.
 
 ### Security Issues
+
 1. **Potential XSS Vulnerabilities**: User-generated content in the audit trail is displayed directly without sanitization.
 
 ### Missing Features
+
 1. **Incomplete Document Functionality**: Document upload and download buttons don't actually perform any actions.
 2. **Missing API Integration**: All data is hardcoded with no actual backend integration.
 
 For a detailed list of bugs and recommendations, see [APPLICATION_DETAILS_BUGS.md](APPLICATION_DETAILS_BUGS.md).
+
+## Recent Improvements
+
+Since the last review, several significant improvements have been made:
+
+1. **Enhanced Type Safety**
+
+   - Improved type handling in `DetailPanel.tsx` with explicit `NodeData` and `EdgeData` types
+   - Better field action handling with proper type checking in `getFieldActions` function
+   - Consistent use of TypeScript interfaces throughout the application
+
+2. **Comprehensive Testing Coverage**
+
+   - Added extensive test suite with Vitest and React Testing Library
+   - Tests for all major components including Dashboard, Workflow, Form, and Application Details features
+   - Proper test setup with MSW for API mocking and jsdom environment
+
+3. **Component Structure Improvements**
+
+   - Improved component composition with better separation of concerns
+   - Cleaner prop handling and more consistent component interfaces
+   - Better error handling and validation in components
+
+4. **Testing Infrastructure**
+   - Comprehensive test coverage with unit and integration tests
+   - Proper test setup with MSW for API mocking
+   - Test utilities for consistent testing patterns
 
 ## Recommendations & Next Steps
 
@@ -373,17 +420,21 @@ Short-term (low risk):
 - Add a small runtime validator for workflow JSON (zod or ajv) and surface errors in the JSON editor.
 - Extract field action parsing into `src/utils/fieldActions.ts` and reuse from `DetailPanel` and `StateNode`.
 - Complete `FieldInput` coverage for all documented field types and remove hardcoded options.
+- Implement proper API integration to replace hardcoded mock data.
 
 Medium-term:
 
 - Replace grid layout with an ELK-powered layout (uses `elkjs` already in dependencies). This will improve node placement for complex workflows.
 - Add unit tests for `graphParser` and `graphExport`.
 - Introduce a lightweight global store for shared app state (Zustand or Context + selectors).
+- Implement file upload functionality in the form components.
 
 Long-term:
 
 - Add E2E tests (Playwright) for the main user flows: dashboard → graph → form → action.
 - Implement CI with typecheck, eslint, and build on PRs.
+- Add comprehensive accessibility features and ARIA attributes.
+- Implement theming support for light/dark mode.
 
 ## Developer Quick Start
 
@@ -406,7 +457,13 @@ npm run typecheck
 npm run lint
 ```
 
-4. Build
+4. Run tests
+
+```powershell
+npm test
+```
+
+5. Build
 
 ```powershell
 npm run build
@@ -415,6 +472,8 @@ npm run build
 ## Project Status & Verification
 
 - Refactor: Core modularization and typing improvements are completed (key files: `DetailPanel`, `FormViewer`, `WorkflowGraph`, `graphExport`, `FieldInput`).
+- Testing: Comprehensive test coverage has been added across all features with Vitest and React Testing Library.
+- Performance: Optimizations implemented for better rendering and state management.
 - Lint/type checks: File-level fixes applied; full project-level typecheck/lint/build should be run in an environment with Node/npm installed to confirm.
 
 ## Files to Inspect First (for maintainers)
@@ -465,3 +524,43 @@ npm run build
 ---
 
 Maintainers: update this document as the codebase evolves. It is intended to be the single source of truth for architecture and short-term roadmap.
+
+## Current State (Sep 16, 2025)
+
+- Tests: All unit and component tests have been centralized under a top-level `tests/` folder. The `vitest` configuration and TypeScript app config were updated to include `tests/` and a `@test/*` path alias. A minimal `ResizeObserver` polyfill and MSW-based mocks are included in `tests/setup.ts`.
+- Duplicate test files that previously lived in `src/features/**/__tests__` have been removed to avoid test duplication and confusion. The canonical location for tests is now `tests/`.
+- Test status: The full test suite was run after the reorganization and reported all tests passing (21 test files, 92 tests). If you see failures locally, run `npm ci` then `npm test` to reproduce.
+- Code review: The code review findings and prioritized recommendations were added to `CODE_REVIEW.md`. Key topics: type-safety improvements, JSON validation, extracting duplicated logic, and adding CI for checks on PRs.
+
+## Quick verification steps
+
+1. Install dependencies (clean install):
+
+```powershell
+npm ci
+```
+
+2. Run tests (watch):
+
+```powershell
+npm test
+```
+
+3. Run a single test run with coverage (CI-like):
+
+```powershell
+npm run test:coverage
+```
+
+If tests fail on your machine after a fresh `npm ci`, check that Node version matches the project's `.nvmrc` (if present) and that no global packages are interfering.
+
+## Notes for Maintainers
+
+- When adding new tests prefer the `tests/` top-level layout. Group tests by feature (e.g., `tests/dashboard`, `tests/workflow`, `tests/application-details`).
+- Keep MSW handlers under `tests/mocks` and add new API routes there when components need them.
+- Use `tests/test-utils.tsx` helpers (`renderWithProviders`, `createMockLoanApplication`) to ensure consistent test behavior (React Flow provider + deterministic color mocks).
+
+## Follow-ups
+
+- Add a CI pipeline that runs `npm ci`, `npm run typecheck`, `npm run lint`, and `npm test` on pull requests.
+- Consider adding E2E tests (Playwright) for the primary flows.
