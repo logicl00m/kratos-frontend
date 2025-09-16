@@ -1,6 +1,6 @@
-# Loan Workflow UI - Project Context for Qwen
+# Workflow Visualizer & Form Renderer - Project Context for Qwen
 
-This document provides essential context about the Loan Workflow UI project for Qwen.
+This document provides essential context about the Workflow Visualizer & Form Renderer project for Qwen.
 
 ## Project Overview
 
@@ -20,9 +20,8 @@ A web application that transforms JSON workflow specifications into interactive 
 - Dynamic Form Generation: Renders forms based on state field definitions
 - Field Type Support: Text, number, select, textarea, file uploads
 - Data Binding: Connects to data sources via template syntax (`{{ data.field }}`)
-- Action Handlers: Executes field-level actions (save, validate, upload, etc.)
+- Action Handlers: Executes field-level actions (validate, calculate, fetch)
 - State Transitions: Navigate between forms following workflow logic
-- Edit/Save Mode: Toggle between view and edit modes for forms
 
 ### Phase 3: Application Management (Implemented)
 - Dashboard View: Queue management for loan applications with filtering and search
@@ -36,13 +35,13 @@ A web application that transforms JSON workflow specifications into interactive 
 ### Core Data Types
 ```typescript
 interface FieldAction {
-  Operation: string; // save, validate, upload, calculate, etc.
+  Operation: string; // validate, calculate, fetch, autofill, upload, notify
 }
 
 interface Field {
   ID: string;
   Name: string;
-  Type: string; // text, number, select, textarea, file
+  Type: string; // text, number, select, textarea, file, date, checkbox
   DataSource: string; // Template syntax for data binding
   FieldActions: FieldAction[];
 }
@@ -91,7 +90,7 @@ interface Workflow {
 
 ## File Structure
 ```
-loan-workflow-ui/
+kratos-frontend/
 ├── src/
 │   ├── app/
 │   │   ├── App.tsx
@@ -191,3 +190,80 @@ loan-workflow-ui/
 - React Flow (graph visualization)
 - JSON-based configuration
 - Export capabilities (JSON, PNG)
+
+## Path Aliases
+- `@/…` → `src/…`
+- `@features/…` → `src/features/…`
+- `@shared/…` → `src/shared/…`
+- `@pages/…` → `src/pages/…`
+
+## Available Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+- `npm run typecheck` - Run TypeScript type checking
+- `npm test` - Run unit tests
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:e2e` - Run end-to-end tests
+
+## Project Architecture
+The project follows a feature-based architecture where each feature contains its own components, types, and utilities. This structure promotes modularity and maintainability.
+
+### Feature Organization
+- `application-details/` - Components for displaying detailed loan application information
+- `dashboard/` - Components for the loan application dashboard and queue management
+- `form/` - Components for dynamic form rendering and field input handling
+- `workflow/` - Components for workflow visualization and JSON editing
+
+### Shared Components
+- `shared/components/layout/` - Layout components like TopBar
+- `shared/utils/` - Utility functions like color mapping and file download helpers
+
+### Conventions
+- Feature-first organization: each feature contains its own components, types, and utils
+- Keep shared, generic building blocks under `src/shared`
+- Prefer colocated types (`features/<feature>/types`) over global types
+- Use semantic, stable keys in lists (avoid array index keys)
+- Keep components small and focused
+- Use the configured path aliases for imports
+
+### Legacy Structure
+- On Sep 16, 2025, legacy folders `src/components`, `src/utils`, and `src/types` were removed to avoid confusion
+- All active code now lives under `src/features` and `src/shared`
+
+## Workflow JSON Specification
+
+### Input Format
+```json
+{
+  "Workflow": {
+    "States": {
+      "StateName": {
+        "Form": {
+          "Fields": [...]
+        }
+      }
+    },
+    "Actions": {
+      "ActionName": {
+        "NextState": "TargetState",
+        "Operation": "Operations list"
+      }
+    }
+  }
+}
+```
+
+### Field Properties
+- **ID**: Unique identifier for backend processing
+- **Name**: Display label for users
+- **Type**: Input control type (text, textarea, number, select, file, date, checkbox)
+- **DataSource**: Template binding for data population (`{{ data.path.to.field }}`)
+- **Actions**: Field-level operations (validate, calculate, fetch, autofill, upload, notify)
+
+### Action Properties
+- **NextState**: Target state after action execution
+- **Operation**: Business logic executed during transition

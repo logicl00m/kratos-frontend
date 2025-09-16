@@ -154,3 +154,67 @@ import { WorkflowGraph } from "@features/workflow/components";
   - Workflow graph export lives at `@features/workflow/utils/graphExport` and uses `@shared/utils/download`.
 - Colors: `getStageColor` in `@shared/utils/colors` centralizes stage color mapping.
 - ESLint: config file renamed to `eslint.config.mjs` for ESM; `eslint.config.js` was removed.
+
+## Testing
+
+All unit and component tests are centralized under the `tests/` folder at the project root. Tests use Vitest with jsdom and React Testing Library. Network calls are mocked via MSW, and a minimal `ResizeObserver` polyfill is installed for components relying on React Flow.
+
+### Location and structure
+
+Root
+
+- `tests/`
+  - `setup.ts` – Global test setup
+    - Registers `@testing-library/jest-dom`
+    - Sets up MSW server lifecycle with handlers from `tests/mocks/handlers.ts`
+    - Installs a minimal `ResizeObserver` polyfill required by React Flow
+  - `test-utils.tsx` – Shared helpers
+    - `renderWithProviders`/`renderWithReactFlow` wrappers
+    - `createMockLoanApplication()` factory
+    - Mocks `@shared/utils/colors` for stable, deterministic colors
+  - `mocks/`
+    - `handlers.ts` – MSW handlers for API routes used during tests
+  - `application-details/` – Tests covering Application Details feature
+  - `dashboard/` – Tests covering Dashboard feature
+  - `workflow/` – Tests covering Workflow graph and related components
+  - `form/` – Tests covering form rendering components
+  - `api.test.tsx` – High-level API-driven Dashboard tests
+
+Tests mirror feature areas rather than living alongside source files to keep the production source tree clean.
+
+### Configuration
+
+- `vitest.config.ts`
+  - Resolves path aliases via `vite-tsconfig-paths`
+  - Uses `environment: 'jsdom'`
+  - Includes tests via `include: ['tests/**/*.test.{ts,tsx}']`
+  - Registers global setup using `setupFiles: ['./tests/setup.ts']`
+- `tsconfig.app.json`
+  - Includes both `src` and `tests` in the TypeScript program
+  - Defines test alias `@test/*` → `./tests/*`
+
+Common path aliases available in tests:
+
+- `@features/*` → `src/features/*`
+- `@shared/*` → `src/shared/*`
+- `@pages/*` → `src/pages/*`
+- `@test/*` → `tests/*`
+
+### How to run
+
+- Run all tests in watch mode:
+
+  npm test
+
+- Run with UI:
+
+  npm run test:ui
+
+- One-off run with coverage:
+
+  npm run test:coverage
+
+### Notes on React Flow in tests
+
+- Components relying on React Flow context should be wrapped using the helpers in `tests/test-utils.tsx` (e.g., `renderWithReactFlow`).
+- The `ResizeObserver` polyfill defined in `tests/setup.ts` ensures React Flow works under jsdom.

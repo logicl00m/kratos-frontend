@@ -16,7 +16,15 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
   onApply,
   error,
 }) => {
-  const [isValid, setIsValid] = useState(true);
+  const [isValid, setIsValid] = useState(() => {
+    if (!value?.trim()) return true;
+    try {
+      JSON.parse(value);
+      return true;
+    } catch {
+      return false;
+    }
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
