@@ -1,4 +1,4 @@
-// StateNode.tsx - single clean implementation
+// StateNode.tsx - properly handles state field configuration
 import React, { useState } from "react";
 import { Handle, Position } from "reactflow";
 import type { NodeProps } from "reactflow";
@@ -9,9 +9,11 @@ import {
   Hash,
   Type,
   List,
+  Edit,
+  EyeOff,
 } from "lucide-react";
 import "./StateNode.css";
-import type { Field } from "@features/workflow/types/workflow.types";
+import type { StateFormField } from "@features/workflow/types/workflow.types";
 
 const getFieldIcon = (type?: string) => {
   if (!type) return <Type size={12} />;
@@ -27,6 +29,61 @@ const getFieldIcon = (type?: string) => {
 
 const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
   const [expanded, setExpanded] = useState(false);
+
+  const renderFieldStatus = (field: StateFormField) => {
+    const config = field.stateConfig;
+    if (!config) return null;
+
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: "4px",
+          marginTop: "2px",
+          alignItems: "center",
+        }}
+      >
+        {config.editable ? (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "2px",
+              color: "#10b981",
+              fontSize: "10px",
+            }}
+          >
+            <Edit size={10} />
+            Editable
+          </span>
+        ) : (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "2px",
+              color: "#6b7280",
+              fontSize: "10px",
+            }}
+          >
+            <EyeOff size={10} />
+            Read-only
+          </span>
+        )}
+        {config.required && (
+          <span
+            style={{
+              color: "#ef4444",
+              fontSize: "10px",
+              fontWeight: "bold",
+            }}
+          >
+            * Required
+          </span>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={`state-node ${selected ? "selected" : ""}`}>
@@ -47,13 +104,14 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
 
           {expanded && data.fields && (
             <div className="state-node-fields">
-              {data.fields.map((field: Field) => (
+              {data.fields.map((field: StateFormField) => (
                 <div key={field.ID || field.Name} className="state-node-field">
                   {getFieldIcon(field.Type)}
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <div className="state-node-field-name">
                       {field.Name || field.ID}
                     </div>
+                    {renderFieldStatus(field)}
                     {field.FieldActions && field.FieldActions.length > 0 && (
                       <div className="state-node-field-actions">
                         Actions:{" "}
@@ -69,7 +127,16 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
           )}
         </div>
       ) : (
-        <div className="state-node-noform">No form configured</div>
+        <div
+          style={{
+            fontSize: "12px",
+            color: "#6b7280",
+            textAlign: "center",
+            padding: "8px",
+          }}
+        >
+          No fields configured
+        </div>
       )}
 
       <Handle

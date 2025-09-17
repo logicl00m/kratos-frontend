@@ -1,6 +1,13 @@
 // src/features/workflow/utils/graphParser.ts
 import type { Node, Edge } from "reactflow";
-import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
+import type { WorkflowConfig, StateFormField } from "@features/workflow/types/workflow.types";
+
+// Default workflow used by the app and tests
+import sampleWorkflow from "../../../../data/sample-loan-workflow-v2.json";
+
+export function getDefaultWorkflow(): WorkflowConfig {
+  return sampleWorkflow as unknown as WorkflowConfig;
+}
 
 export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   nodes: Node[];
@@ -14,12 +21,16 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   }
 
   const states = workflow.Workflow.States;
+  const globalForm = workflow.Workflow.Form;
   const stateKeys = Object.keys(states);
 
   // Create nodes
   stateKeys.forEach((stateKey, index) => {
     const state = states[stateKey];
-    const hasForm = Boolean(state?.Form?.Fields?.length);
+    
+    // Get fields visible for this state
+    const stateFields = getStateFields(globalForm, state);
+    const hasForm = stateFields.length > 0;
 
     nodes.push({
       id: stateKey,
@@ -31,12 +42,12 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
       data: {
         label: stateKey,
         hasForm,
-        fields: state?.Form?.Fields || [],
+        fields: stateFields,
       },
     });
   });
 
-  // Create edges ONLY from Actions defined in each State
+  // Create edges from Actions defined in each State
   stateKeys.forEach((stateKey) => {
     const state = states[stateKey];
     if (state?.Actions && typeof state.Actions === "object") {
@@ -66,54 +77,25 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   return { nodes, edges };
 }
 
-export function getDefaultWorkflow(): WorkflowConfig {
-  return {
-    Workflow: {
-      States: {
-        Start: {
-          Form: {
-            Fields: [
-              {
-                ID: "name",
-                Name: "Applicant Name",
-                Type: "text",
-                DataSource: "{{ data.applicant.name }}",
-                FieldActions: [{ Operation: "validate" }],
-              },
-            ],
-          },
-          Actions: {
-            Submit: {
-              NextState: "Review",
-              Operation: "Save and notify reviewer",
-            },
-          },
-        },
-        Review: {
-          Form: {
-            Fields: [
-              {
-                ID: "decision",
-                Name: "Decision",
-                Type: "select",
-                DataSource: "{{ data.review.decision }}",
-                FieldActions: [{ Operation: "validate" }],
-              },
-            ],
-          },
-          Actions: {
-            Approve: {
-              NextState: "Complete",
-              Operation: "Approve application",
-            },
-            Reject: {
-              NextState: "Start",
-              Operation: "Return to applicant",
-            },
-          },
-        },
-        Complete: {},
-      },
-    },
-  };
+export function getStateFields(
+  globalForm: WorkflowConfig["Workflow"]["Form"], 
+  state: WorkflowConfig["Workflow"]["States"][string]
+): StateFormField[] {
+  if (!globalForm?.Fields) return [];
+  
+  if (!state.Fields) return [];
+  
+  return globalForm.Fields
+    .filter(field => {
+      const fieldConfig = state.Fields?.[field.ID];
+      return fieldConfig && fieldConfig.visible !== false;
+    })
+    .map(field => {
+      const fieldConfig = state.Fields?.[field.ID];
+      return {
+        ...field,
+        stateConfig: fieldConfig,
+        FieldActions: fieldConfig?.overrideActions || field.FieldActions,
+      } as StateFormField;
+    });
 }

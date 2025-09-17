@@ -1,8 +1,16 @@
 // src/features/workflow/components/DetailPanel.tsx
 import React from "react";
-import { X, ArrowRight, FileText, Settings, Eye } from "lucide-react";
+import {
+  X,
+  ArrowRight,
+  FileText,
+  Settings,
+  Eye,
+  Edit,
+  EyeOff,
+} from "lucide-react";
 import type { Node, Edge } from "reactflow";
-import type { Field } from "@features/workflow/types/workflow.types";
+import type { StateFormField } from "@features/workflow/types/workflow.types";
 import "./DetailPanel.css";
 
 interface DetailPanelProps {
@@ -12,10 +20,7 @@ interface DetailPanelProps {
   onViewForm?: (nodeId: string) => void;
 }
 
-const getFieldActions = (f: Field): string[] => {
-  if (Array.isArray(f.Actions)) {
-    return f.Actions;
-  }
+const getFieldActions = (f: StateFormField): string[] => {
   if (Array.isArray(f.FieldActions)) {
     return f.FieldActions.map((a) => a.Operation).filter(Boolean);
   }
@@ -23,10 +28,14 @@ const getFieldActions = (f: Field): string[] => {
 };
 
 const splitOperations = (op?: string): string[] => {
-  return typeof op === "string" ? op.split(",") : [];
+  return typeof op === "string" ? op.split(";").map((s) => s.trim()) : [];
 };
 
-type NodeData = { hasForm?: boolean; label?: string; fields?: Field[] };
+type NodeData = {
+  hasForm?: boolean;
+  label?: string;
+  fields?: StateFormField[];
+};
 type EdgeData = { operation?: string };
 
 const DetailPanel: React.FC<DetailPanelProps> = ({
@@ -39,7 +48,9 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
 
   const nodeData: NodeData = (selectedNode?.data as NodeData) ?? {};
   const edgeData: EdgeData = (selectedEdge?.data as EdgeData) ?? {};
-  const fields: Field[] = Array.isArray(nodeData.fields) ? nodeData.fields : [];
+  const fields: StateFormField[] = Array.isArray(nodeData.fields)
+    ? nodeData.fields
+    : [];
 
   const safeString = (v: unknown): string => {
     if (v == null) return "";
@@ -76,22 +87,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                 onClick={() =>
                   onViewForm ? onViewForm(selectedNode.id) : undefined
                 }
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  marginBottom: "16px",
-                  background: "#4f46e5",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
+                className="dp-form-view-btn"
               >
                 <Eye size={16} />
                 Form View
@@ -99,15 +95,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
             ) : null}
 
             <div style={{ marginBottom: "16px" }}>
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "#6b7280",
-                  marginBottom: "4px",
-                }}
-              >
-                State Name
-              </div>
+              <div className="dp-section-label">State Name</div>
               <div style={{ fontSize: "14px", fontWeight: 500 }}>
                 {safeString(nodeData.label)}
               </div>
@@ -133,41 +121,52 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   {fields.map((f, idx) => {
                     const actions = getFieldActions(f);
                     const key = f.ID || f.Name || `field-${idx}`;
+                    const config = f.stateConfig;
 
                     return (
-                      <div
-                        key={key}
-                        style={{
-                          padding: "8px",
-                          background: "#f9fafb",
-                          borderRadius: "6px",
-                          marginBottom: "8px",
-                          border: "1px solid #e5e7eb",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "13px",
-                            fontWeight: 500,
-                            marginBottom: "4px",
-                          }}
-                        >
+                      <div key={key} className="dp-field-card">
+                        <div className="dp-field-name">
                           {safeString(f.Name || f.ID)}
+                          {config?.required && (
+                            <span
+                              style={{
+                                color: "#ef4444",
+                                fontSize: "11px",
+                                marginLeft: "4px",
+                              }}
+                            >
+                              *
+                            </span>
+                          )}
                         </div>
-                        <div style={{ fontSize: "11px", color: "#6b7280" }}>
-                          <div>ID: {safeString(f.ID)}</div>
+                        <div className="dp-field-meta">
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              marginBottom: "2px",
+                            }}
+                          >
+                            {config?.editable ? (
+                              <>
+                                <Edit size={10} color="#10b981" />
+                                <span style={{ color: "#10b981" }}>
+                                  Editable
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <EyeOff size={10} color="#6b7280" />
+                                <span>Read-only</span>
+                              </>
+                            )}
+                          </div>
                           <div>Type: {safeString(f.Type)}</div>
                           {f.DataSource ? (
                             <div>
                               Source:{" "}
-                              <code
-                                style={{
-                                  background: "#e5e7eb",
-                                  padding: "1px 4px",
-                                  borderRadius: "3px",
-                                  fontSize: "10px",
-                                }}
-                              >
+                              <code className="dp-code">
                                 {safeString(f.DataSource)}
                               </code>
                             </div>
@@ -182,17 +181,8 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                 </div>
               </div>
             ) : (
-              <div
-                style={{
-                  padding: "12px",
-                  background: "#f9fafb",
-                  borderRadius: "6px",
-                  fontSize: "13px",
-                  color: "#6b7280",
-                  textAlign: "center",
-                }}
-              >
-                No form configured for this state
+              <div className="dp-noform">
+                No fields configured for this state
               </div>
             )}
           </section>
@@ -201,15 +191,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
         {selectedEdge ? (
           <section aria-label="Action details">
             <div style={{ marginBottom: "16px" }}>
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "#6b7280",
-                  marginBottom: "4px",
-                }}
-              >
-                Action Name
-              </div>
+              <div className="dp-section-label">Action Name</div>
               <div style={{ fontSize: "14px", fontWeight: 500 }}>
                 {(typeof selectedEdge.label === "string" &&
                   selectedEdge.label) ||
@@ -218,15 +200,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
             </div>
 
             <div style={{ marginBottom: "16px" }}>
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "#6b7280",
-                  marginBottom: "4px",
-                }}
-              >
-                Flow
-              </div>
+              <div className="dp-section-label">Flow</div>
               <div
                 style={{
                   display: "flex",
@@ -235,31 +209,17 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   fontSize: "13px",
                 }}
               >
-                <span
-                  style={{
-                    padding: "4px 8px",
-                    background: "#dbeafe",
-                    borderRadius: "4px",
-                    fontWeight: 500,
-                  }}
-                >
+                <span className="dp-flow-badge source">
                   {selectedEdge.source}
                 </span>
                 <ArrowRight size={16} color="#6b7280" />
-                <span
-                  style={{
-                    padding: "4px 8px",
-                    background: "#dcfce7",
-                    borderRadius: "4px",
-                    fontWeight: 500,
-                  }}
-                >
+                <span className="dp-flow-badge target">
                   {selectedEdge.target}
                 </span>
               </div>
             </div>
 
-            {(edgeData as EdgeData).operation ? (
+            {edgeData.operation ? (
               <div style={{ marginBottom: "16px" }}>
                 <div
                   style={{
@@ -275,29 +235,19 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   <span>Operations</span>
                 </div>
 
-                <div
-                  style={{
-                    padding: "8px",
-                    background: "#f9fafb",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    border: "1px solid #e5e7eb",
-                  }}
-                >
-                  {splitOperations((edgeData as EdgeData).operation).map(
-                    (op, idx, arr) => (
-                      <div
-                        key={`${op}-${idx}`}
-                        style={{
-                          padding: "4px 0",
-                          borderBottom:
-                            idx < arr.length - 1 ? "1px solid #e5e7eb" : "none",
-                        }}
-                      >
-                        • {op.trim()}
-                      </div>
-                    )
-                  )}
+                <div className="dp-ops-list">
+                  {splitOperations(edgeData.operation).map((op, idx, arr) => (
+                    <div
+                      key={`${op}-${idx}`}
+                      className="dp-op-item"
+                      style={{
+                        borderBottom:
+                          idx < arr.length - 1 ? "1px solid #e5e7eb" : "none",
+                      }}
+                    >
+                      • {op}
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : null}
