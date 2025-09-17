@@ -1,0 +1,179 @@
+{
+    "Workflow": {
+        "Form": {
+            "Fields": [
+                {
+                    "ID": "applicant_legal_name",
+                    "Name": "Applicant Legal Name",
+                    "Type": "text",
+                    "DataSource": "{{ data.borrower.legalName }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "save"
+                        },
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "requested_amount",
+                    "Name": "Requested Amount",
+                    "Type": "number",
+                    "DataSource": "{{ data.facility.requestedAmount }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "save"
+                        },
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "proposal_details",
+                    "Name": "Proposal Details",
+                    "Type": "textarea",
+                    "DataSource": "{{ data.proposal.details }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "save"
+                        },
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "supporting_documents",
+                    "Name": "Supporting Documents",
+                    "Type": "file",
+                    "DataSource": "{{ data.documents }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "upload"
+                        },
+                        {
+                            "Operation": "replace"
+                        },
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "rm_decision",
+                    "Name": "RM Decision",
+                    "Type": "select",
+                    "DataSource": "{{ data.rm.decision }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "final_memo",
+                    "Name": "Credit Memo",
+                    "Type": "file",
+                    "DataSource": "{{ data.outputs.creditMemo }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "download"
+                        }
+                    ]
+                }
+            ]
+        },
+        "States": {
+            "ARMDraft": {
+                "Fields": {
+                    "applicant_legal_name": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "requested_amount": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "proposal_details": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "supporting_documents": {
+                        "status": "actionable",
+                        "required": true
+                    },
+                    "rm_decision": {
+                        "status": "hidden"
+                    },
+                    "final_memo": {
+                        "status": "hidden"
+                    }
+                },
+                "Actions": {
+                    "SubmitToRM": {
+                        "NextState": "RMReview",
+                        "Operation": "Validate draft; save; notify RM"
+                    }
+                }
+            },
+            "RMReview": {
+                "Fields": {
+                    "applicant_legal_name": {
+                        "status": "readonly"
+                    },
+                    "requested_amount": {
+                        "status": "readonly"
+                    },
+                    "proposal_details": {
+                        "status": "readonly"
+                    },
+                    "supporting_documents": {
+                        "status": "actionable"
+                    },
+                    "rm_decision": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "final_memo": {
+                        "status": "hidden"
+                    }
+                },
+                "Actions": {
+                    "RMReject": {
+                        "NextState": "ARMDraft",
+                        "Operation": "Return to ARM with fields to correct"
+                    },
+                    "RMFinalize": {
+                        "NextState": "Completed",
+                        "Operation": "Finalize proposal"
+                    }
+                }
+            },
+            "Completed": {
+                "Fields": {
+                    "applicant_legal_name": {
+                        "status": "readonly"
+                    },
+                    "requested_amount": {
+                        "status": "readonly"
+                    },
+                    "proposal_details": {
+                        "status": "readonly"
+                    },
+                    "supporting_documents": {
+                        "status": "readonly"
+                    },
+                    "rm_decision": {
+                        "status": "readonly"
+                    },
+                    "final_memo": {
+                        "status": "actionable"
+                    }
+                },
+                "Actions": {}
+            }
+        }
+    }
+}

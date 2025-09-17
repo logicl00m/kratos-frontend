@@ -132,10 +132,11 @@ function App() {
 
       <div className="app-body">
         {viewMode === "form" ? (
-          <div style={{ width: "100%" }}>
+          <div className="form-panel">
             <FormViewer
               stateName={currentState}
-              state={workflow.Workflow?.States?.[currentState]}
+              workflow={workflow.Workflow}
+              currentState={currentState}
               onSubmit={(data) => console.log("Submit:", data)}
               onReject={(data) => console.log("Reject:", data)}
               onBack={handleBackToGraph}
