@@ -102,3 +102,44 @@ export function getStateFields(
     })
     .filter(field => field !== null) as StateFormField[];
 }
+
+// Provide a small default workflow used by the app and tests.
+export function getDefaultWorkflow(): WorkflowConfig {
+  return {
+    Workflow: {
+      Form: {
+        Fields: [
+          { ID: "proposal_details", Name: "Proposal Details", Type: "textarea", DataSource: "{{ data.proposal.details }}" },
+          { ID: "supporting_documents", Name: "Supporting Documents", Type: "file", DataSource: "{{ data.documents }}" },
+          { ID: "rm_decision", Name: "RM Decision", Type: "select", DataSource: "{{ data.rm.decision }}" },
+        ],
+      },
+      States: {
+        ARMDraft: {
+          Fields: {
+            rm_decision: { status: "hidden" },
+            rm_remarks: { status: "hidden" },
+          },
+          Actions: {
+            SubmitToRM: { NextState: "RMReview", Operation: "Submit" },
+          },
+        },
+        RMReview: {
+          Fields: {
+            proposal_details: { status: "readonly" },
+          },
+          Actions: {
+            RMReject: { NextState: "ARMDraft", Operation: "Reject" },
+            RMFinalize: { NextState: "BusinessReview", Operation: "Finalize" },
+          },
+        },
+        BusinessReview: {
+          Fields: {},
+          Actions: {
+            THApprove: { NextState: "Completed", Operation: "Approve" },
+          },
+        },
+      },
+    },
+  };
+}

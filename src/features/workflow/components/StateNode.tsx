@@ -142,7 +142,7 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
             padding: "8px",
           }}
         >
-          No fields visible
+          No form configured
         </div>
       )}
 
