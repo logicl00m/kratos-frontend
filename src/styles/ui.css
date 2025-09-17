@@ -1,0 +1,61 @@
+/* Badges (pill) */
+.badges { 
+  display: flex; 
+  gap: 6px; 
+  margin-top: 6px; 
+}
+
+.badge {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 6px;
+  padding: 2px 8px; 
+  font-size: 11px; 
+  border-radius: 999px; 
+  border: 1px solid;
+}
+
+.badge.override { 
+  background: #ffecec; 
+  color: #a10009; 
+  border-color: #ffb3b8; 
+}
+
+.badge.sla      { 
+  background: #fff7e6; 
+  color: #8a5300; 
+  border-color: #ffd591; 
+}
+
+.badge.editable { 
+  background: #eef7ff; 
+  color: #134b9a; 
+  border-color: #cfe1ff; 
+}
+
+/* Toolbar (top-right cluster) */
+.toolbar {
+  display: flex; 
+  gap: 8px; 
+  align-items: center; 
+  margin-left: auto;
+}
+
+.segment {
+  display: inline-flex; 
+  border: 1px solid var(--stroke); 
+  border-radius: 10px; 
+  overflow: hidden;
+}
+
+.segment button {
+  background: #fff; 
+  border: 0; 
+  padding: 8px 10px; 
+  color: var(--text); 
+  cursor: pointer;
+}
+
+.segment button.active { 
+  background: #eef2ff; 
+}

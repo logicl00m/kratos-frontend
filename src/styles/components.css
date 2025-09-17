@@ -1,0 +1,75 @@
+/* Topbar styles */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  /* translucent topbar over hero */
+  background: rgba(6,38,71,0.18);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+}
+
+.topbar input, .topbar button, .topbar label {
+  font-size: 14px;
+}
+
+.textfield {
+  background: #0e1116; 
+  border: 1px solid #252a33; 
+  color: var(--text);
+  padding: 8px 10px; 
+  border-radius: 10px; 
+  outline: none; 
+  width: 280px;
+}
+
+.btn {
+  background: #1a1e25; 
+  border: 1px solid #2a2f39; 
+  color: var(--text);
+  padding: 8px 12px; 
+  border-radius: 10px; 
+  cursor: pointer;
+}
+
+.btn:hover { 
+  border-color: #3a4250; 
+}
+
+.switch {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px; 
+  cursor: pointer;
+}
+
+/* Light theme adjustments for topbar */
+body.light .topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--stroke);
+}
+
+body.light .btn {
+  background: #fff;
+  border: 1px solid var(--stroke);
+  color: var(--text);
+  border-radius: 999px;
+}
+
+body.light .topbar .btn,
+body.light .topbar .toolbar .btn,
+body.light .topbar .segment button,
+body.light .topbar button.segment,
+body.light .topbar .segment button:not(.active) {
+  /* Make pill buttons black on white for high contrast */
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: var(--stroke) !important;
+}
+
+body.light .textfield { 
+  background: #fff; 
+  border: 1px solid var(--stroke); 
+  color: var(--text); 
+}

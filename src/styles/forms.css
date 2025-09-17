@@ -1,0 +1,281 @@
+/* Form */
+.form-page { 
+  padding: 16px; 
+}
+
+.form-header { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  margin-bottom: 6px; 
+}
+
+.icon-btn { 
+  background: #fff; 
+  border: 1px solid #e6ebf2; 
+  border-radius: 8px; 
+  padding: 6px 10px; 
+  cursor: pointer; 
+}
+
+.form { 
+  max-width: 720px; 
+  display: grid; 
+  gap: 10px; 
+  position: relative; 
+  padding-bottom: 64px; 
+}
+
+.form-field { 
+  display: grid; 
+  gap: 6px; 
+}
+
+.form-field input, 
+.form-field select, 
+.form-field textarea { 
+  background: #fff; 
+  border: 1px solid #e6ebf2; 
+  border-radius: 10px; 
+  padding: 10px; 
+}
+
+.form-field input[aria-invalid="true"],
+.form-field select[aria-invalid="true"],
+.form-field textarea[aria-invalid="true"] { 
+  border-color: #ef4444; 
+}
+
+.error { 
+  color: #b91c1c; 
+}
+
+/* sticky bottom bar */
+.sticky-bar { 
+  position: sticky; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  background: rgba(255,255,255,.9); 
+  backdrop-filter: blur(6px); 
+  border: 1px solid #e6ebf2; 
+  border-radius: 12px; 
+  padding: 8px; 
+  display: flex; 
+  gap: 8px; 
+}
+
+/* Sheet & modal */
+.sheet, 
+.modal { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(15, 23, 42, 0.4); 
+  display: grid; 
+  place-items: end center; 
+}
+
+.sheet-card { 
+  width: 520px; 
+  background: #fff; 
+  border-radius: 16px 16px 0 0; 
+  border: 1px solid #e6ebf2; 
+  padding: 16px; 
+}
+
+.sheet-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 8px; 
+  margin-top: 10px; 
+}
+
+.modal { 
+  place-items: center; 
+}
+
+.modal-card { 
+  width: 520px; 
+  background: #fff; 
+  border-radius: 16px; 
+  border: 1px solid #e6ebf2; 
+  padding: 16px; 
+}
+
+.modal-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 8px; 
+  margin-top: 10px; 
+}
+
+/* Toast */
+.toast { 
+  position: fixed; 
+  left: 50%; 
+  bottom: 16px; 
+  transform: translateX(-50%); 
+  pointer-events: none; 
+}
+
+.toast-card { 
+  background: #0f172a; 
+  color: #fff; 
+  border-radius: 10px; 
+  padding: 10px 14px; 
+  box-shadow: 0 8px 24px rgba(2,6,23,.24); 
+}
+
+/* Maker layout */
+.maker-shell { 
+  display: grid; 
+  grid-template-columns: 260px 1fr 320px; 
+  height: 100vh; 
+}
+
+.palette { 
+  background: #fff; 
+  border-right: 1px solid #e6ebf2; 
+  padding: 12px; 
+  overflow: auto; 
+}
+
+.palette-title { 
+  font-weight: 800; 
+  margin-bottom: 8px; 
+}
+
+.palette-subhead { 
+  margin-top: 14px; 
+  font-weight: 700; 
+  color: #334155; 
+}
+
+.palette .row { 
+  display: flex; 
+  gap: 8px; 
+  margin-top: 6px; 
+}
+
+.palette .btn, 
+.maker-props .btn { 
+  background: #fff; 
+  border: 1px solid #e6ebf2; 
+  border-radius: 10px; 
+  padding: 6px 10px; 
+  cursor: pointer; 
+}
+
+.palette .switch, 
+.palette .radio { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  margin-top: 6px; 
+}
+
+.palette-item { 
+  width: 100%; 
+  text-align: left; 
+  border: 1px dashed #cbd5e1; 
+  border-radius: 10px; 
+  padding: 8px; 
+  background: #f8fafc; 
+  cursor: grab; 
+}
+
+.palette .warnings { 
+  margin: 8px 0 0; 
+  padding-left: 18px; 
+  color: #9a3412; 
+}
+
+/* Canvas */
+.maker-canvas { 
+  position: relative; 
+  background: #f7f9fc; 
+}
+
+.lane { 
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  height: 50%; 
+  border-top: 1px dashed #e2e8f0; 
+  border-bottom: 1px dashed #e2e8f0; 
+  display: flex; 
+  align-items: flex-start; 
+}
+
+.lane span { 
+  font-size: 12px; 
+  color: #64748b; 
+  margin: 6px 10px; 
+}
+
+.lane-business { 
+  top: 0; 
+  background: rgba(238, 244, 255, .4); 
+}
+
+.lane-crm { 
+  bottom: 0; 
+  background: rgba(234, 248, 241, .35); 
+}
+
+/* Properties */
+.maker-props { 
+  background: #fff; 
+  border-left: 1px solid #e6ebf2; 
+  padding: 12px; 
+  overflow: auto; 
+}
+
+.props-title { 
+  font-weight: 800; 
+  margin-bottom: 8px; 
+}
+
+.props-subtitle { 
+  font-weight: 700; 
+  margin: 10px 0 6px; 
+}
+
+.form-row { 
+  display: grid; 
+  grid-template-columns: 96px 1fr; 
+  align-items: center; 
+  gap: 8px; 
+  margin: 8px 0; 
+}
+
+.form-row input, 
+.form-row select { 
+  border: 1px solid #e6ebf2; 
+  border-radius: 10px; 
+  padding: 6px 8px; 
+}
+
+.muted { 
+  color: #6b7280; 
+}
+
+/* maker canvas layers */
+.maker-canvas { 
+  position: relative; 
+}
+
+.maker-canvas .lane {
+  position: absolute;
+  left: 0; 
+  right: 0;
+  height: 50%;
+  pointer-events: none;   /* << allow clicks to pass to React Flow */
+  z-index: 0;             /* behind the canvas */
+}
+
+/* ensure RF pane sits above the decorative lanes */
+.maker-canvas .rf-area { 
+  position: relative; 
+  z-index: 1; 
+}
