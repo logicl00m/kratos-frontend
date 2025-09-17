@@ -32,7 +32,7 @@ A dynamic workflow management system for loan applications that:
 src/
 ├── app/
 │   ├── App.tsx - Main application orchestrator managing view modes
-│   └── App.css - Global application styles
+│   └── styles/ - Directory containing organized CSS files
 ├── assets/ - Static assets (images, icons)
 ├── features/
 │   ├── application-details/

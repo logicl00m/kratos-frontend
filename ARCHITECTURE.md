@@ -9,7 +9,7 @@ Root
 - `src/`
   - `app/`
     - `App.tsx` – Main application orchestrator
-    - `App.css` – App-level styles
+    - `styles/` – Directory containing organized CSS files
   - `assets/` – Static assets (images, svgs)
   - `components/` (removed)
   - `features/` – Feature-based code

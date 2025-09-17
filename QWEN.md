@@ -93,59 +93,14 @@ interface Workflow {
 kratos-frontend/
 ├── src/
 │   ├── app/
-│   │   ├── App.tsx
-│   │   └── App.css
 │   ├── assets/
+│   ├── components/
 │   ├── features/
-│   │   ├── application-details/
-│   │   │   ├── components/
-│   │   │   │   ├── ApplicationDetails.tsx
-│   │   │   │   ├── ApplicationHeader.tsx
-│   │   │   │   ├── WorkflowProgress.tsx
-│   │   │   │   ├── ContactInfo.tsx
-│   │   │   │   ├── FinancialDetails.tsx
-│   │   │   │   ├── RiskSnapshot.tsx
-│   │   │   │   ├── DocumentsSection.tsx
-│   │   │   │   └── AuditTrail.tsx
-│   │   │   └── types/
-│   │   │       └── dashboard.types.ts
-│   │   ├── dashboard/
-│   │   │   ├── components/
-│   │   │   │   ├── Dashboard.tsx
-│   │   │   │   ├── DashboardHeader.tsx
-│   │   │   │   ├── ApplicationTable.tsx
-│   │   │   │   ├── ApplicationRow.tsx
-│   │   │   │   └── ResultsCount.tsx
-│   │   │   └── types/
-│   │   │       └── dashboard.types.ts
-│   │   ├── form/
-│   │   │   └── components/
-│   │   │       ├── FormViewer.tsx
-│   │   │       └── FieldInput.tsx
-│   │   └── workflow/
-│   │       ├── components/
-│   │       │   ├── WorkflowGraph.tsx
-│   │       │   ├── GraphToolbar.tsx
-│   │       │   ├── DetailPanel.tsx
-│   │       │   ├── StateNode.tsx
-│   │       │   └── JsonEditor.tsx
-│   │       ├── types/
-│   │       │   └── workflow.types.ts
-│   │       └── utils/
-│   │           ├── graphParser.ts
-│   │           └── graphExport.ts
+│   ├── lib/
 │   ├── pages/
-│   │   └── NotFoundPage.tsx
 │   ├── shared/
-│   │   ├── components/
-│   │   │   └── layout/
-│   │   │       └── TopBar.tsx
-│   │   └── utils/
-│   │       ├── colors.ts
-│   │       └── download.ts
-│   └── ...
+│   └── styles/
 ├── data/
-│   └── sample-loan-workflow.json
 └── ...
 ```
 
