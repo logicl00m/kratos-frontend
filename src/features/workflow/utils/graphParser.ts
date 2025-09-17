@@ -1,13 +1,6 @@
 // src/features/workflow/utils/graphParser.ts
 import type { Node, Edge } from "reactflow";
-import type { WorkflowConfig, StateFormField } from "@features/workflow/types/workflow.types";
-
-// Default workflow used by the app and tests
-import sampleWorkflow from "../../../../data/sample-loan-workflow-v2.json";
-
-export function getDefaultWorkflow(): WorkflowConfig {
-  return sampleWorkflow as unknown as WorkflowConfig;
-}
+import type { WorkflowConfig, StateFormField, StateFieldConfig } from "@features/workflow/types/workflow.types";
 
 export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   nodes: Node[];
@@ -28,7 +21,7 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   stateKeys.forEach((stateKey, index) => {
     const state = states[stateKey];
     
-    // Get fields visible for this state
+    // Get all fields for this state (except hidden ones)
     const stateFields = getStateFields(globalForm, state);
     const hasForm = stateFields.length > 0;
 
@@ -47,7 +40,7 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
     });
   });
 
-  // Create edges from Actions defined in each State
+  // Create edges from Actions
   stateKeys.forEach((stateKey) => {
     const state = states[stateKey];
     if (state?.Actions && typeof state.Actions === "object") {
@@ -83,19 +76,29 @@ export function getStateFields(
 ): StateFormField[] {
   if (!globalForm?.Fields) return [];
   
-  if (!state.Fields) return [];
-  
+  // ALL fields are visible by default unless explicitly hidden
   return globalForm.Fields
-    .filter(field => {
-      const fieldConfig = state.Fields?.[field.ID];
-      return fieldConfig && fieldConfig.visible !== false;
-    })
     .map(field => {
-      const fieldConfig = state.Fields?.[field.ID];
+      const fieldConfig: StateFieldConfig = state.Fields?.[field.ID] || {};
+      
+      // Default status is "editable" if not specified
+      const status = fieldConfig.status || "editable";
+      
+      // Skip hidden fields
+      if (status === "hidden") return null;
+      
       return {
         ...field,
-        stateConfig: fieldConfig,
-        FieldActions: fieldConfig?.overrideActions || field.FieldActions,
+        stateConfig: {
+          ...fieldConfig,
+          status,
+          // For backward compatibility
+          editable: status === "editable",
+          visible: status !== "hidden",
+        },
+        // Override field actions if specified
+        FieldActions: fieldConfig.overrideActions || field.FieldActions,
       } as StateFormField;
-    });
+    })
+    .filter(field => field !== null) as StateFormField[];
 }

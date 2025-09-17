@@ -13,10 +13,8 @@ export interface Field {
 }
 
 export interface StateFieldConfig {
-  visible?: boolean;
-  editable?: boolean;
+  status?: "hidden" | "readonly" | "editable";  // Default is "editable"
   required?: boolean;
-  validations?: string[];
   overrideActions?: FieldAction[];
 }
 
@@ -26,7 +24,7 @@ export interface StateAction {
 }
 
 export interface State {
-  Fields?: Record<string, StateFieldConfig>;
+  Fields?: Record<string, StateFieldConfig>;  // Only specify overrides
   Actions?: Record<string, StateAction>;
 }
 

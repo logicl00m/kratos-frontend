@@ -1,14 +1,6 @@
 // src/features/workflow/components/DetailPanel.tsx
 import React from "react";
-import {
-  X,
-  ArrowRight,
-  FileText,
-  Settings,
-  Eye,
-  Edit,
-  EyeOff,
-} from "lucide-react";
+import { X, ArrowRight, FileText, Settings, Eye, Edit } from "lucide-react";
 import type { Node, Edge } from "reactflow";
 import type { StateFormField } from "@features/workflow/types/workflow.types";
 import "./DetailPanel.css";
@@ -64,6 +56,36 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
     return "";
   };
 
+  const getStatusIcon = (status?: string) => {
+    switch (status) {
+      case "readonly":
+        return <Eye size={10} color="#6b7280" />;
+      case "editable":
+      default:
+        return <Edit size={10} color="#10b981" />;
+    }
+  };
+
+  const getStatusLabel = (status?: string) => {
+    switch (status) {
+      case "readonly":
+        return "Read-only";
+      case "editable":
+      default:
+        return "Editable";
+    }
+  };
+
+  const getStatusColor = (status?: string) => {
+    switch (status) {
+      case "readonly":
+        return "#6b7280";
+      case "editable":
+      default:
+        return "#10b981";
+    }
+  };
+
   return (
     <div className="detail-panel">
       <div className="detail-panel-header">
@@ -114,25 +136,26 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   }}
                 >
                   <FileText size={12} />
-                  <span>Form Fields ({fields.length})</span>
+                  <span>Visible Fields ({fields.length})</span>
                 </div>
 
                 <div style={{ display: "block" }}>
                   {fields.map((f, idx) => {
                     const actions = getFieldActions(f);
                     const key = f.ID || f.Name || `field-${idx}`;
-                    const config = f.stateConfig;
+                    const status = f.stateConfig?.status || "editable";
 
                     return (
                       <div key={key} className="dp-field-card">
                         <div className="dp-field-name">
                           {safeString(f.Name || f.ID)}
-                          {config?.required && (
+                          {f.stateConfig?.required && (
                             <span
                               style={{
                                 color: "#ef4444",
                                 fontSize: "11px",
                                 marginLeft: "4px",
+                                fontWeight: "bold",
                               }}
                             >
                               *
@@ -148,19 +171,10 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                               marginBottom: "2px",
                             }}
                           >
-                            {config?.editable ? (
-                              <>
-                                <Edit size={10} color="#10b981" />
-                                <span style={{ color: "#10b981" }}>
-                                  Editable
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <EyeOff size={10} color="#6b7280" />
-                                <span>Read-only</span>
-                              </>
-                            )}
+                            {getStatusIcon(status)}
+                            <span style={{ color: getStatusColor(status) }}>
+                              {getStatusLabel(status)}
+                            </span>
                           </div>
                           <div>Type: {safeString(f.Type)}</div>
                           {f.DataSource ? (
@@ -181,9 +195,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="dp-noform">
-                No fields configured for this state
-              </div>
+              <div className="dp-noform">No fields visible in this state</div>
             )}
           </section>
         ) : null}
