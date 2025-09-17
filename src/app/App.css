@@ -138,3 +138,11 @@ body {
 .btn-approve { background: #10b981; color: white; }
 .back-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; font-size: 14px; color: #374151; }
 .back-btn:hover { background: #e5e7eb; }
+
+/* Tailwind CSS utility classes */
+.bg-red-500 { background-color: #ef4444; }
+.text-white { color: #ffffff; }
+.p-4 { padding: 1rem; }
+.m-4 { margin: 1rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.hidden { display: none; }
