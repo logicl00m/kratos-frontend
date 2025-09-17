@@ -4,6 +4,7 @@ import FormViewer from "@features/form/components/FormViewer";
 import JsonEditor from "@features/workflow/components/JsonEditor";
 import Dashboard from "@features/dashboard/components/Dashboard";
 import ApplicationDetails from "@features/application-details/components/ApplicationDetails";
+import RunningWorkflowsPage from "@features/running-workflows/components/RunningWorkflowsPage";
 import {
   parseWorkflowToGraph,
   getDefaultWorkflow,
@@ -23,7 +24,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<
-    "dashboard" | "graph" | "form" | "details"
+    "dashboard" | "graph" | "form" | "details" | "running"
   >("dashboard");
   const [selectedApplication, setSelectedApplication] =
     useState<LoanApplication | null>(null);
@@ -65,6 +66,11 @@ function App() {
 
   const { nodes, edges } = parseWorkflowToGraph(workflow);
 
+  // Running Workflows view
+  if (viewMode === "running") {
+    return <RunningWorkflowsPage onBack={() => setViewMode("dashboard")} />;
+  }
+
   // Application Details view
   if (viewMode === "details" && selectedApplication) {
     return (
@@ -82,13 +88,22 @@ function App() {
         <TopBar
           title="Workflow Manager"
           right={
-            <button
-              className="toggle-button"
-              onClick={() => setViewMode("graph")}
-              style={{ background: "#10b981" }}
-            >
-              Workflow Editor
-            </button>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                className="toggle-button"
+                onClick={() => setViewMode("running")}
+                style={{ background: "#3b82f6" }}
+              >
+                Running Workflows
+              </button>
+              <button
+                className="toggle-button"
+                onClick={() => setViewMode("graph")}
+                style={{ background: "#10b981" }}
+              >
+                Workflow Editor
+              </button>
+            </div>
           }
         />
         <div style={{ flex: 1, overflow: "hidden" }}>
@@ -114,6 +129,13 @@ function App() {
             </button>
             <button
               className="toggle-button"
+              onClick={() => setViewMode("running")}
+              style={{ background: "#3b82f6", marginRight: 12 }}
+            >
+              Running Workflows
+            </button>
+            <button
+              className="toggle-button"
               onClick={() =>
                 setViewMode(viewMode === "graph" ? "form" : "graph")
               }
@@ -132,11 +154,10 @@ function App() {
 
       <div className="app-body">
         {viewMode === "form" ? (
-          <div className="form-panel">
+          <div style={{ width: "100%" }}>
             <FormViewer
               stateName={currentState}
-              workflow={workflow.Workflow}
-              currentState={currentState}
+              state={workflow.Workflow?.States?.[currentState]}
               onSubmit={(data) => console.log("Submit:", data)}
               onReject={(data) => console.log("Reject:", data)}
               onBack={handleBackToGraph}

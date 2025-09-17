@@ -1,0 +1,124 @@
+/* src/features/running-workflows/components/RunningStateNode.css */
+
+.running-state-node {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  min-width: 220px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.running-state-node.selected {
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.running-state-node.current {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.running-state-node.visited {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.running-state-node.pending {
+  border-color: #d1d5db;
+  background: #f9fafb;
+  opacity: 0.7;
+}
+
+.running-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.running-node-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.running-node-info {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.running-node-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-pulse {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.running-node-pending {
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: #f3f4f6;
+  color: #9ca3af;
+  border-radius: 6px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.handle-running {
+  background: #6b7280 !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.running-state-node.current .handle-running {
+  background: #3b82f6 !important;
+}
+
+.running-state-node.visited .handle-running {
+  background: #10b981 !important;
+}

@@ -1,0 +1,223 @@
+/* src/features/running-workflows/components/RunningWorkflowDetailPanel.css */
+
+.running-detail-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 400px;
+  background: white;
+  border-left: 1px solid #e5e7eb;
+  box-shadow: -4px 0 6px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.rdp-header {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f9fafb;
+}
+
+.rdp-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rdp-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #6b7280;
+}
+
+.rdp-close:hover {
+  color: #111827;
+}
+
+.rdp-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.rdp-section {
+  margin-bottom: 24px;
+}
+
+.rdp-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rdp-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.rdp-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rdp-label {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rdp-value {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-active {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.status-completed {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.status-badge.status-pending {
+  background: #fed7aa;
+  color: #7c2d12;
+}
+
+.status-badge.status-rejected {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.rdp-data-container {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.rdp-data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.rdp-data-item:last-child {
+  margin-bottom: 0;
+}
+
+.rdp-data-key {
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+.rdp-data-value {
+  font-size: 13px;
+  color: #111827;
+  word-break: break-word;
+}
+
+.rdp-history {
+  position: relative;
+  padding-left: 24px;
+}
+
+.rdp-history::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.rdp-history-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.rdp-history-marker {
+  position: absolute;
+  left: -20px;
+  top: 6px;
+  width: 10px;
+  height: 10px;
+  background: #6b7280;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.rdp-history-content {
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.rdp-history-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.rdp-history-state {
+  font-weight: 600;
+  font-size: 13px;
+  color: #111827;
+}
+
+.rdp-history-action {
+  padding: 2px 6px;
+  background: #4f46e5;
+  color: white;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.rdp-history-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.rdp-history-comments {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+  color: #374151;
+  font-style: italic;
+}

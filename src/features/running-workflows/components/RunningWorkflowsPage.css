@@ -1,0 +1,358 @@
+/* src/features/running-workflows/components/RunningWorkflowsPage.css */
+
+.running-workflows-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f9fafb;
+}
+
+.rwp-header {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.rwp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rwp-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rwp-back-btn {
+  padding: 6px 12px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rwp-back-btn:hover {
+  background: #4338ca;
+}
+
+.rwp-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rwp-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rwp-search svg {
+  position: absolute;
+  left: 10px;
+  color: #6b7280;
+}
+
+.rwp-search input {
+  padding: 6px 12px 6px 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  width: 200px;
+}
+
+.rwp-filter {
+  padding: 6px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+}
+
+.rwp-view-toggle {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rwp-view-toggle button {
+  padding: 6px 10px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+}
+
+.rwp-view-toggle button.active {
+  background: #4f46e5;
+  color: white;
+}
+
+.rwp-view-toggle button:first-child {
+  border-right: 1px solid #e5e7eb;
+}
+
+.rwp-refresh {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.rwp-refresh:hover {
+  background: #f9fafb;
+}
+
+.rwp-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  min-height: 0; /* allow children to shrink and not collapse canvas */
+}
+
+.rwp-sidebar {
+  width: 280px;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+}
+
+.rwp-sidebar-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.rwp-instances-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.rwp-instance-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rwp-instance-card:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.rwp-instance-card.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.rwp-instance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.rwp-instance-id {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rwp-instance-status {
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rwp-instance-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.rwp-instance-state {
+  font-weight: 500;
+}
+
+.rwp-instance-progress {
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rwp-progress-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.rwp-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  position: relative;
+  min-height: 0; /* enable child flex item to take remaining height */
+}
+
+.rwp-graph-info {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rwp-graph-info h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.rwp-graph-info span {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.rwp-graph-info strong {
+  color: #111827;
+}
+
+.rwp-list-view {
+  padding: 24px;
+  overflow: auto;
+}
+
+/* Graph canvas area below the info bar */
+.rwp-graph-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  overflow: hidden; /* keep internals tidy */
+}
+
+.rwp-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rwp-table thead {
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.rwp-table th {
+  padding: 12px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rwp-table tbody tr {
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rwp-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.rwp-table tbody tr.selected {
+  background: #eff6ff;
+}
+
+.rwp-table td {
+  padding: 12px;
+  font-size: 13px;
+  color: #111827;
+}
+
+.rwp-table-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rwp-table-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rwp-table-progress-bar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  width: 60px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rwp-table-progress-bar::after {
+  content: "";
+  position: absolute;
+  height: 100%;
+  background: inherit;
+  border-radius: 3px;
+}
+
+.rwp-table-progress span {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.rwp-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 14px;
+}
