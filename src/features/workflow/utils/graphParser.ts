@@ -76,13 +76,14 @@ export function getStateFields(
 ): StateFormField[] {
   if (!globalForm?.Fields) return [];
   
-  // ALL fields are visible by default unless explicitly hidden
+  // ALL fields are visible by default (as read-only) unless explicitly hidden
   return globalForm.Fields
     .map(field => {
       const fieldConfig: StateFieldConfig = state.Fields?.[field.ID] || {};
       
-      // Default status is "editable" if not specified
-      const status = fieldConfig.status || "editable";
+      // Default status is read-only (no status) if not specified
+      // Only "editable" or "actionable" fields have special behaviors
+      const status = fieldConfig.status;
       
       // Skip hidden fields
       if (status === "hidden") return null;
@@ -91,10 +92,7 @@ export function getStateFields(
         ...field,
         stateConfig: {
           ...fieldConfig,
-          status,
-          // For backward compatibility
-          editable: status === "editable",
-          visible: status !== "hidden",
+          status: status || "readonly", // Default to readonly if not specified
         },
         // Override field actions if specified
         FieldActions: fieldConfig.overrideActions || field.FieldActions,
@@ -112,13 +110,17 @@ export function getDefaultWorkflow(): WorkflowConfig {
           { ID: "proposal_details", Name: "Proposal Details", Type: "textarea", DataSource: "{{ data.proposal.details }}" },
           { ID: "supporting_documents", Name: "Supporting Documents", Type: "file", DataSource: "{{ data.documents }}" },
           { ID: "rm_decision", Name: "RM Decision", Type: "select", DataSource: "{{ data.rm.decision }}" },
+          { ID: "rm_remarks", Name: "RM Remarks", Type: "textarea", DataSource: "{{ data.rm.remarks }}" },
         ],
       },
       States: {
         ARMDraft: {
           Fields: {
+            proposal_details: { status: "editable", required: true },
+            supporting_documents: { status: "actionable" }, // Can perform actions but not edit
             rm_decision: { status: "hidden" },
             rm_remarks: { status: "hidden" },
+            // Any field not listed here will be displayed as read-only
           },
           Actions: {
             SubmitToRM: { NextState: "RMReview", Operation: "Submit" },
@@ -126,7 +128,10 @@ export function getDefaultWorkflow(): WorkflowConfig {
         },
         RMReview: {
           Fields: {
-            proposal_details: { status: "readonly" },
+            rm_decision: { status: "editable", required: true },
+            rm_remarks: { status: "editable" },
+            supporting_documents: { status: "actionable" }, // Can perform actions
+            // proposal_details not listed, so it's read-only
           },
           Actions: {
             RMReject: { NextState: "ARMDraft", Operation: "Reject" },
@@ -134,7 +139,7 @@ export function getDefaultWorkflow(): WorkflowConfig {
           },
         },
         BusinessReview: {
-          Fields: {},
+          // No Fields specified means all fields are read-only
           Actions: {
             THApprove: { NextState: "Completed", Operation: "Approve" },
           },

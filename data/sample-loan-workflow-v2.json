@@ -1,145 +1,191 @@
 {
-  "Workflow": {
-    "Form": {
-      "Fields": [
-        {
-          "ID": "proposal_details",
-          "Name": "Proposal Details",
-          "Type": "textarea",
-          "DataSource": "{{ data.proposal.details }}",
-          "FieldActions": [
-            { "Operation": "save" },
-            { "Operation": "validate" }
-          ]
+    "Workflow": {
+        "Form": {
+            "Fields": [
+                {
+                    "ID": "proposal_details",
+                    "Name": "Proposal Details",
+                    "Type": "textarea",
+                    "DataSource": "{{ data.proposal.details }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "save"
+                        },
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "supporting_documents",
+                    "Name": "Supporting Documents",
+                    "Type": "file",
+                    "DataSource": "{{ data.documents }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "upload"
+                        },
+                        {
+                            "Operation": "replace"
+                        },
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "rm_decision",
+                    "Name": "RM Decision",
+                    "Type": "select",
+                    "DataSource": "{{ data.rm.decision }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "rm_remarks",
+                    "Name": "RM Remarks",
+                    "Type": "textarea",
+                    "DataSource": "{{ data.rm.remarks }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "save"
+                        }
+                    ]
+                },
+                {
+                    "ID": "rm_additional_docs",
+                    "Name": "Additional Documents",
+                    "Type": "file",
+                    "DataSource": "{{ data.rm.additionalDocs }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "upload"
+                        }
+                    ]
+                },
+                {
+                    "ID": "th_decision",
+                    "Name": "Team Head/Business Lead Decision",
+                    "Type": "select",
+                    "DataSource": "{{ data.th.decision }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "validate"
+                        }
+                    ]
+                },
+                {
+                    "ID": "final_memo",
+                    "Name": "Credit Memo",
+                    "Type": "file",
+                    "DataSource": "{{ data.outputs.creditMemo }}",
+                    "FieldActions": [
+                        {
+                            "Operation": "download"
+                        }
+                    ]
+                }
+            ]
         },
-        {
-          "ID": "supporting_documents",
-          "Name": "Supporting Documents",
-          "Type": "file",
-          "DataSource": "{{ data.documents }}",
-          "FieldActions": [
-            { "Operation": "upload" },
-            { "Operation": "replace" },
-            { "Operation": "validate" }
-          ]
-        },
-        {
-          "ID": "rm_decision",
-          "Name": "RM Decision",
-          "Type": "select",
-          "DataSource": "{{ data.rm.decision }}",
-          "FieldActions": [
-            { "Operation": "validate" }
-          ]
-        },
-        {
-          "ID": "rm_remarks",
-          "Name": "RM Remarks",
-          "Type": "textarea",
-          "DataSource": "{{ data.rm.remarks }}",
-          "FieldActions": [
-            { "Operation": "save" }
-          ]
-        },
-        {
-          "ID": "rm_additional_docs",
-          "Name": "Additional Documents",
-          "Type": "file",
-          "DataSource": "{{ data.rm.additionalDocs }}",
-          "FieldActions": [
-            { "Operation": "upload" }
-          ]
-        },
-        {
-          "ID": "th_decision",
-          "Name": "Team Head/Business Lead Decision",
-          "Type": "select",
-          "DataSource": "{{ data.th.decision }}",
-          "FieldActions": [
-            { "Operation": "validate" }
-          ]
-        },
-        {
-          "ID": "final_memo",
-          "Name": "Credit Memo",
-          "Type": "file",
-          "DataSource": "{{ data.outputs.creditMemo }}",
-          "FieldActions": [
-            { "Operation": "download" }
-          ]
+        "States": {
+            "ARMDraft": {
+                "Fields": {
+                    "proposal_details": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "supporting_documents": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "rm_decision": {
+                        "status": "hidden"
+                    },
+                    "rm_remarks": {
+                        "status": "hidden"
+                    },
+                    "rm_additional_docs": {
+                        "status": "hidden"
+                    },
+                    "th_decision": {
+                        "status": "hidden"
+                    },
+                    "final_memo": {
+                        "status": "hidden"
+                    }
+                },
+                "Actions": {
+                    "SubmitToRM": {
+                        "NextState": "RMReview",
+                        "Operation": "Validate draft; save; notify RM"
+                    }
+                }
+            },
+            "RMReview": {
+                "Fields": {
+                    "rm_decision": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "rm_remarks": {
+                        "status": "editable"
+                    },
+                    "rm_additional_docs": {
+                        "status": "actionable"
+                    },
+                    "supporting_documents": {
+                        "status": "actionable"
+                    },
+                    "th_decision": {
+                        "status": "hidden"
+                    },
+                    "final_memo": {
+                        "status": "hidden"
+                    }
+                },
+                "Actions": {
+                    "RMReject": {
+                        "NextState": "ARMDraft",
+                        "Operation": "Return to ARM with fields to correct"
+                    },
+                    "RMFinalize": {
+                        "NextState": "BusinessReview",
+                        "Operation": "Finalize proposal"
+                    }
+                }
+            },
+            "BusinessReview": {
+                "Fields": {
+                    "th_decision": {
+                        "status": "editable",
+                        "required": true
+                    },
+                    "final_memo": {
+                        "status": "actionable"
+                    }
+                },
+                "Actions": {
+                    "THReject": {
+                        "NextState": "RMReview",
+                        "Operation": "Send back to RM for correction"
+                    },
+                    "THApprove": {
+                        "NextState": "Completed",
+                        "Operation": "Approve application"
+                    }
+                }
+            },
+            "Completed": {
+                "Fields": {
+                    "final_memo": {
+                        "status": "actionable"
+                    }
+                },
+                "Actions": {}
+            }
         }
-      ]
-    },
-    "States": {
-      "ARMDraft": {
-        "Fields": {
-          "rm_decision": { "status": "hidden" },
-          "rm_remarks": { "status": "hidden" },
-          "rm_additional_docs": { "status": "hidden" },
-          "th_decision": { "status": "hidden" },
-          "final_memo": { "status": "hidden" },
-          "proposal_details": { "required": true },
-          "supporting_documents": { "required": true }
-        },
-        "Actions": {
-          "SubmitToRM": {
-            "NextState": "RMReview",
-            "Operation": "Validate draft; save; notify RM"
-          }
-        }
-      },
-      "RMReview": {
-        "Fields": {
-          "proposal_details": { "status": "readonly" },
-          "supporting_documents": { "status": "readonly" },
-          "th_decision": { "status": "hidden" },
-          "final_memo": { "status": "hidden" },
-          "rm_decision": { "required": true }
-        },
-        "Actions": {
-          "RMReject": {
-            "NextState": "ARMDraft",
-            "Operation": "Return to ARM with fields to correct"
-          },
-          "RMFinalize": {
-            "NextState": "BusinessReview",
-            "Operation": "Finalize proposal"
-          }
-        }
-      },
-      "BusinessReview": {
-        "Fields": {
-          "proposal_details": { "status": "readonly" },
-          "supporting_documents": { "status": "readonly" },
-          "rm_decision": { "status": "readonly" },
-          "rm_remarks": { "status": "readonly" },
-          "rm_additional_docs": { "status": "readonly" },
-          "final_memo": { "status": "hidden" },
-          "th_decision": { "required": true }
-        },
-        "Actions": {
-          "THReject": {
-            "NextState": "RMReview",
-            "Operation": "Send back to RM for correction"
-          },
-          "THApprove": {
-            "NextState": "Completed",
-            "Operation": "Approve application"
-          }
-        }
-      },
-      "Completed": {
-        "Fields": {
-          "proposal_details": { "status": "readonly" },
-          "supporting_documents": { "status": "readonly" },
-          "rm_decision": { "status": "readonly" },
-          "rm_remarks": { "status": "readonly" },
-          "rm_additional_docs": { "status": "readonly" },
-          "th_decision": { "status": "readonly" },
-          "final_memo": { "status": "readonly" }
-        },
-        "Actions": {}
-      }
     }
-  }
 }

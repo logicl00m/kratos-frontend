@@ -12,6 +12,7 @@ import {
   Edit,
   Eye,
   Upload,
+  Zap,
 } from "lucide-react";
 import "./StateNode.css";
 import type { StateFormField } from "@features/workflow/types/workflow.types";
@@ -37,31 +38,37 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
-      case "readonly":
-        return <Eye size={10} />;
       case "editable":
-      default:
         return <Edit size={10} />;
+      case "actionable":
+        return <Zap size={10} />;
+      case "readonly":
+      default:
+        return <Eye size={10} />;
     }
   };
 
   const getStatusLabel = (status?: string) => {
     switch (status) {
-      case "readonly":
-        return "Read-only";
       case "editable":
-      default:
         return "Editable";
+      case "actionable":
+        return "Actionable";
+      case "readonly":
+      default:
+        return "Read-only";
     }
   };
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "readonly":
-        return "#6b7280";
       case "editable":
-      default:
         return "#10b981";
+      case "actionable":
+        return "#f59e0b";
+      case "readonly":
+      default:
+        return "#6b7280";
     }
   };
 
@@ -85,7 +92,7 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
           {expanded && data.fields && (
             <div className="state-node-fields">
               {data.fields.map((field: StateFormField) => {
-                const status = field.stateConfig?.status || "editable";
+                const status = field.stateConfig?.status || "readonly";
 
                 return (
                   <div

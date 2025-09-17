@@ -1,6 +1,14 @@
 // src/features/workflow/components/DetailPanel.tsx
 import React from "react";
-import { X, ArrowRight, FileText, Settings, Eye, Edit } from "lucide-react";
+import {
+  X,
+  ArrowRight,
+  FileText,
+  Settings,
+  Eye,
+  Edit,
+  Zap,
+} from "lucide-react";
 import type { Node, Edge } from "reactflow";
 import type { StateFormField } from "@features/workflow/types/workflow.types";
 import "./DetailPanel.css";
@@ -58,31 +66,49 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
-      case "readonly":
-        return <Eye size={10} color="#6b7280" />;
       case "editable":
-      default:
         return <Edit size={10} color="#10b981" />;
+      case "actionable":
+        return <Zap size={10} color="#f59e0b" />;
+      case "readonly":
+      default:
+        return <Eye size={10} color="#6b7280" />;
     }
   };
 
   const getStatusLabel = (status?: string) => {
     switch (status) {
-      case "readonly":
-        return "Read-only";
       case "editable":
-      default:
         return "Editable";
+      case "actionable":
+        return "Actionable";
+      case "readonly":
+      default:
+        return "Read-only";
     }
   };
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "readonly":
-        return "#6b7280";
       case "editable":
-      default:
         return "#10b981";
+      case "actionable":
+        return "#f59e0b";
+      case "readonly":
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const getStatusDescription = (status?: string) => {
+    switch (status) {
+      case "editable":
+        return "User can modify this field";
+      case "actionable":
+        return "Read-only with special actions";
+      case "readonly":
+      default:
+        return "View only, no modifications";
     }
   };
 
@@ -143,7 +169,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   {fields.map((f, idx) => {
                     const actions = getFieldActions(f);
                     const key = f.ID || f.Name || `field-${idx}`;
-                    const status = f.stateConfig?.status || "editable";
+                    const status = f.stateConfig?.status || "readonly";
 
                     return (
                       <div key={key} className="dp-field-card">
@@ -174,6 +200,11 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                             {getStatusIcon(status)}
                             <span style={{ color: getStatusColor(status) }}>
                               {getStatusLabel(status)}
+                            </span>
+                            <span
+                              style={{ fontSize: "10px", color: "#9ca3af" }}
+                            >
+                              - {getStatusDescription(status)}
                             </span>
                           </div>
                           <div>Type: {safeString(f.Type)}</div>

@@ -13,7 +13,14 @@ export interface Field {
 }
 
 export interface StateFieldConfig {
-  status?: "hidden" | "readonly" | "editable";  // Default is "editable"
+  /**
+   * Field status in this state:
+   * - hidden: Field not displayed
+   * - editable: User can edit the field
+   * - actionable: Field is read-only but has special actions enabled
+   * - If not specified, field is displayed as read-only
+   */
+  status?: "hidden" | "editable" | "actionable";
   required?: boolean;
   overrideActions?: FieldAction[];
 }
@@ -24,7 +31,12 @@ export interface StateAction {
 }
 
 export interface State {
-  Fields?: Record<string, StateFieldConfig>;  // Only specify overrides
+  /**
+   * Field configurations for this state.
+   * If a field is not listed here, it will be displayed as read-only by default.
+   * Only fields that need special behavior (hidden, editable, actionable) need to be specified.
+   */
+  Fields?: Record<string, StateFieldConfig>;
   Actions?: Record<string, StateAction>;
 }
 
