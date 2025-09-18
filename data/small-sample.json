@@ -1,5 +1,8 @@
 {
     "workflow": {
+        "id": "loan_workflow_v1",
+        "version": 1,
+        "initialState": "armDraft",
         "forms": {
             "coreDetails": {
                 "fields": [
@@ -7,59 +10,45 @@
                         "id": "applicantLegalName",
                         "name": "Applicant Legal Name",
                         "type": "text",
+                        "status": "default",
                         "data": "{{ data.borrower.legalName }}",
                         "fieldActions": [
-                            {
-                                "operation": "save"
-                            },
-                            {
-                                "operation": "validate"
-                            }
+                            "save",
+                            "validate"
                         ]
                     },
                     {
                         "id": "requestedAmount",
                         "name": "Requested Amount",
                         "type": "number",
+                        "status": "default",
                         "data": "{{ data.facility.requestedAmount }}",
                         "fieldActions": [
-                            {
-                                "operation": "save"
-                            },
-                            {
-                                "operation": "validate"
-                            }
+                            "save",
+                            "validate"
                         ]
                     },
                     {
                         "id": "proposalDetails",
                         "name": "Proposal Details",
                         "type": "textarea",
+                        "status": "default",
                         "data": "{{ data.proposal.details }}",
                         "fieldActions": [
-                            {
-                                "operation": "save"
-                            },
-                            {
-                                "operation": "validate"
-                            }
+                            "save",
+                            "validate"
                         ]
                     },
                     {
                         "id": "supportingDocuments",
                         "name": "Supporting Documents",
                         "type": "file",
+                        "status": "default",
                         "data": "{{ data.documents }}",
                         "fieldActions": [
-                            {
-                                "operation": "upload"
-                            },
-                            {
-                                "operation": "replace"
-                            },
-                            {
-                                "operation": "validate"
-                            }
+                            "upload",
+                            "replace",
+                            "validate"
                         ]
                     }
                 ]
@@ -70,54 +59,31 @@
                         "id": "rmDecision",
                         "name": "RM Decision",
                         "type": "select",
+                        "status": "default",
                         "data": "{{ data.rm.decision }}",
                         "fieldActions": [
-                            {
-                                "operation": "validate"
-                            }
+                            "validate"
                         ]
                     },
                     {
                         "id": "finalMemo",
                         "name": "Credit Memo",
                         "type": "file",
+                        "status": "default",
                         "data": "{{ data.outputs.creditMemo }}",
                         "fieldActions": [
-                            {
-                                "operation": "download"
-                            }
+                            "download"
                         ]
                     }
                 ]
             }
         },
         "states": {
-            "ARMDraft": {
+            "armDraft": {
+                "name": "ARM Draft",
                 "forms": [
                     {
-                        "formName": "coreDetails",
-                        "fieldOverrides": {
-                            "applicantLegalName": {
-                                "status": "editable",
-                                "required": true
-                            },
-                            "requestedAmount": {
-                                "status": "editable",
-                                "required": true
-                            },
-                            "proposalDetails": {
-                                "status": "editable",
-                                "required": true
-                            },
-                            "supportingDocuments": {
-                                "status": "actionable",
-                                "required": true
-                            }
-                        }
-                    },
-                    {
-                        "formName": "reviewOutputs",
-                        "visibility": "hidden"
+                        "formName": "coreDetails"
                     }
                 ],
                 "actions": {
@@ -128,35 +94,13 @@
                 }
             },
             "rmReview": {
+                "name": "RM Review",
                 "forms": [
                     {
-                        "formName": "coreDetails",
-                        "fieldOverrides": {
-                            "applicantLegalName": {
-                                "status": "readonly"
-                            },
-                            "requestedAmount": {
-                                "status": "readonly"
-                            },
-                            "proposalDetails": {
-                                "status": "readonly"
-                            },
-                            "supportingDocuments": {
-                                "status": "actionable"
-                            }
-                        }
+                        "formName": "coreDetails"
                     },
                     {
-                        "formName": "reviewOutputs",
-                        "fieldOverrides": {
-                            "rmDecision": {
-                                "status": "editable",
-                                "required": true
-                            },
-                            "finalMemo": {
-                                "status": "hidden"
-                            }
-                        }
+                        "formName": "reviewOutputs"
                     }
                 ],
                 "actions": {
@@ -171,34 +115,13 @@
                 }
             },
             "completed": {
+                "name": "Completed",
                 "forms": [
                     {
-                        "formName": "coreDetails",
-                        "fieldOverrides": {
-                            "applicantLegalName": {
-                                "status": "readonly"
-                            },
-                            "requestedAmount": {
-                                "status": "readonly"
-                            },
-                            "proposalDetails": {
-                                "status": "readonly"
-                            },
-                            "supportingDocuments": {
-                                "status": "readonly"
-                            }
-                        }
+                        "formName": "coreDetails"
                     },
                     {
-                        "formName": "reviewOutputs",
-                        "fieldOverrides": {
-                            "rmDecision": {
-                                "status": "readonly"
-                            },
-                            "finalMemo": {
-                                "status": "actionable"
-                            }
-                        }
+                        "formName": "reviewOutputs"
                     }
                 ],
                 "actions": {}
