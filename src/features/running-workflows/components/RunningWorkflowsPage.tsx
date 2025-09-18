@@ -1,15 +1,7 @@
 // src/features/running-workflows/components/RunningWorkflowsPage.tsx
 
 import React, { useState } from "react";
-import ReactFlow, {
-  Controls,
-  Background,
-  MiniMap,
-  Panel,
-  useNodesState,
-  useEdgesState,
-} from "reactflow";
-import type { Node, Edge } from "reactflow";
+import ReactFlow, { Controls, Background, MiniMap } from "reactflow";
 import "reactflow/dist/style.css";
 import { RefreshCw, Grid, List, Search } from "lucide-react";
 import RunningStateNode from "./RunningStateNode";
@@ -18,11 +10,18 @@ import { runningWorkflowsData } from "../data/runningWorkflows.data";
 import {
   parseRunningWorkflowToGraph,
   getStatusInfo,
-  calculateProgress,
 } from "../utils/runningWorkflowParser";
 import { getDefaultWorkflow } from "@features/workflow/utils/graphParser";
 import type { WorkflowInstance } from "../types/runningWorkflow.types";
 import "./RunningWorkflowsPage.css";
+
+const calculateProgress = (
+  instance: WorkflowInstance,
+  totalStates: number
+): number => {
+  const visitedStates = new Set(instance.history.map((h) => h.state));
+  return Math.round((visitedStates.size / totalStates) * 100);
+};
 
 const nodeTypes = {
   runningStateNode: RunningStateNode,
@@ -43,21 +42,14 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const workflowConfig = getDefaultWorkflow(); // In future, this can be fetched based on workflow type
+  const workflowConfig = getDefaultWorkflow();
 
-  const { nodes: graphNodes, edges: graphEdges } = React.useMemo(() => {
+  // Directly calculate nodes and edges without state management
+  const { nodes, edges } = React.useMemo(() => {
     return selectedInstance
       ? parseRunningWorkflowToGraph(selectedInstance, workflowConfig)
       : { nodes: [], edges: [] };
   }, [selectedInstance, workflowConfig]);
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(graphNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(graphEdges);
-
-  React.useEffect(() => {
-    setNodes(graphNodes);
-    setEdges(graphEdges);
-  }, [selectedInstance]); // Only update when instance changes
 
   const filteredInstances = runningWorkflowsData.instances.filter(
     (instance) => {
@@ -139,7 +131,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
               const statusInfo = getStatusInfo(instance);
               const progress = calculateProgress(
                 instance,
-                Object.keys(workflowConfig.Workflow.States).length
+                Object.keys(workflowConfig.workflow.states).length
               );
 
               return (
@@ -196,12 +188,13 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
                 <ReactFlow
                   nodes={nodes}
                   edges={edges}
-                  onNodesChange={onNodesChange}
-                  onEdgesChange={onEdgesChange}
                   nodeTypes={nodeTypes}
                   fitView
                   fitViewOptions={{ padding: 0.2 }}
                   proOptions={{ hideAttribution: true }}
+                  nodesDraggable={false}
+                  nodesConnectable={false}
+                  elementsSelectable={true}
                 >
                   <Background gap={12} size={1} />
                   <Controls />
@@ -232,7 +225,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
                     const statusInfo = getStatusInfo(instance);
                     const progress = calculateProgress(
                       instance,
-                      Object.keys(workflowConfig.Workflow.States).length
+                      Object.keys(workflowConfig.workflow.states).length
                     );
 
                     return (

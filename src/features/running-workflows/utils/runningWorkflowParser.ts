@@ -22,11 +22,11 @@ export function parseRunningWorkflowToGraph(
   const nodes: Node<RunningNodeData>[] = [];
   const edges: Edge[] = [];
 
-  if (!workflowConfig?.Workflow?.States) {
+  if (!workflowConfig?.workflow?.states) {
     return { nodes, edges };
   }
 
-  const states = workflowConfig.Workflow.States;
+  const states = workflowConfig.workflow.states;
   const stateKeys = Object.keys(states);
   const visitedStates = new Set(instance.history.map(h => h.state));
   
@@ -73,10 +73,10 @@ export function parseRunningWorkflowToGraph(
 
   stateKeys.forEach((stateKey) => {
     const state = states[stateKey];
-    if (state?.Actions && typeof state.Actions === "object") {
-      Object.entries(state.Actions).forEach(([actionName, actionData]) => {
-        if (actionData?.NextState && states[actionData.NextState]) {
-          const edgeId = `${stateKey}-${actionName}-${actionData.NextState}`;
+    if (state?.actions && typeof state.actions === "object") {
+      Object.entries(state.actions).forEach(([actionName, actionData]) => {
+        if (actionData?.nextState && states[actionData.nextState]) {
+          const edgeId = `${stateKey}-${actionName}-${actionData.nextState}`;
           const isExecuted = executedActions.has(edgeId);
           
           let stroke = "#d1d5db"; // Default gray
@@ -93,7 +93,7 @@ export function parseRunningWorkflowToGraph(
           edges.push({
             id: edgeId,
             source: stateKey,
-            target: actionData.NextState,
+            target: actionData.nextState,
             label: actionName,
             type: "smoothstep",
             animated: isExecuted,
@@ -103,7 +103,7 @@ export function parseRunningWorkflowToGraph(
               opacity: isExecuted ? 1 : 0.3,
             },
             data: { 
-              operation: actionData.Operation,
+              operation: actionData.operation,
               executed: isExecuted,
             },
           });
