@@ -1,0 +1,104 @@
+/* src/features/workflow-config-edit/components/builder/DecisionNode.css */
+.decision-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 160px;
+  gap: 10px;
+}
+
+.diamond-shape {
+  width: 140px;
+  height: 140px;
+  transform: rotate(45deg);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid rgba(208, 215, 230, 0.85);
+  box-shadow: 0 22px 36px rgba(15, 23, 42, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.decision-node.selected .diamond-shape {
+  border-color: #6366f1;
+  box-shadow: 0 28px 48px rgba(99, 102, 241, 0.22);
+}
+
+.diamond-content {
+  transform: rotate(-45deg);
+  text-align: center;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.decision-icon {
+  justify-self: center;
+  color: #4f46e5;
+}
+
+.decision-node .node-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.decision-node .node-internal-id {
+  font-size: 11px;
+  color: #64748b;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+.transition-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.transition-label {
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(199, 210, 254, 0.9);
+  background: rgba(237, 233, 254, 0.8);
+  font-size: 11px;
+  font-weight: 600;
+  color: #4c1d95;
+}
+
+.decision-assignees {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(236, 243, 255, 0.8);
+  color: #1e40af;
+  font-size: 12px;
+}
+
+.decision-assignees .assignee-names {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decision-handle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.7);
+  transition: transform 0.2s ease;
+}
+
+.decision-handle:hover {
+  transform: scale(1.25);
+}
+
+.handle-source {
+  z-index: 10;
+}

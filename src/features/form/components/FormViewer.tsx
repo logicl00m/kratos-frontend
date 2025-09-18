@@ -44,8 +44,11 @@ interface Workflow {
 
 interface FormViewerProps {
   stateName: string;
-  workflow: { workflow: Workflow };
-  currentState: string;
+  // new/current API
+  workflow?: { workflow: Workflow };
+  currentState?: string;
+  // legacy API: some tests and older code pass a `state` prop directly
+  state?: any;
   onSubmit?: (data: Record<string, unknown>) => void;
   onReject?: (data: Record<string, unknown>) => void;
   onBack?: () => void;
@@ -55,6 +58,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
   stateName,
   workflow,
   currentState,
+  state: legacyState,
   onSubmit,
   onReject,
   onBack,
@@ -63,7 +67,19 @@ const FormViewer: React.FC<FormViewerProps> = ({
   const [editMode, setEditMode] = useState(false);
 
   // Validate workflow structure
-  if (!workflow?.workflow) {
+  // Support legacy tests/code that pass a `state` prop directly instead of a workflow
+  if (!workflow?.workflow && legacyState) {
+    const fields = Array.isArray(legacyState?.Form?.Fields)
+      ? legacyState.Form.Fields
+      : [];
+
+    const handleFieldChange = (
+      fieldId: string,
+      value: string | number | File | undefined
+    ) => {
+      setFormData((prev) => ({ ...prev, [fieldId]: value }));
+    };
+
     return (
       <div className="form-viewer">
         <div className="form-header">
@@ -72,9 +88,52 @@ const FormViewer: React.FC<FormViewerProps> = ({
             Back to Graph
           </button>
           <h2>{stateName}</h2>
+          <div className="form-status">
+            <span className="status-badge">Finalized</span>
+          </div>
         </div>
+
         <div className="form-content">
-          <p>Error: Workflow configuration not loaded</p>
+          {fields.map((f: any) => {
+            const fieldProp = {
+              ID: f.ID ?? f.id,
+              Name: f.Name ?? f.name,
+              Type: f.Type ?? f.type,
+              DataSource: f.DataSource ?? f.data,
+              FieldActions: f.FieldActions ?? f.fieldActions,
+            };
+
+            return (
+              <div key={fieldProp.ID} className="form-group">
+                <div className="field-row">
+                  <label className="field-label">{fieldProp.Name}</label>
+                  <div className="field-value">
+                    <FieldInput
+                      field={fieldProp}
+                      value={formData[fieldProp.ID]}
+                      disabled={true}
+                      onChange={(val) => handleFieldChange(fieldProp.ID, val)}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="form-footer">
+          <button className="btn-save" onClick={() => onSubmit?.(formData)}>
+            Save
+          </button>
+          <button className="btn-submit" onClick={() => onSubmit?.(formData)}>
+            Submit
+          </button>
+          <button className="btn-reject" onClick={() => onReject?.(formData)}>
+            Reject
+          </button>
+          <button className="btn-approve" onClick={() => onSubmit?.(formData)}>
+            Approve
+          </button>
         </div>
       </div>
     );

@@ -1,0 +1,150 @@
+/* src/features/workflow-config-edit/components/builder/ProcessNode.css */
+.process-node {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(208, 215, 230, 0.85);
+  border-radius: 20px;
+  padding: 18px 20px;
+  min-width: 260px;
+  max-width: 320px;
+  box-shadow: 0 22px 36px rgba(15, 23, 42, 0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.process-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 28px 42px rgba(79, 70, 229, 0.18);
+}
+
+.process-node.selected {
+  border-color: #6366f1;
+  box-shadow: 0 28px 48px rgba(99, 102, 241, 0.22);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(208, 215, 230, 0.6);
+}
+
+.node-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.node-internal-id {
+  font-size: 11px;
+  color: #64748b;
+  font-family: "JetBrains Mono", "Consolas", monospace;
+}
+
+.node-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.action-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  font-size: 12px;
+  color: #475569;
+  min-height: 36px;
+}
+
+.action-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #0f172a;
+  background: rgba(226, 232, 240, 0.9);
+}
+
+.action-label.left .action-indicator {
+  background: rgba(254, 226, 226, 0.55);
+  color: #b91c1c;
+}
+
+.action-label.center .action-indicator {
+  background: rgba(226, 232, 240, 0.8);
+  color: #1f2937;
+}
+
+.action-label.right .action-indicator {
+  background: rgba(209, 250, 229, 0.75);
+  color: #047857;
+}
+
+.action-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.node-assignees {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(236, 243, 255, 0.8);
+  border-radius: 999px;
+  font-size: 12px;
+  color: #1e40af;
+}
+
+.assignee-icon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.assignee-names {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.process-handle {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.7);
+  transition: transform 0.2s ease;
+}
+
+.process-handle:hover {
+  transform: scale(1.25);
+}
+
+.handle-left {
+  left: -6px;
+}
+
+.handle-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.handle-right {
+  right: -6px;
+}
+
+.handle-target {
+  background: #6366f1 !important;
+}

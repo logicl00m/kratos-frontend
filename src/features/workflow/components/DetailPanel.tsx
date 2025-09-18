@@ -73,6 +73,18 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
     return "";
   };
 
+  // Helper to support legacy field shapes (some sources use ID/Name instead of id/name)
+  const getFieldDisplayName = (f: StateFormField): string => {
+    const asRecord = f as unknown as Record<string, unknown>;
+    return (
+      safeString(asRecord["Name"]) ||
+      safeString(asRecord["name"]) ||
+      safeString(asRecord["ID"]) ||
+      safeString(asRecord["id"]) ||
+      ""
+    );
+  };
+
   const getStatusIcon = (status?: string) => {
     switch (status) {
       case "editable":
@@ -204,7 +216,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                               style={{ marginLeft: "8px" }}
                             >
                               <div className="dp-field-name">
-                                {safeString(f.name || f.id)}
+                                {getFieldDisplayName(f)}
                                 {f.stateConfig?.required && (
                                   <span
                                     style={{
