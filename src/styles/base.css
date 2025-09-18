@@ -5,28 +5,33 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
-  color: var(--text); /* dark text by default */
-  font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  color: var(--text);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+    "Roboto", "Helvetica Neue", sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
   min-height: 100vh;
   background-color: var(--bg);
-  /* layered hero-style blue background */
-  background-image: linear-gradient(120deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 40%, rgba(255,255,255,0.04) 80%),
-                    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03), transparent 30%),
-                    linear-gradient(180deg, rgba(6,38,71,1), rgba(2,34,74,0.9));
-  background-blend-mode: overlay, overlay, normal;
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(99, 102, 241, 0.18), transparent 58%),
+    radial-gradient(circle at 92% 8%, rgba(59, 130, 246, 0.14), transparent 60%),
+    linear-gradient(180deg, #eef2ff 0%, #f8fafc 55%, #f5f7ff 100%);
+  background-attachment: fixed;
   background-size: cover;
-  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Ensure most UI fonts are dark by default, but explicitly exclude the JSON editor textarea which is styled separately */
-.app, .app *:not(.editor-panel textarea) {
+.app,
+.app *:not(.editor-panel textarea) {
   color: var(--text);
 }
 
 .app-shell {
   display: grid;
-  grid-template-rows: 56px 1fr;
+  grid-template-rows: 64px 1fr;
   height: 100vh;
 }
