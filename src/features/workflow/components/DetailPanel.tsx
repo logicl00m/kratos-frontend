@@ -8,6 +8,7 @@ import {
   Eye,
   Edit,
   Zap,
+  Folder,
 } from "lucide-react";
 import type { Node, Edge } from "reactflow";
 import type { StateFormField } from "@features/workflow/types/workflow.types";
@@ -21,8 +22,8 @@ interface DetailPanelProps {
 }
 
 const getFieldActions = (f: StateFormField): string[] => {
-  if (Array.isArray(f.FieldActions)) {
-    return f.FieldActions.map((a) => a.Operation).filter(Boolean);
+  if (Array.isArray(f.fieldActions)) {
+    return f.fieldActions.map((a) => a.operation).filter(Boolean);
   }
   return [];
 };
@@ -51,6 +52,14 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
   const fields: StateFormField[] = Array.isArray(nodeData.fields)
     ? nodeData.fields
     : [];
+
+  // Group fields by form name
+  const fieldsByForm = fields.reduce((acc, field) => {
+    const formName = field.formName || "Default Form";
+    if (!acc[formName]) acc[formName] = [];
+    acc[formName].push(field);
+    return acc;
+  }, {} as Record<string, StateFormField[]>);
 
   const safeString = (v: unknown): string => {
     if (v == null) return "";
@@ -166,63 +175,92 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                 </div>
 
                 <div style={{ display: "block" }}>
-                  {fields.map((f, idx) => {
-                    const actions = getFieldActions(f);
-                    const key = f.ID || f.Name || `field-${idx}`;
-                    const status = f.stateConfig?.status || "readonly";
+                  {Object.entries(fieldsByForm).map(
+                    ([formName, formFields]) => (
+                      <div key={formName} style={{ marginBottom: "12px" }}>
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color: "#9ca3af",
+                            marginBottom: "6px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontWeight: 500,
+                          }}
+                        >
+                          <Folder size={10} />
+                          <span>{formName}</span>
+                        </div>
+                        {formFields.map((f, idx) => {
+                          const actions = getFieldActions(f);
+                          const key = f.id || f.name || `field-${idx}`;
+                          const status = f.stateConfig?.status || "readonly";
 
-                    return (
-                      <div key={key} className="dp-field-card">
-                        <div className="dp-field-name">
-                          {safeString(f.Name || f.ID)}
-                          {f.stateConfig?.required && (
-                            <span
-                              style={{
-                                color: "#ef4444",
-                                fontSize: "11px",
-                                marginLeft: "4px",
-                                fontWeight: "bold",
-                              }}
+                          return (
+                            <div
+                              key={key}
+                              className="dp-field-card"
+                              style={{ marginLeft: "8px" }}
                             >
-                              *
-                            </span>
-                          )}
-                        </div>
-                        <div className="dp-field-meta">
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "4px",
-                              marginBottom: "2px",
-                            }}
-                          >
-                            {getStatusIcon(status)}
-                            <span style={{ color: getStatusColor(status) }}>
-                              {getStatusLabel(status)}
-                            </span>
-                            <span
-                              style={{ fontSize: "10px", color: "#9ca3af" }}
-                            >
-                              - {getStatusDescription(status)}
-                            </span>
-                          </div>
-                          <div>Type: {safeString(f.Type)}</div>
-                          {f.DataSource ? (
-                            <div>
-                              Source:{" "}
-                              <code className="dp-code">
-                                {safeString(f.DataSource)}
-                              </code>
+                              <div className="dp-field-name">
+                                {safeString(f.name || f.id)}
+                                {f.stateConfig?.required && (
+                                  <span
+                                    style={{
+                                      color: "#ef4444",
+                                      fontSize: "11px",
+                                      marginLeft: "4px",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    *
+                                  </span>
+                                )}
+                              </div>
+                              <div className="dp-field-meta">
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "4px",
+                                    marginBottom: "2px",
+                                  }}
+                                >
+                                  {getStatusIcon(status)}
+                                  <span
+                                    style={{ color: getStatusColor(status) }}
+                                  >
+                                    {getStatusLabel(status)}
+                                  </span>
+                                  <span
+                                    style={{
+                                      fontSize: "10px",
+                                      color: "#9ca3af",
+                                    }}
+                                  >
+                                    - {getStatusDescription(status)}
+                                  </span>
+                                </div>
+                                <div>Type: {safeString(f.type)}</div>
+                                {f.data ? (
+                                  <div>
+                                    Source:{" "}
+                                    <code className="dp-code">
+                                      {safeString(f.data)}
+                                    </code>
+                                  </div>
+                                ) : null}
+                                {actions.length > 0 && (
+                                  <div>Actions: {actions.join(", ")}</div>
+                                )}
+                              </div>
                             </div>
-                          ) : null}
-                          {actions.length > 0 && (
-                            <div>Actions: {actions.join(", ")}</div>
-                          )}
-                        </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
+                    )
+                  )}
                 </div>
               </div>
             ) : (

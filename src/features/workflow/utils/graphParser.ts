@@ -1,6 +1,6 @@
 // src/features/workflow/utils/graphParser.ts
 import type { Node, Edge } from "reactflow";
-import type { WorkflowConfig, StateFormField, StateFieldConfig } from "@features/workflow/types/workflow.types";
+import type { WorkflowConfig, StateFormField, Form, StateForm, FieldOverride } from "@features/workflow/types/workflow.types";
 
 export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   nodes: Node[];
@@ -9,20 +9,20 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  if (!workflow?.Workflow?.States) {
+  if (!workflow?.workflow?.states) {
     return { nodes, edges };
   }
 
-  const states = workflow.Workflow.States;
-  const globalForm = workflow.Workflow.Form;
+  const states = workflow.workflow.states;
+  const forms = workflow.workflow.forms;
   const stateKeys = Object.keys(states);
 
   // Create nodes
   stateKeys.forEach((stateKey, index) => {
     const state = states[stateKey];
     
-    // Get all fields for this state (except hidden ones)
-    const stateFields = getStateFields(globalForm, state);
+    // Get all fields for this state from referenced forms
+    const stateFields = getStateFields(forms, state);
     const hasForm = stateFields.length > 0;
 
     nodes.push({
@@ -40,27 +40,27 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
     });
   });
 
-  // Create edges from Actions
+  // Create edges from actions
   stateKeys.forEach((stateKey) => {
     const state = states[stateKey];
-    if (state?.Actions && typeof state.Actions === "object") {
-      Object.entries(state.Actions).forEach(([actionName, actionData]) => {
-        if (actionData?.NextState && states[actionData.NextState]) {
+    if (state?.actions && typeof state.actions === "object") {
+      Object.entries(state.actions).forEach(([actionName, actionData]) => {
+        if (actionData?.nextState && states[actionData.nextState]) {
           let stroke = "#6b7280";
           if (actionName.includes("Reject")) {
             stroke = "#ef4444";
-          } else if (actionName.includes("Approve")) {
+          } else if (actionName.includes("Approve") || actionName.includes("Finalize")) {
             stroke = "#10b981";
           }
           edges.push({
-            id: `${stateKey}-${actionName}-${actionData.NextState}`,
+            id: `${stateKey}-${actionName}-${actionData.nextState}`,
             source: stateKey,
-            target: actionData.NextState,
+            target: actionData.nextState,
             label: actionName,
             type: "smoothstep",
             animated: true,
             style: { stroke },
-            data: { operation: actionData.Operation },
+            data: { operation: actionData.operation },
           });
         }
       });
@@ -71,80 +71,177 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
 }
 
 export function getStateFields(
-  globalForm: WorkflowConfig["Workflow"]["Form"], 
-  state: WorkflowConfig["Workflow"]["States"][string]
+  forms: WorkflowConfig["workflow"]["forms"],
+  state: WorkflowConfig["workflow"]["states"][string]
 ): StateFormField[] {
-  if (!globalForm?.Fields) return [];
+  if (!forms || !state.forms) return [];
   
-  // ALL fields are visible by default (as read-only) unless explicitly hidden
-  return globalForm.Fields
-    .map(field => {
-      const fieldConfig: StateFieldConfig = state.Fields?.[field.ID] || {};
-      
-      // Default status is read-only (no status) if not specified
-      // Only "editable" or "actionable" fields have special behaviors
-      const status = fieldConfig.status;
+  const allFields: StateFormField[] = [];
+  
+  // Process each form referenced by this state
+  state.forms.forEach((stateForm: StateForm) => {
+    // Skip if entire form is hidden
+    if (stateForm.visibility === "hidden") return;
+    
+    const form = forms[stateForm.formName];
+    if (!form?.fields) return;
+    
+    // Process each field in the form
+    form.fields.forEach(field => {
+      const fieldOverride: FieldOverride = stateForm.fieldOverrides?.[field.id] || {};
       
       // Skip hidden fields
-      if (status === "hidden") return null;
+      if (fieldOverride.status === "hidden") return;
       
-      return {
+      // Default to readonly if not specified
+      const status = fieldOverride.status || "readonly";
+      
+      allFields.push({
         ...field,
+        formName: stateForm.formName,
         stateConfig: {
-          ...fieldConfig,
-          status: status || "readonly", // Default to readonly if not specified
+          status,
+          required: fieldOverride.required,
         },
-        // Override field actions if specified
-        FieldActions: fieldConfig.overrideActions || field.FieldActions,
-      } as StateFormField;
-    })
-    .filter(field => field !== null) as StateFormField[];
+      });
+    });
+  });
+  
+  return allFields;
 }
 
-// Provide a small default workflow used by the app and tests.
+// Updated default workflow using the new format
 export function getDefaultWorkflow(): WorkflowConfig {
   return {
-    Workflow: {
-      Form: {
-        Fields: [
-          { ID: "proposal_details", Name: "Proposal Details", Type: "textarea", DataSource: "{{ data.proposal.details }}" },
-          { ID: "supporting_documents", Name: "Supporting Documents", Type: "file", DataSource: "{{ data.documents }}" },
-          { ID: "rm_decision", Name: "RM Decision", Type: "select", DataSource: "{{ data.rm.decision }}" },
-          { ID: "rm_remarks", Name: "RM Remarks", Type: "textarea", DataSource: "{{ data.rm.remarks }}" },
-        ],
+    workflow: {
+      forms: {
+        CoreDetails: {
+          fields: [
+            { 
+              id: "applicant_legal_name", 
+              name: "Applicant Legal Name", 
+              type: "text", 
+              data: "{{ data.borrower.legalName }}",
+              fieldActions: [{ operation: "save" }, { operation: "validate" }]
+            },
+            { 
+              id: "requested_amount", 
+              name: "Requested Amount", 
+              type: "number", 
+              data: "{{ data.facility.requestedAmount }}",
+              fieldActions: [{ operation: "save" }, { operation: "validate" }]
+            },
+            { 
+              id: "proposal_details", 
+              name: "Proposal Details", 
+              type: "textarea", 
+              data: "{{ data.proposal.details }}",
+              fieldActions: [{ operation: "save" }, { operation: "validate" }]
+            },
+            { 
+              id: "supporting_documents", 
+              name: "Supporting Documents", 
+              type: "file", 
+              data: "{{ data.documents }}",
+              fieldActions: [{ operation: "upload" }, { operation: "replace" }, { operation: "validate" }]
+            }
+          ]
+        },
+        ReviewOutputs: {
+          fields: [
+            { 
+              id: "rm_decision", 
+              name: "RM Decision", 
+              type: "select", 
+              data: "{{ data.rm.decision }}",
+              fieldActions: [{ operation: "validate" }]
+            },
+            { 
+              id: "final_memo", 
+              name: "Credit Memo", 
+              type: "file", 
+              data: "{{ data.outputs.creditMemo }}",
+              fieldActions: [{ operation: "download" }]
+            }
+          ]
+        }
       },
-      States: {
+      states: {
         ARMDraft: {
-          Fields: {
-            proposal_details: { status: "editable", required: true },
-            supporting_documents: { status: "actionable" }, // Can perform actions but not edit
-            rm_decision: { status: "hidden" },
-            rm_remarks: { status: "hidden" },
-            // Any field not listed here will be displayed as read-only
-          },
-          Actions: {
-            SubmitToRM: { NextState: "RMReview", Operation: "Submit" },
-          },
+          forms: [
+            {
+              formName: "CoreDetails",
+              fieldOverrides: {
+                applicant_legal_name: { status: "editable", required: true },
+                requested_amount: { status: "editable", required: true },
+                proposal_details: { status: "editable", required: true },
+                supporting_documents: { status: "actionable", required: true }
+              }
+            },
+            {
+              formName: "ReviewOutputs",
+              visibility: "hidden"
+            }
+          ],
+          actions: {
+            SubmitToRM: {
+              nextState: "RMReview",
+              operation: "Validate draft; save; notify RM"
+            }
+          }
         },
         RMReview: {
-          Fields: {
-            rm_decision: { status: "editable", required: true },
-            rm_remarks: { status: "editable" },
-            supporting_documents: { status: "actionable" }, // Can perform actions
-            // proposal_details not listed, so it's read-only
-          },
-          Actions: {
-            RMReject: { NextState: "ARMDraft", Operation: "Reject" },
-            RMFinalize: { NextState: "BusinessReview", Operation: "Finalize" },
-          },
+          forms: [
+            {
+              formName: "CoreDetails",
+              fieldOverrides: {
+                applicant_legal_name: { status: "readonly" },
+                requested_amount: { status: "readonly" },
+                proposal_details: { status: "readonly" },
+                supporting_documents: { status: "actionable" }
+              }
+            },
+            {
+              formName: "ReviewOutputs",
+              fieldOverrides: {
+                rm_decision: { status: "editable", required: true },
+                final_memo: { status: "hidden" }
+              }
+            }
+          ],
+          actions: {
+            RMReject: {
+              nextState: "ARMDraft",
+              operation: "Return to ARM with fields to correct"
+            },
+            RMFinalize: {
+              nextState: "Completed",
+              operation: "Finalize proposal"
+            }
+          }
         },
-        BusinessReview: {
-          // No Fields specified means all fields are read-only
-          Actions: {
-            THApprove: { NextState: "Completed", Operation: "Approve" },
-          },
-        },
-      },
-    },
+        Completed: {
+          forms: [
+            {
+              formName: "CoreDetails",
+              fieldOverrides: {
+                applicant_legal_name: { status: "readonly" },
+                requested_amount: { status: "readonly" },
+                proposal_details: { status: "readonly" },
+                supporting_documents: { status: "readonly" }
+              }
+            },
+            {
+              formName: "ReviewOutputs",
+              fieldOverrides: {
+                rm_decision: { status: "readonly" },
+                final_memo: { status: "actionable" }
+              }
+            }
+          ],
+          actions: {}
+        }
+      }
+    }
   };
 }

@@ -13,6 +13,7 @@ import {
   Eye,
   Upload,
   Zap,
+  Folder,
 } from "lucide-react";
 import "./StateNode.css";
 import type { StateFormField } from "@features/workflow/types/workflow.types";
@@ -72,6 +73,21 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
     }
   };
 
+  // Group fields by form name
+  const fieldsByForm =
+    data.fields?.reduce(
+      (acc: Record<string, StateFormField[]>, field: StateFormField) => {
+        const formName = field.formName || "Default Form";
+        if (!acc[formName]) acc[formName] = [];
+        acc[formName].push(field);
+        return acc;
+      },
+      {}
+    ) || {};
+
+  const totalFieldCount = data.fields?.length || 0;
+  const formCount = Object.keys(fieldsByForm).length;
+
   return (
     <div className={`state-node ${selected ? "selected" : ""}`}>
       <Handle type="target" position={Position.Top} className="handle-accent" />
@@ -86,57 +102,86 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
           >
             {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             <FileText size={14} />
-            <span>{data.fields?.length || 0} fields</span>
+            <span>{totalFieldCount} fields</span>
+            {formCount > 1 && (
+              <span style={{ fontSize: "10px", color: "#9ca3af" }}>
+                ({formCount} forms)
+              </span>
+            )}
           </button>
 
           {expanded && data.fields && (
             <div className="state-node-fields">
-              {data.fields.map((field: StateFormField) => {
-                const status = field.stateConfig?.status || "readonly";
+              {Object.entries(fieldsByForm).map(([formName, formFields]) => (
+                <div
+                  key={formName}
+                  style={{ marginBottom: formCount > 1 ? "8px" : "0" }}
+                >
+                  {formCount > 1 && (
+                    <div
+                      style={{
+                        fontSize: "10px",
+                        color: "#9ca3af",
+                        marginBottom: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontWeight: 500,
+                      }}
+                    >
+                      <Folder size={10} />
+                      <span>{formName}</span>
+                    </div>
+                  )}
+                  {formFields.map((field: StateFormField) => {
+                    const status = field.stateConfig?.status || "readonly";
 
-                return (
-                  <div
-                    key={field.ID || field.Name}
-                    className="state-node-field"
-                  >
-                    {getFieldIcon(field.Type)}
-                    <div style={{ flex: 1 }}>
-                      <div className="state-node-field-name">
-                        {field.Name || field.ID}
-                        {field.stateConfig?.required && (
-                          <span
+                    return (
+                      <div
+                        key={field.id || field.name}
+                        className="state-node-field"
+                        style={{ marginLeft: formCount > 1 ? "8px" : "0" }}
+                      >
+                        {getFieldIcon(field.type)}
+                        <div style={{ flex: 1 }}>
+                          <div className="state-node-field-name">
+                            {field.name || field.id}
+                            {field.stateConfig?.required && (
+                              <span
+                                style={{
+                                  color: "#ef4444",
+                                  marginLeft: "4px",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                *
+                              </span>
+                            )}
+                          </div>
+                          <div
                             style={{
-                              color: "#ef4444",
-                              marginLeft: "4px",
-                              fontWeight: "bold",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              marginTop: "2px",
                             }}
                           >
-                            *
-                          </span>
-                        )}
+                            {getStatusIcon(status)}
+                            <span
+                              style={{
+                                fontSize: "10px",
+                                color: getStatusColor(status),
+                              }}
+                            >
+                              {getStatusLabel(status)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          marginTop: "2px",
-                        }}
-                      >
-                        {getStatusIcon(status)}
-                        <span
-                          style={{
-                            fontSize: "10px",
-                            color: getStatusColor(status),
-                          }}
-                        >
-                          {getStatusLabel(status)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           )}
         </div>
