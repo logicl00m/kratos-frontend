@@ -28,7 +28,13 @@ export function parseRunningWorkflowToGraph(
 
   const states = workflowConfig.workflow.states;
   const stateKeys = Object.keys(states);
-  const visitedStates = new Set(instance.history.map(h => h.state));
+  
+  // Get visited states from new history format
+  const visitedStates = new Set<string>();
+  instance.history.forEach(h => {
+    if (h.event.to) visitedStates.add(h.event.to);
+    if (h.event.from) visitedStates.add(h.event.from);
+  });
   
   // Create nodes with status
   stateKeys.forEach((stateKey, index) => {
@@ -40,9 +46,9 @@ export function parseRunningWorkflowToGraph(
       status = "current";
     } else if (visitedStates.has(stateKey)) {
       status = "visited";
-      const historyItem = instance.history.find(h => h.state === stateKey);
+      const historyItem = instance.history.find(h => h.event.to === stateKey);
       visitedAt = historyItem?.timestamp;
-      performedBy = historyItem?.performedBy;
+      performedBy = historyItem?.actor.email;
     }
 
     nodes.push({
@@ -64,10 +70,9 @@ export function parseRunningWorkflowToGraph(
 
   // Create edges with execution status
   const executedActions = new Set<string>();
-  instance.history.forEach((item, index) => {
-    if (item.action && index < instance.history.length - 1) {
-      const nextState = instance.history[index + 1].state;
-      executedActions.add(`${item.state}-${item.action}-${nextState}`);
+  instance.history.forEach((item) => {
+    if (item.event.action && item.event.from && item.event.to) {
+      executedActions.add(`${item.event.from}-${item.event.action}-${item.event.to}`);
     }
   });
 
@@ -137,6 +142,10 @@ export function getStatusInfo(instance: WorkflowInstance) {
 }
 
 export function calculateProgress(instance: WorkflowInstance, totalStates: number): number {
-  const visitedStates = new Set(instance.history.map(h => h.state));
+  const visitedStates = new Set<string>();
+  instance.history.forEach(h => {
+    if (h.event.to) visitedStates.add(h.event.to);
+    if (h.event.from) visitedStates.add(h.event.from);
+  });
   return Math.round((visitedStates.size / totalStates) * 100);
 }

@@ -1,7 +1,15 @@
 // src/features/running-workflows/components/RunningWorkflowDetailPanel.tsx
 
 import React from "react";
-import { X, Clock, User, FileText, Activity } from "lucide-react";
+import {
+  X,
+  Clock,
+  User,
+  FileText,
+  Activity,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import type { WorkflowInstance } from "../types/runningWorkflow.types";
 import "./RunningWorkflowDetailPanel.css";
 
@@ -26,8 +34,34 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
     });
   };
 
+  const formatDuration = (ms?: number) => {
+    if (!ms) return "N/A";
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    return `${hours}h ${minutes}m`;
+  };
+
   const getStatusBadgeClass = (status: string) => {
     return `status-badge status-${status}`;
+  };
+
+  const getEventTypeLabel = (type: string) => {
+    return type.replace(/_/g, " ").toLowerCase();
+  };
+
+  const getPriorityBadge = (priority?: string) => {
+    if (!priority) return null;
+    const colors = {
+      critical: "status-rejected",
+      high: "status-pending",
+      medium: "status-active",
+      low: "status-completed",
+    };
+    return (
+      <span className={`status-badge ${colors[priority]}`}>
+        {priority.toUpperCase()}
+      </span>
+    );
   };
 
   return (
@@ -35,9 +69,12 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
       <div className="rdp-header">
         <div>
           <h3 className="rdp-title">{instance.id}</h3>
-          <span className={getStatusBadgeClass(instance.status)}>
-            {instance.status.toUpperCase()}
-          </span>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <span className={getStatusBadgeClass(instance.status)}>
+              {instance.status.toUpperCase()}
+            </span>
+            {getPriorityBadge(instance.priority)}
+          </div>
         </div>
         <button onClick={onClose} className="rdp-close">
           <X size={18} />
@@ -58,7 +95,13 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Owner</span>
-              <span className="rdp-value">{instance.owner}</span>
+              <span className="rdp-value">{instance.owner.name}</span>
+            </div>
+            <div className="rdp-info-item">
+              <span className="rdp-label">Assigned To</span>
+              <span className="rdp-value">
+                {instance.currentAssignee?.name || "Unassigned"}
+              </span>
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Created</span>
@@ -72,8 +115,40 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
                 {formatDate(instance.updatedAt)}
               </span>
             </div>
+            <div className="rdp-info-item">
+              <span className="rdp-label">Due Date</span>
+              <span className="rdp-value">
+                {instance.dueDate
+                  ? formatDate(instance.dueDate)
+                  : "No deadline"}
+              </span>
+            </div>
           </div>
         </div>
+
+        {/* Metrics */}
+        {instance.metrics && (
+          <div className="rdp-section">
+            <div className="rdp-section-title">
+              <Clock size={14} />
+              Performance Metrics
+            </div>
+            <div className="rdp-info-grid">
+              <div className="rdp-info-item">
+                <span className="rdp-label">Total Duration</span>
+                <span className="rdp-value">
+                  {formatDuration(instance.metrics.totalDuration)}
+                </span>
+              </div>
+              <div className="rdp-info-item">
+                <span className="rdp-label">States Visited</span>
+                <span className="rdp-value">
+                  {Object.keys(instance.metrics.statesDuration || {}).length}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Current Data */}
         <div className="rdp-section">
@@ -97,7 +172,7 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
           </div>
         </div>
 
-        {/* History */}
+        {/* Enhanced History */}
         <div className="rdp-section">
           <div className="rdp-section-title">
             <Clock size={14} />
@@ -105,23 +180,73 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
           </div>
           <div className="rdp-history">
             {instance.history.map((item, index) => (
-              <div key={index} className="rdp-history-item">
+              <div key={item.id} className="rdp-history-item">
                 <div className="rdp-history-marker"></div>
                 <div className="rdp-history-content">
                   <div className="rdp-history-header">
-                    <span className="rdp-history-state">{item.state}</span>
-                    {item.action && (
-                      <span className="rdp-history-action">{item.action}</span>
+                    <span className="rdp-history-state">
+                      {getEventTypeLabel(item.event.type)}
+                    </span>
+                    {item.event.action && (
+                      <span className="rdp-history-action">
+                        {item.event.action}
+                      </span>
+                    )}
+                    {item.validation && !item.validation.passed && (
+                      <AlertCircle size={12} style={{ color: "#ef4444" }} />
+                    )}
+                    {item.validation && item.validation.passed && (
+                      <CheckCircle size={12} style={{ color: "#10b981" }} />
                     )}
                   </div>
+                  {item.event.from && item.event.to && (
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        color: "#6b7280",
+                        marginBottom: "4px",
+                      }}
+                    >
+                      {item.event.from} → {item.event.to}
+                    </div>
+                  )}
                   <div className="rdp-history-meta">
                     <User size={10} />
-                    <span>{item.performedBy}</span>
+                    <span>
+                      {item.actor.name} ({item.actor.role})
+                    </span>
                     <Clock size={10} />
                     <span>{formatDate(item.timestamp)}</span>
                   </div>
-                  {item.comments && (
-                    <div className="rdp-history-comments">{item.comments}</div>
+                  {item.notes && (
+                    <div className="rdp-history-comments">{item.notes}</div>
+                  )}
+                  {item.validation && item.validation.errors.length > 0 && (
+                    <div
+                      style={{
+                        marginTop: "6px",
+                        fontSize: "11px",
+                        color: "#ef4444",
+                      }}
+                    >
+                      Errors: {item.validation.errors.join(", ")}
+                    </div>
+                  )}
+                  {item.changes && item.changes.length > 0 && (
+                    <div
+                      style={{
+                        marginTop: "6px",
+                        fontSize: "11px",
+                        color: "#6b7280",
+                      }}
+                    >
+                      {item.changes.map((change, idx) => (
+                        <div key={idx}>
+                          • {change.fieldName || change.fieldId}:{" "}
+                          {change.changeType.toLowerCase()}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
