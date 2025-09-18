@@ -1,5 +1,7 @@
 // src/features/running-workflows/types/runningWorkflow.types.ts
 
+import type { FieldOverride } from "../../workflow/types/workflow.types";
+
 // New JSON structure types
 export interface WorkflowAssignee {
   subjectId: string;
@@ -17,14 +19,15 @@ export interface WorkflowHistoryEntry {
     id: string;
     name: string;
     role: string;
+    email?: string;
   };
   action: string;
   stateFrom: string | null;
   stateTo: string;
   changes?: Array<{
     fieldId: string;
-    old: any;
-    new: any;
+    old: unknown;
+    new: unknown;
   }>;
 }
 
@@ -33,13 +36,16 @@ export interface WorkflowState {
   forms: Array<{
     formName: string;
     visibility?: string;
-    fieldOverrides?: Record<string, any>;
+    fieldOverrides?: Record<string, FieldOverride>;
   }>;
-  actions: Record<string, {
-    nextState: string;
-    operation: string;
-    allowedRoles?: string[];
-  }>;
+  actions: Record<
+    string,
+    {
+      nextState: string;
+      operation: string;
+      allowedRoles?: string[];
+    }
+  >;
   history: WorkflowHistoryEntry[];
   assigneePolicy?: {
     requiredRoles: string[];
@@ -50,7 +56,7 @@ export interface WorkflowField {
   id: string;
   name: string;
   type: string;
-  data: any;
+  data: unknown;
   fieldActions: Array<{
     operation: string;
   }>;
@@ -84,9 +90,9 @@ export interface Actor {
 export interface FieldChange {
   fieldId: string;
   fieldName?: string;
-  oldValue: any;
-  newValue: any;
-  changeType: 'CREATE' | 'UPDATE' | 'DELETE';
+  oldValue: unknown;
+  newValue: unknown;
+  changeType: "CREATE" | "UPDATE" | "DELETE";
 }
 
 export interface ValidationResult {
@@ -95,21 +101,21 @@ export interface ValidationResult {
   warnings?: string[];
 }
 
-export type EventType = 
-  | 'STATE_TRANSITION' 
-  | 'FIELD_UPDATE' 
-  | 'DOCUMENT_UPLOAD' 
-  | 'VALIDATION_FAILURE'
-  | 'COMMENT_ADDED'
-  | 'ESCALATION'
-  | 'DELEGATION';
+export type EventType =
+  | "STATE_TRANSITION"
+  | "FIELD_UPDATE"
+  | "DOCUMENT_UPLOAD"
+  | "VALIDATION_FAILURE"
+  | "COMMENT_ADDED"
+  | "ESCALATION"
+  | "DELEGATION";
 
 export interface WorkflowEvent {
   type: EventType;
   action?: string;
   from?: string;
   to?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export interface WorkflowHistoryItem {
@@ -123,7 +129,7 @@ export interface WorkflowHistoryItem {
     ipAddress?: string;
     userAgent?: string;
     sessionId?: string;
-    source?: 'UI' | 'API' | 'SYSTEM';
+    source?: "UI" | "API" | "SYSTEM";
   };
   notes?: string;
   attachments?: string[];
@@ -133,8 +139,8 @@ export interface WorkflowInstance {
   id: string;
   workflowName: string;
   currentState: string;
-  status: 'active' | 'completed' | 'pending' | 'rejected';
-  priority?: 'low' | 'medium' | 'high' | 'critical';
+  status: "active" | "completed" | "pending" | "rejected";
+  priority?: "low" | "medium" | "high" | "critical";
   createdAt: string;
   updatedAt: string;
   completedAt?: string;
@@ -142,7 +148,7 @@ export interface WorkflowInstance {
   owner: Actor;
   currentAssignee?: Actor;
   watchers?: Actor[];
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   history: WorkflowHistoryItem[];
   metrics?: {
     totalDuration?: number;
@@ -167,5 +173,5 @@ export interface RunningWorkflowNodeData {
   status: "visited" | "current" | "pending";
   visitedAt?: string;
   performedBy?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }

@@ -15,13 +15,6 @@ import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
 import type { LoanApplication } from "@features/dashboard/types/dashboard.types";
 import "./App.css";
 import TopBar from "@shared/components/layout/TopBar";
-// Local helper type to match FormViewer expected prop shape
-type FormViewerWorkflowProp = {
-  workflow: {
-    forms: Record<string, unknown>;
-    states: Record<string, unknown>;
-  };
-};
 
 function App() {
   const [workflow, setWorkflow] = useState<WorkflowConfig>(
@@ -224,7 +217,7 @@ function App() {
           <div style={{ width: "100%" }}>
             <FormViewer
               stateName={currentState}
-              workflow={workflow as unknown as FormViewerWorkflowProp}
+              workflow={workflow}
               currentState={currentState}
               onSubmit={(data) => console.log("Submit:", data)}
               onReject={(data) => console.log("Reject:", data)}
@@ -259,3 +252,8 @@ function App() {
 }
 
 export default App;
+
+
+
+
+

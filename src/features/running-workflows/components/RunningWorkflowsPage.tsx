@@ -18,6 +18,7 @@ import {
   ArrowRight,
   CheckCircle,
   XCircle,
+  X,
   AlertCircle,
   FileText,
   Activity,
@@ -51,10 +52,46 @@ interface RunningWorkflowsPageProps {
 interface DetailPanelProps {
   workflow: WorkflowData | null;
   selectedNodeId: string | null;
-  nodes: any[];
+  nodes: Node<RunningWorkflowNodeData>[];
   onClose: () => void;
   onNodeDetailClose: () => void;
 }
+
+const formatDisplayValue = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (item && typeof item === "object" && "name" in item) {
+          const name = (item as { name?: unknown }).name;
+          if (typeof name === "string") {
+            return name;
+          }
+        }
+        return String(item ?? "");
+      })
+      .join(", ");
+  }
+
+  if (value && typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  if (value == null) {
+    return "";
+  }
+
+  return String(value);
+};
+
+const formatStateTransition = (
+  from?: string | null,
+  to?: string | null
+): string => {
+  if (from && to) {
+    return `${from} -> ${to}`;
+  }
+  return to ?? from ?? "State";
+};
 
 const DetailPanel: React.FC<DetailPanelProps> = ({
   workflow,
@@ -76,15 +113,18 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
 
   const getActionIcon = (action?: string) => {
     if (!action) return <ArrowRight size={12} />;
-    if (action.toLowerCase().includes("reject"))
+    if (action.toLowerCase().includes("reject")) {
       return <XCircle size={12} color="#ef4444" />;
+    }
     if (
       action.toLowerCase().includes("approve") ||
       action.toLowerCase().includes("finalize")
-    )
+    ) {
       return <CheckCircle size={12} color="#10b981" />;
-    if (action.toLowerCase().includes("submit"))
+    }
+    if (action.toLowerCase().includes("submit")) {
       return <ArrowRight size={12} color="#3b82f6" />;
+    }
     return <ArrowRight size={12} />;
   };
 
@@ -95,7 +135,6 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
       .trim();
   };
 
-  // If a node is selected, show node details
   if (selectedNodeId) {
     const state = workflow.workflow.states[selectedNodeId];
     const nodeStatus = nodes.find((n) => n.id === selectedNodeId)?.data?.status;
@@ -112,7 +151,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
             <h3 className="rdp-title">State: {selectedNodeId}</h3>
           </div>
           <button onClick={onNodeDetailClose} className="rdp-close">
-            ×
+            <X size={16} />
           </button>
         </div>
 
@@ -142,7 +181,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   </div>
                   {item.stateFrom && item.stateTo && (
                     <div className="rdp-action-transition">
-                      {item.stateFrom} → {item.stateTo}
+                      {formatStateTransition(item.stateFrom, item.stateTo)}
                     </div>
                   )}
                   <div className="rdp-action-meta">
@@ -158,11 +197,21 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   {item.changes && item.changes.length > 0 && (
                     <div className="rdp-action-changes">
                       <strong>Changes made:</strong>
-                      {item.changes.map((change, idx) => (
-                        <div key={idx}>
-                          • {change.fieldId}: {change.old} → {change.new}
-                        </div>
-                      ))}
+                      {item.changes.map((change) => {
+                        const key =
+                          change.fieldId ||
+                          `${change.fieldName || "change"}-${
+                            change.changeType
+                          }`;
+                        const fieldLabel =
+                          change.fieldId || change.fieldName || "Field";
+                        return (
+                          <div key={key}>
+                            - {fieldLabel}: {formatDisplayValue(change.old)}{" -> "}
+                            {formatDisplayValue(change.new)}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -174,26 +223,22 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
     );
   }
 
-  // Otherwise show workflow details
   const allHistory = getAllHistory(workflow);
   const mainActions = allHistory.filter((h) => h.action !== "updateFields");
   const formData = getWorkflowFormData(workflow);
+  const statusInfo = getWorkflowStatus(workflow);
 
   return (
     <div className="rdp-enhanced-panel">
       <div className="rdp-header">
         <div>
           <h3 className="rdp-title">{workflow.workflow.id}</h3>
-          <span
-            className={`status-badge status-${
-              getWorkflowStatus(workflow).status
-            }`}
-          >
-            {getWorkflowStatus(workflow).label}
+          <span className={`status-badge status-${statusInfo.status}`}>
+            {statusInfo.label}
           </span>
         </div>
         <button onClick={onClose} className="rdp-close">
-          ×
+          <X size={16} />
         </button>
       </div>
 
@@ -216,9 +261,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                     </span>
                   </div>
                   <div className="rdp-summary-state">
-                    {action.stateFrom && action.stateTo
-                      ? `${action.stateFrom} → ${action.stateTo}`
-                      : action.stateTo || action.stateFrom || "State"}
+                    {formatStateTransition(action.stateFrom, action.stateTo)}
                   </div>
                   <div className="rdp-summary-action">
                     <span className="rdp-action-badge">
@@ -246,13 +289,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                   {key.replace(/([A-Z])/g, " $1").toLowerCase()}
                 </span>
                 <span className="rdp-data-value">
-                  {Array.isArray(value)
-                    ? value
-                        .map((v) => (typeof v === "object" ? v.name : v))
-                        .join(", ")
-                    : typeof value === "object"
-                    ? JSON.stringify(value)
-                    : String(value)}
+                  {formatDisplayValue(value)}
                 </span>
               </div>
             ))}
@@ -280,24 +317,25 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
       : { nodes: [], edges: [] };
   }, [selectedWorkflow]);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(graphNodes);
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<RunningWorkflowNodeData>(graphNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(graphEdges);
 
   React.useEffect(() => {
     setNodes(graphNodes);
     setEdges(graphEdges);
-  }, [selectedWorkflow]);
+  }, [graphNodes, graphEdges, setNodes, setEdges]);
+
+  const lowerSearchTerm = searchTerm.toLowerCase();
 
   const filteredWorkflows = allWorkflows.filter((workflow) => {
     const status = getWorkflowStatus(workflow).status;
     const owner = getWorkflowOwner(workflow);
+    const ownerName = owner?.employeeName?.toLowerCase() ?? "";
     const matchesSearch =
-      workflow.workflow.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      workflow.workflow.currentState
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      owner?.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      false;
+      workflow.workflow.id.toLowerCase().includes(lowerSearchTerm) ||
+      workflow.workflow.currentState.toLowerCase().includes(lowerSearchTerm) ||
+      ownerName.includes(lowerSearchTerm);
     const matchesStatus = statusFilter === "all" || status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -310,10 +348,120 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
     }
   };
 
-  const handleNodeClick = (event: React.MouseEvent, node: any) => {
+  const handleNodeClick = (
+    _event: React.MouseEvent,
+    node: Node<RunningWorkflowNodeData>
+  ) => {
     setSelectedNodeId(node.id);
   };
 
+  const renderViewContent = (): React.ReactNode => {
+    if (viewMode === "graph" && selectedWorkflow) {
+      return (
+        <>
+          <div className="rwp-graph-info">
+            <h2>{selectedWorkflow.workflow.id} - Workflow Visualization</h2>
+            <span>
+              Current State{" "}
+              <strong>{selectedWorkflow.workflow.currentState}</strong>
+            </span>
+          </div>
+          <div className="rwp-graph-canvas">
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onNodeClick={handleNodeClick}
+              nodeTypes={nodeTypes}
+              fitView
+              fitViewOptions={{ padding: 0.2 }}
+              proOptions={{ hideAttribution: true }}
+              nodesConnectable={false}
+              elementsSelectable={true}
+            >
+              <Background gap={12} size={1} />
+              <Controls />
+              <MiniMap style={{ height: 100, width: 120 }} zoomable pannable />
+            </ReactFlow>
+          </div>
+        </>
+      );
+    }
+
+    if (viewMode === "list") {
+      return (
+        <div className="rwp-list-view">
+          <table className="rwp-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Status</th>
+                <th>Current State</th>
+                <th>Owner</th>
+                <th>Last Updated</th>
+                <th>Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredWorkflows.map((workflow) => {
+                const statusInfo = getWorkflowStatus(workflow);
+                const progress = calculateProgress(workflow);
+                const owner = getWorkflowOwner(workflow);
+
+                return (
+                  <tr
+                    key={workflow.workflow.id}
+                    onClick={() => handleWorkflowSelect(workflow)}
+                    className={
+                      selectedWorkflow?.workflow.id === workflow.workflow.id
+                        ? "selected"
+                        : ""
+                    }
+                  >
+                    <td>{workflow.workflow.id}</td>
+                    <td>
+                      <span
+                        className="rwp-table-status"
+                        style={{ background: statusInfo.color }}
+                      >
+                        {statusInfo.label}
+                      </span>
+                    </td>
+                    <td>{workflow.workflow.currentState}</td>
+                    <td>{owner?.employeeName || "System"}</td>
+                    <td>
+                      {new Date(
+                        workflow.workflow.currentStateEnteredAt
+                      ).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <div className="rwp-table-progress">
+                        <div
+                          className="rwp-table-progress-bar"
+                          style={{
+                            width: `${progress}%`,
+                            background: statusInfo.color,
+                          }}
+                        />
+                        <span>{progress}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    return (
+      <div className="rwp-empty">
+        <p>Select a workflow instance to view its visualization</p>
+      </div>
+    );
+  };
   return (
     <div className="running-workflows-page">
       <div className="rwp-header">
@@ -377,7 +525,8 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
               const owner = getWorkflowOwner(workflow);
 
               return (
-                <div
+                <button
+                  type="button"
                   key={workflow.workflow.id}
                   className={`rwp-instance-card ${
                     selectedWorkflow?.workflow.id === workflow.workflow.id
@@ -414,115 +563,13 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
                       }}
                     />
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
 
-        <div className="rwp-main">
-          {viewMode === "graph" && selectedWorkflow ? (
-            <>
-              <div className="rwp-graph-info">
-                <h2>{selectedWorkflow.workflow.id} - Workflow Visualization</h2>
-                <span>
-                  Current State:{" "}
-                  <strong>{selectedWorkflow.workflow.currentState}</strong>
-                </span>
-              </div>
-              <div className="rwp-graph-canvas">
-                <ReactFlow
-                  nodes={nodes}
-                  edges={edges}
-                  onNodesChange={onNodesChange}
-                  onEdgesChange={onEdgesChange}
-                  onNodeClick={handleNodeClick}
-                  nodeTypes={nodeTypes}
-                  fitView
-                  fitViewOptions={{ padding: 0.2 }}
-                  proOptions={{ hideAttribution: true }}
-                  nodesConnectable={false}
-                  elementsSelectable={true}
-                >
-                  <Background gap={12} size={1} />
-                  <Controls />
-                  <MiniMap
-                    style={{ height: 100, width: 120 }}
-                    zoomable
-                    pannable
-                  />
-                </ReactFlow>
-              </div>
-            </>
-          ) : viewMode === "list" ? (
-            <div className="rwp-list-view">
-              <table className="rwp-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Status</th>
-                    <th>Current State</th>
-                    <th>Owner</th>
-                    <th>Last Updated</th>
-                    <th>Progress</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredWorkflows.map((workflow) => {
-                    const statusInfo = getWorkflowStatus(workflow);
-                    const progress = calculateProgress(workflow);
-                    const owner = getWorkflowOwner(workflow);
-
-                    return (
-                      <tr
-                        key={workflow.workflow.id}
-                        onClick={() => handleWorkflowSelect(workflow)}
-                        className={
-                          selectedWorkflow?.workflow.id === workflow.workflow.id
-                            ? "selected"
-                            : ""
-                        }
-                      >
-                        <td>{workflow.workflow.id}</td>
-                        <td>
-                          <span
-                            className="rwp-table-status"
-                            style={{ background: statusInfo.color }}
-                          >
-                            {statusInfo.label}
-                          </span>
-                        </td>
-                        <td>{workflow.workflow.currentState}</td>
-                        <td>{owner?.employeeName || "System"}</td>
-                        <td>
-                          {new Date(
-                            workflow.workflow.currentStateEnteredAt
-                          ).toLocaleDateString()}
-                        </td>
-                        <td>
-                          <div className="rwp-table-progress">
-                            <div
-                              className="rwp-table-progress-bar"
-                              style={{
-                                width: `${progress}%`,
-                                background: statusInfo.color,
-                              }}
-                            />
-                            <span>{progress}%</span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="rwp-empty">
-              <p>Select a workflow instance to view its visualization</p>
-            </div>
-          )}
-        </div>
+        <div className="rwp-main">{renderViewContent()}</div>
 
         {selectedWorkflow && viewMode === "graph" && (
           <DetailPanel
@@ -539,3 +586,4 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
 };
 
 export default RunningWorkflowsPage;
+

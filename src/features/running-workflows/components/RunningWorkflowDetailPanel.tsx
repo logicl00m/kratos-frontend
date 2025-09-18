@@ -18,51 +18,71 @@ interface RunningWorkflowDetailPanelProps {
   onClose: () => void;
 }
 
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const formatDuration = (ms?: number) => {
+  if (!ms) return "N/A";
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  return `${hours}h ${minutes}m`;
+};
+
+const statusBadgeClass = (status: WorkflowInstance["status"]) =>
+  `status-badge status-${status}`;
+
+const priorityClasses: Record<
+  NonNullable<WorkflowInstance["priority"]>,
+  string
+> = {
+  critical: "status-rejected",
+  high: "status-pending",
+  medium: "status-active",
+  low: "status-completed",
+};
+
+const getPriorityBadge = (priority?: WorkflowInstance["priority"]) => {
+  if (!priority) return null;
+  const className = priorityClasses[priority];
+  return (
+    <span className={`status-badge ${className}`}>
+      {priority.toUpperCase()}
+    </span>
+  );
+};
+
+const getEventTypeLabel = (type: string) => {
+  return type.replace(/_/g, " ").toLowerCase();
+};
+
+const formatDataValue = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+
+  if (value && typeof value === "object") {
+    return JSON.stringify(value);
+  }
+
+  if (value == null) {
+    return "";
+  }
+
+  return String(value);
+};
+
 const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
   instance,
   onClose,
 }) => {
   if (!instance) return null;
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatDuration = (ms?: number) => {
-    if (!ms) return "N/A";
-    const hours = Math.floor(ms / 3600000);
-    const minutes = Math.floor((ms % 3600000) / 60000);
-    return `${hours}h ${minutes}m`;
-  };
-
-  const getStatusBadgeClass = (status: string) => {
-    return `status-badge status-${status}`;
-  };
-
-  const getEventTypeLabel = (type: string) => {
-    return type.replace(/_/g, " ").toLowerCase();
-  };
-
-  const getPriorityBadge = (priority?: string) => {
-    if (!priority) return null;
-    const colors = {
-      critical: "status-rejected",
-      high: "status-pending",
-      medium: "status-active",
-      low: "status-completed",
-    };
-    return (
-      <span className={`status-badge ${colors[priority]}`}>
-        {priority.toUpperCase()}
-      </span>
-    );
-  };
 
   return (
     <div className="running-detail-panel">
@@ -70,7 +90,7 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
         <div>
           <h3 className="rdp-title">{instance.id}</h3>
           <div style={{ display: "flex", gap: "8px" }}>
-            <span className={getStatusBadgeClass(instance.status)}>
+            <span className={statusBadgeClass(instance.status)}>
               {instance.status.toUpperCase()}
             </span>
             {getPriorityBadge(instance.priority)}
@@ -105,22 +125,16 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Created</span>
-              <span className="rdp-value">
-                {formatDate(instance.createdAt)}
-              </span>
+              <span className="rdp-value">{formatDate(instance.createdAt)}</span>
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Last Updated</span>
-              <span className="rdp-value">
-                {formatDate(instance.updatedAt)}
-              </span>
+              <span className="rdp-value">{formatDate(instance.updatedAt)}</span>
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Due Date</span>
               <span className="rdp-value">
-                {instance.dueDate
-                  ? formatDate(instance.dueDate)
-                  : "No deadline"}
+                {instance.dueDate ? formatDate(instance.dueDate) : "No deadline"}
               </span>
             </div>
           </div>
@@ -160,13 +174,7 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
             {Object.entries(instance.data).map(([key, value]) => (
               <div key={key} className="rdp-data-item">
                 <span className="rdp-data-key">{key.replace(/_/g, " ")}</span>
-                <span className="rdp-data-value">
-                  {Array.isArray(value)
-                    ? value.join(", ")
-                    : typeof value === "object"
-                    ? JSON.stringify(value)
-                    : String(value)}
-                </span>
+                <span className="rdp-data-value">{formatDataValue(value)}</span>
               </div>
             ))}
           </div>
@@ -179,9 +187,9 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
             Workflow History
           </div>
           <div className="rdp-history">
-            {instance.history.map((item, index) => (
+            {instance.history.map((item) => (
               <div key={item.id} className="rdp-history-item">
-                <div className="rdp-history-marker"></div>
+                <div className="rdp-history-marker" />
                 <div className="rdp-history-content">
                   <div className="rdp-history-header">
                     <span className="rdp-history-state">
@@ -207,7 +215,7 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
                         marginBottom: "4px",
                       }}
                     >
-                      {item.event.from} → {item.event.to}
+                      {item.event.from} -> {item.event.to}
                     </div>
                   )}
                   <div className="rdp-history-meta">
@@ -240,12 +248,16 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
                         color: "#6b7280",
                       }}
                     >
-                      {item.changes.map((change, idx) => (
-                        <div key={idx}>
-                          • {change.fieldName || change.fieldId}:{" "}
-                          {change.changeType.toLowerCase()}
-                        </div>
-                      ))}
+                      {item.changes.map((change) => {
+                        const key =
+                          change.fieldId ||
+                          `${change.fieldName || "change"}-${change.changeType}`;
+                        return (
+                          <div key={key}>
+                            - {change.fieldName || change.fieldId}: {change.changeType.toLowerCase()}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

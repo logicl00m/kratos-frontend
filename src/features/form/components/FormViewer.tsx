@@ -2,57 +2,81 @@
 import React, { useState } from "react";
 import { Edit, Save, ArrowLeft } from "lucide-react";
 import FieldInput from "./FieldInput";
+import type { FieldInputField } from "./FieldInput";
+import type {
+  WorkflowConfig,
+  Field as WorkflowField,
+  FieldOverride as WorkflowFieldOverride,
+  State as WorkflowState,
+} from "../../workflow/types/workflow.types";
 
-// Type definitions matching the JSON structure
-interface FieldDefinition {
-  id: string;
-  name: string;
-  type: string;
+interface LegacyFieldAction {
+  Operation?: string;
+  operation?: string;
+}
+
+interface LegacyField {
+  ID?: string;
+  id?: string;
+  Name?: string;
+  name?: string;
+  Type?: string;
+  type?: string;
+  DataSource?: string;
   data?: string;
-  fieldActions?: Array<{ operation: string }>;
+  FieldActions?: LegacyFieldAction[];
+  fieldActions?: LegacyFieldAction[];
 }
 
-interface FormDefinition {
-  fields: FieldDefinition[];
-}
-
-interface FieldOverride {
-  status: "editable" | "readonly" | "hidden" | "actionable";
-  required?: boolean;
-}
-
-interface StateForm {
-  formName: string;
-  visibility?: "hidden";
-  fieldOverrides?: Record<string, FieldOverride>;
-}
-
-interface StateAction {
-  nextState: string;
-  operation: string;
-}
-
-interface State {
-  forms: StateForm[];
-  actions: Record<string, StateAction>;
-}
-
-interface Workflow {
-  forms: Record<string, FormDefinition>;
-  states: Record<string, State>;
+interface LegacyWorkflowState {
+  Form?: {
+    Fields?: LegacyField[];
+  };
 }
 
 interface FormViewerProps {
   stateName: string;
-  // new/current API
-  workflow?: { workflow: Workflow };
+  workflow?: WorkflowConfig;
   currentState?: string;
-  // legacy API: some tests and older code pass a `state` prop directly
-  state?: any;
+  state?: LegacyWorkflowState;
   onSubmit?: (data: Record<string, unknown>) => void;
   onReject?: (data: Record<string, unknown>) => void;
   onBack?: () => void;
 }
+
+const toFieldInputField = (
+  field: WorkflowField
+): FieldInputField => ({
+  id: field.id,
+  name: field.name,
+  type: field.type,
+  data: field.data,
+  fieldActions: field.fieldActions?.map((action) => ({
+    operation: action.operation,
+  })),
+});
+
+const toFieldInputFieldFromLegacy = (
+  field: LegacyField,
+  index: number
+): FieldInputField => {
+  const actionSource = field.FieldActions ?? field.fieldActions ?? [];
+  const operations = actionSource
+    .map((action) => action.operation ?? action.Operation)
+    .filter((operation): operation is string => Boolean(operation));
+
+  const id = field.ID ?? field.id ?? `legacy-field-${index}`;
+  const name = field.Name ?? field.name ?? `Field ${index + 1}`;
+  const type = field.Type ?? field.type ?? "text";
+
+  return {
+    id: String(id),
+    name: String(name),
+    type: String(type),
+    data: field.DataSource ?? field.data,
+    fieldActions: operations.map((operation) => ({ operation })),
+  };
+};
 
 const FormViewer: React.FC<FormViewerProps> = ({
   stateName,
@@ -66,19 +90,22 @@ const FormViewer: React.FC<FormViewerProps> = ({
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [editMode, setEditMode] = useState(false);
 
-  // Validate workflow structure
+  const handleFieldChange = (
+    fieldId: string,
+    value: string | number | File | undefined
+  ) => {
+    setFormData((prev) => ({ ...prev, [fieldId]: value }));
+  };
+
   // Support legacy tests/code that pass a `state` prop directly instead of a workflow
   if (!workflow?.workflow && legacyState) {
-    const fields = Array.isArray(legacyState?.Form?.Fields)
-      ? legacyState.Form.Fields
+    const legacyFields = Array.isArray(legacyState.Form?.Fields)
+      ? legacyState.Form?.Fields ?? []
       : [];
 
-    const handleFieldChange = (
-      fieldId: string,
-      value: string | number | File | undefined
-    ) => {
-      setFormData((prev) => ({ ...prev, [fieldId]: value }));
-    };
+    const normalizedFields = legacyFields.map((field, index) =>
+      toFieldInputFieldFromLegacy(field, index)
+    );
 
     return (
       <div className="form-viewer">
@@ -94,31 +121,21 @@ const FormViewer: React.FC<FormViewerProps> = ({
         </div>
 
         <div className="form-content">
-          {fields.map((f: any) => {
-            const fieldProp = {
-              ID: f.ID ?? f.id,
-              Name: f.Name ?? f.name,
-              Type: f.Type ?? f.type,
-              DataSource: f.DataSource ?? f.data,
-              FieldActions: f.FieldActions ?? f.fieldActions,
-            };
-
-            return (
-              <div key={fieldProp.ID} className="form-group">
-                <div className="field-row">
-                  <label className="field-label">{fieldProp.Name}</label>
-                  <div className="field-value">
-                    <FieldInput
-                      field={fieldProp}
-                      value={formData[fieldProp.ID]}
-                      disabled={true}
-                      onChange={(val) => handleFieldChange(fieldProp.ID, val)}
-                    />
-                  </div>
+          {normalizedFields.map((field) => (
+            <div key={field.id} className="form-group">
+              <div className="field-row">
+                <label className="field-label">{field.name}</label>
+                <div className="field-value">
+                  <FieldInput
+                    field={field}
+                    value={formData[field.id]}
+                    disabled
+                    onChange={(val) => handleFieldChange(field.id, val)}
+                  />
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         <div className="form-footer">
@@ -139,9 +156,9 @@ const FormViewer: React.FC<FormViewerProps> = ({
     );
   }
 
-  const { forms, states } = workflow.workflow;
+  const workflowDefinition: WorkflowConfig["workflow"] | undefined = workflow?.workflow;
 
-  if (!states || !forms) {
+  if (!workflowDefinition) {
     return (
       <div className="form-viewer">
         <div className="form-header">
@@ -158,9 +175,9 @@ const FormViewer: React.FC<FormViewerProps> = ({
     );
   }
 
-  const state = states[currentState];
+  const { forms, states } = workflowDefinition;
 
-  if (!state) {
+  if (!forms) {
     return (
       <div className="form-viewer">
         <div className="form-header">
@@ -171,42 +188,53 @@ const FormViewer: React.FC<FormViewerProps> = ({
           <h2>{stateName}</h2>
         </div>
         <div className="form-content">
-          <p>Error: State '{currentState}' not found in workflow</p>
+          <p>Error: Invalid workflow configuration structure</p>
         </div>
       </div>
     );
   }
 
-  const handleFieldChange = (
-    fieldId: string,
-    value: string | number | File | undefined
-  ) => {
-    setFormData((prev) => ({ ...prev, [fieldId]: value }));
-  };
+  const stateKey = currentState ?? stateName;
+  const stateConfig: WorkflowState | undefined = stateKey
+    ? states[stateKey]
+    : undefined;
 
-  // Get all fields with their configurations for the current state
+  if (!stateConfig) {
+    return (
+      <div className="form-viewer">
+        <div className="form-header">
+          <button className="back-btn" onClick={onBack}>
+            <ArrowLeft size={16} />
+            Back to Graph
+          </button>
+          <h2>{stateName}</h2>
+        </div>
+        <div className="form-content">
+          <p>Error: State '{stateKey}' not found in workflow</p>
+        </div>
+      </div>
+    );
+  }
+
   const getVisibleFields = () => {
     const visibleFields: Array<{
-      field: FieldDefinition;
-      config: FieldOverride | null;
+      field: WorkflowField;
+      config?: WorkflowFieldOverride;
     }> = [];
 
-    state.forms.forEach((stateForm) => {
-      // Skip hidden forms
+    stateConfig.forms?.forEach((stateForm) => {
       if (stateForm.visibility === "hidden") return;
 
-      const formDef = forms[stateForm.formName];
+      const formDef = stateForm.formName ? forms[stateForm.formName] : undefined;
       if (!formDef) return;
 
       formDef.fields.forEach((field) => {
         const override = stateForm.fieldOverrides?.[field.id];
-
-        // Skip hidden fields
         if (override?.status === "hidden") return;
 
         visibleFields.push({
           field,
-          config: override || null,
+          config: override,
         });
       });
     });
@@ -214,8 +242,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
     return visibleFields;
   };
 
-  // Check if field is editable
-  const isFieldEditable = (config: FieldOverride | null): boolean => {
+  const isFieldEditable = (config?: WorkflowFieldOverride): boolean => {
     if (!config) return false;
 
     if (config.status === "readonly") return false;
@@ -225,10 +252,9 @@ const FormViewer: React.FC<FormViewerProps> = ({
     return false;
   };
 
-  // Get field status display text
   const getFieldStatusDisplay = (
     fieldId: string,
-    config: FieldOverride | null
+    config?: WorkflowFieldOverride
   ): string => {
     if (!config) return "";
 
@@ -248,17 +274,6 @@ const FormViewer: React.FC<FormViewerProps> = ({
     }
   };
 
-  // Transform field to match FieldInput expectations
-  const transformField = (field: FieldDefinition) => ({
-    ID: field.id,
-    Name: field.name,
-    Type: field.type,
-    DataSource: field.data,
-    FieldActions: field.fieldActions?.map((action) => ({
-      Operation: action.operation,
-    })),
-  });
-
   const visibleFields = getVisibleFields();
 
   return (
@@ -270,7 +285,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
         </button>
         <h2>{stateName}</h2>
         <div className="form-status">
-          <span className="status-badge">State: {currentState}</span>
+          <span className="status-badge">State: {stateKey}</span>
         </div>
         <button className="edit-btn" onClick={() => setEditMode(!editMode)}>
           {editMode ? <Save size={16} /> : <Edit size={16} />}
@@ -281,6 +296,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
       <div className="form-content">
         {visibleFields.map(({ field, config }) => {
           const statusText = getFieldStatusDisplay(field.id, config);
+          const normalizedField = toFieldInputField(field);
 
           return (
             <div key={field.id} className="form-group">
@@ -293,7 +309,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
                 </label>
                 <div className="field-value">
                   <FieldInput
-                    field={transformField(field)}
+                    field={normalizedField}
                     value={formData[field.id]}
                     disabled={!isFieldEditable(config)}
                     onChange={(val) => handleFieldChange(field.id, val)}
@@ -311,11 +327,16 @@ const FormViewer: React.FC<FormViewerProps> = ({
 
               {field.fieldActions && field.fieldActions.length > 0 && (
                 <div className="field-actions">
-                  {field.fieldActions.map((action, index) => (
-                    <span key={index} className="action-tag">
-                      {action.operation}
-                    </span>
-                  ))}
+                  {field.fieldActions.map((action, index) => {
+                    const key = action.operation
+                      ? `${field.id}-${action.operation}`
+                      : `${field.id}-action-${index}`;
+                    return (
+                      <span key={key} className="action-tag">
+                        {action.operation}
+                      </span>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -324,9 +345,8 @@ const FormViewer: React.FC<FormViewerProps> = ({
       </div>
 
       <div className="form-footer">
-        {/* Render state actions dynamically */}
-        {state?.actions &&
-          Object.entries(state.actions).map(([actionKey, actionData]) => (
+        {stateConfig.actions &&
+          Object.keys(stateConfig.actions).map((actionKey) => (
             <button
               key={actionKey}
               className={`btn-${actionKey
@@ -342,8 +362,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
             </button>
           ))}
 
-        {/* Fallback buttons if no state actions defined */}
-        {(!state?.actions || Object.keys(state.actions).length === 0) && (
+        {!stateConfig.actions || Object.keys(stateConfig.actions).length === 0 ? (
           <>
             <button className="btn-save" onClick={() => onSubmit?.(formData)}>
               Save
@@ -355,7 +374,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
               Reject
             </button>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );

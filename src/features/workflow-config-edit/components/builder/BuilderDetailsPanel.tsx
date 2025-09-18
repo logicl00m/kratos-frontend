@@ -33,13 +33,13 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
 
   if (!selectedNode && !selectedEdge) return null;
 
-  const nodeData = selectedNode?.data as ProcessNodeData | DecisionNodeData;
+  const nodeData = selectedNode?.data;
   const isProcessNode = selectedNode?.type === "process";
   const isDecisionNode = selectedNode?.type === "decision";
 
   const handleRename = () => {
     const newName = prompt("Enter new state name:", nodeData?.label);
-    if (newName && selectedNode) {
+    if (newName && selectedNode && nodeData) {
       onNodeUpdate(selectedNode.id, { ...nodeData, label: newName });
     }
   };

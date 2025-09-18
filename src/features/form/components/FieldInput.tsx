@@ -1,18 +1,25 @@
 // src/features/form/components/FieldInput.tsx
 import React from "react";
-import type { Field } from "@features/workflow/types/workflow.types";
+
+export type FieldInputField = {
+  id: string;
+  name: string;
+  type: string;
+  data?: unknown;
+  fieldActions?: Array<{ operation: string }>;
+};
 
 type Props = {
-  field: Field;
+  field: FieldInputField;
   value: unknown;
   disabled?: boolean;
   onChange: (val: string | number | File | undefined) => void;
 };
 
 const FieldInput: React.FC<Props> = ({ field, value, disabled, onChange }) => {
-  const t = (field.Type || "text").toLowerCase();
+  const fieldType = (field.type ?? "text").toLowerCase();
 
-  switch (t) {
+  switch (fieldType) {
     case "text":
       return (
         <input
