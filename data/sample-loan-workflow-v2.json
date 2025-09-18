@@ -1,2026 +1,1678 @@
 {
-    "Workflow": {
-        "Form": {
-            "Fields": [
-                {
-                    "ID": "applicant_legal_name",
-                    "Name": "Applicant Legal Name",
-                    "Type": "text",
-                    "DataSource": "{{ data.borrower.legalName }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "group_name",
-                    "Name": "Group / Parent Name",
-                    "Type": "text",
-                    "DataSource": "{{ data.borrower.groupName }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "business_segment",
-                    "Name": "Business Segment (CnIB/CB/EM/FI)",
-                    "Type": "select",
-                    "DataSource": "{{ data.borrower.segment }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "registration_no",
-                    "Name": "Company Registration No.",
-                    "Type": "text",
-                    "DataSource": "{{ data.borrower.registrationNo }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "tin",
-                    "Name": "Tax Identification Number (TIN)",
-                    "Type": "text",
-                    "DataSource": "{{ data.borrower.tin }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "sector_code",
-                    "Name": "Sector / Industry Code",
-                    "Type": "select",
-                    "DataSource": "{{ data.borrower.sectorCode }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "facility_type",
-                    "Name": "Facility Type",
-                    "Type": "select",
-                    "DataSource": "{{ data.facility.type }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "requested_amount",
-                    "Name": "Requested Amount",
-                    "Type": "number",
-                    "DataSource": "{{ data.facility.requestedAmount }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "currency",
-                    "Name": "Currency",
-                    "Type": "select",
-                    "DataSource": "{{ data.facility.currency }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "tenor_months",
-                    "Name": "Tenor (months)",
-                    "Type": "number",
-                    "DataSource": "{{ data.facility.tenorMonths }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "facility_purpose",
-                    "Name": "Purpose of Facility",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.facility.purpose }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "collateral_type",
-                    "Name": "Collateral Type",
-                    "Type": "select",
-                    "DataSource": "{{ data.collateral.type }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "collateral_value",
-                    "Name": "Collateral Appraised Value",
-                    "Type": "number",
-                    "DataSource": "{{ data.collateral.appraisedValue }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "exposure_existing",
-                    "Name": "Existing Exposure (All Banks)",
-                    "Type": "number",
-                    "DataSource": "{{ data.exposure.existingTotal }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "exposure_proposed",
-                    "Name": "Proposed Exposure (This Bank)",
-                    "Type": "number",
-                    "DataSource": "{{ data.exposure.proposedThisBank }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "icrr_score",
-                    "Name": "ICRR Score",
-                    "Type": "number",
-                    "DataSource": "{{ data.icrr.score }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "calculate"
-                        },
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "icrr_grade",
-                    "Name": "ICRR Grade",
-                    "Type": "select",
-                    "DataSource": "{{ data.icrr.grade }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "icrr_date",
-                    "Name": "ICRR Assessment Date",
-                    "Type": "date",
-                    "DataSource": "{{ data.icrr.date }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "esrm_category",
-                    "Name": "ESRM Category",
-                    "Type": "select",
-                    "DataSource": "{{ data.esrm.category }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "esrm_screening_ref",
-                    "Name": "ESRM Screening Reference",
-                    "Type": "text",
-                    "DataSource": "{{ data.esrm.screeningRef }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "kyc_status",
-                    "Name": "KYC/e-KYC Status",
-                    "Type": "select",
-                    "DataSource": "{{ data.kyc.status }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "aml_sanctions_ref",
-                    "Name": "AML/Sanctions Screening Ref",
-                    "Type": "text",
-                    "DataSource": "{{ data.kyc.amlSanctionsRef }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "pep_flag",
-                    "Name": "PEP Flag",
-                    "Type": "select",
-                    "DataSource": "{{ data.kyc.pepFlag }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "incorporation_date",
-                    "Name": "Incorporation Date",
-                    "Type": "date",
-                    "DataSource": "{{ data.borrower.incorporationDate }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "registered_address",
-                    "Name": "Registered Address",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.borrower.registeredAddress }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "proposal_details",
-                    "Name": "Proposal Details",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.proposal.details }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "supporting_documents",
-                    "Name": "Supporting Documents",
-                    "Type": "file",
-                    "DataSource": "{{ data.documents }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "upload"
-                        },
-                        {
-                            "Operation": "replace"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "rm_decision",
-                    "Name": "RM Decision",
-                    "Type": "select",
-                    "DataSource": "{{ data.rm.decision }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "rm_remarks",
-                    "Name": "RM Remarks",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.rm.remarks }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "rm_additional_docs",
-                    "Name": "Additional Documents",
-                    "Type": "file",
-                    "DataSource": "{{ data.rm.additionalDocs }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "upload"
-                        }
-                    ]
-                },
-                {
-                    "ID": "th_decision",
-                    "Name": "Team Head/Business Lead Decision",
-                    "Type": "select",
-                    "DataSource": "{{ data.th.decision }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "recommendation",
-                    "Name": "Recommendation",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.th.recommendation }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "assigned_recommender",
-                    "Name": "Assign Recommender (CBO/HOD)",
-                    "Type": "select",
-                    "DataSource": "{{ data.th.recommender }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "assign"
-                        }
-                    ]
-                },
-                {
-                    "ID": "cbo_decision",
-                    "Name": "CBO/HOD Decision",
-                    "Type": "select",
-                    "DataSource": "{{ data.cbo.decision }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "cbo_recommendation",
-                    "Name": "CBO/HOD Recommendation",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.cbo.recommendation }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "assign_th_crm",
-                    "Name": "Assign Team Head, CRM",
-                    "Type": "select",
-                    "DataSource": "{{ data.crm.teamHead }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "assign"
-                        }
-                    ]
-                },
-                {
-                    "ID": "assign_cm",
-                    "Name": "Assign Credit Manager",
-                    "Type": "select",
-                    "DataSource": "{{ data.crm.creditManager }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "assign"
-                        }
-                    ]
-                },
-                {
-                    "ID": "cm_decision",
-                    "Name": "Credit Manager Decision",
-                    "Type": "select",
-                    "DataSource": "{{ data.cm.decision }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "cm_remarks",
-                    "Name": "CM Remarks/Observation",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.cm.remarks }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "risk_assessment",
-                    "Name": "Risk Assessment",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.cm.risk }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "calculate"
-                        },
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "correction_details",
-                    "Name": "Correction Details",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.rm.correction }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        },
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "updated_docs",
-                    "Name": "Updated Documents",
-                    "Type": "file",
-                    "DataSource": "{{ data.rm.updatedDocs }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "upload"
-                        },
-                        {
-                            "Operation": "replace"
-                        }
-                    ]
-                },
-                {
-                    "ID": "thcrm_decision",
-                    "Name": "Team Head–CRM Decision",
-                    "Type": "select",
-                    "DataSource": "{{ data.thcrm.decision }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "validate"
-                        }
-                    ]
-                },
-                {
-                    "ID": "thcrm_notes",
-                    "Name": "Notes",
-                    "Type": "textarea",
-                    "DataSource": "{{ data.thcrm.notes }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "save"
-                        }
-                    ]
-                },
-                {
-                    "ID": "final_memo",
-                    "Name": "Credit Memo",
-                    "Type": "file",
-                    "DataSource": "{{ data.outputs.creditMemo }}",
-                    "FieldActions": [
-                        {
-                            "Operation": "download"
-                        }
-                    ]
-                }
-            ]
-        },
-        "States": {
-            "ARMDraft": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "editable",
-                        "required": true
+    "workflow": {
+        "forms": {
+            "applicationCore": {
+                "fields": [
+                    {
+                        "id": "applicantLegalName",
+                        "name": "Applicant Legal Name",
+                        "type": "text",
+                        "data": "{{ data.borrower.legalName }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
                     },
-                    "group_name": {
-                        "status": "editable"
+                    {
+                        "id": "groupName",
+                        "name": "Group / Parent Name",
+                        "type": "text",
+                        "data": "{{ data.borrower.groupName }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
                     },
-                    "business_segment": {
-                        "status": "editable",
-                        "required": true
+                    {
+                        "id": "businessSegment",
+                        "name": "Business Segment (CnIB/CB/EM/FI)",
+                        "type": "select",
+                        "data": "{{ data.borrower.segment }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
                     },
-                    "registration_no": {
-                        "status": "editable",
-                        "required": true
+                    {
+                        "id": "registrationNo",
+                        "name": "Company Registration No.",
+                        "type": "text",
+                        "data": "{{ data.borrower.registrationNo }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
                     },
-                    "tin": {
-                        "status": "editable"
+                    {
+                        "id": "tin",
+                        "name": "Tax Identification Number (TIN)",
+                        "type": "text",
+                        "data": "{{ data.borrower.tin }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
                     },
-                    "sector_code": {
-                        "status": "editable",
-                        "required": true
+                    {
+                        "id": "sectorCode",
+                        "name": "Sector / Industry Code",
+                        "type": "select",
+                        "data": "{{ data.borrower.sectorCode }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
                     },
-                    "facility_type": {
-                        "status": "editable",
-                        "required": true
+                    {
+                        "id": "incorporationDate",
+                        "name": "Incorporation Date",
+                        "type": "date",
+                        "data": "{{ data.borrower.incorporationDate }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
                     },
-                    "requested_amount": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "currency": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "tenor_months": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "facility_purpose": {
-                        "status": "editable"
-                    },
-                    "collateral_type": {
-                        "status": "editable"
-                    },
-                    "collateral_value": {
-                        "status": "editable"
-                    },
-                    "exposure_existing": {
-                        "status": "editable"
-                    },
-                    "exposure_proposed": {
-                        "status": "editable"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "editable"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "editable"
-                    },
-                    "kyc_status": {
-                        "status": "editable"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "editable"
-                    },
-                    "pep_flag": {
-                        "status": "editable"
-                    },
-                    "incorporation_date": {
-                        "status": "editable"
-                    },
-                    "registered_address": {
-                        "status": "editable"
-                    },
-                    "proposal_details": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "supporting_documents": {
-                        "status": "actionable",
-                        "required": true
-                    },
-                    "rm_decision": {
-                        "status": "hidden"
-                    },
-                    "rm_remarks": {
-                        "status": "hidden"
-                    },
-                    "rm_additional_docs": {
-                        "status": "hidden"
-                    },
-                    "th_decision": {
-                        "status": "hidden"
-                    },
-                    "recommendation": {
-                        "status": "hidden"
-                    },
-                    "assigned_recommender": {
-                        "status": "hidden"
-                    },
-                    "cbo_decision": {
-                        "status": "hidden"
-                    },
-                    "cbo_recommendation": {
-                        "status": "hidden"
-                    },
-                    "assign_th_crm": {
-                        "status": "hidden"
-                    },
-                    "assign_cm": {
-                        "status": "hidden"
-                    },
-                    "cm_decision": {
-                        "status": "hidden"
-                    },
-                    "cm_remarks": {
-                        "status": "hidden"
-                    },
-                    "risk_assessment": {
-                        "status": "hidden"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "id": "registeredAddress",
+                        "name": "Registered Address",
+                        "type": "textarea",
+                        "data": "{{ data.borrower.registeredAddress }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
                     }
-                },
-                "Actions": {
-                    "SubmitToRM": {
-                        "NextState": "RMReview",
-                        "Operation": "Validate draft; save; notify RM"
+                ]
+            },
+            "facilityDetails": {
+                "fields": [
+                    {
+                        "id": "facilityType",
+                        "name": "Facility Type",
+                        "type": "select",
+                        "data": "{{ data.facility.type }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "requestedAmount",
+                        "name": "Requested Amount",
+                        "type": "number",
+                        "data": "{{ data.facility.requestedAmount }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "currency",
+                        "name": "Currency",
+                        "type": "select",
+                        "data": "{{ data.facility.currency }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "tenorMonths",
+                        "name": "Tenor (months)",
+                        "type": "number",
+                        "data": "{{ data.facility.tenorMonths }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "facilityPurpose",
+                        "name": "Purpose of Facility",
+                        "type": "textarea",
+                        "data": "{{ data.facility.purpose }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "collateralType",
+                        "name": "Collateral Type",
+                        "type": "select",
+                        "data": "{{ data.collateral.type }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "collateralValue",
+                        "name": "Collateral Appraised Value",
+                        "type": "number",
+                        "data": "{{ data.collateral.appraisedValue }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "exposureExisting",
+                        "name": "Existing Exposure (All Banks)",
+                        "type": "number",
+                        "data": "{{ data.exposure.existingTotal }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "exposureProposed",
+                        "name": "Proposed Exposure (This Bank)",
+                        "type": "number",
+                        "data": "{{ data.exposure.proposedThisBank }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "riskCompliance": {
+                "fields": [
+                    {
+                        "id": "icrrScore",
+                        "name": "ICRR Score",
+                        "type": "number",
+                        "data": "{{ data.icrr.score }}",
+                        "fieldActions": [
+                            {
+                                "operation": "calculate"
+                            },
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "icrrGrade",
+                        "name": "ICRR Grade",
+                        "type": "select",
+                        "data": "{{ data.icrr.grade }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "icrrDate",
+                        "name": "ICRR Assessment Date",
+                        "type": "date",
+                        "data": "{{ data.icrr.date }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "esrmCategory",
+                        "name": "ESRM Category",
+                        "type": "select",
+                        "data": "{{ data.esrm.category }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "esrmScreeningRef",
+                        "name": "ESRM Screening Reference",
+                        "type": "text",
+                        "data": "{{ data.esrm.screeningRef }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "kycStatus",
+                        "name": "KYC/e-KYC Status",
+                        "type": "select",
+                        "data": "{{ data.kyc.status }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "amlSanctionsRef",
+                        "name": "AML/Sanctions Screening Ref",
+                        "type": "text",
+                        "data": "{{ data.kyc.amlSanctionsRef }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "pepFlag",
+                        "name": "PEP Flag",
+                        "type": "select",
+                        "data": "{{ data.kyc.pepFlag }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "proposalDocs": {
+                "fields": [
+                    {
+                        "id": "proposalDetails",
+                        "name": "Proposal Details",
+                        "type": "textarea",
+                        "data": "{{ data.proposal.details }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "supportingDocuments",
+                        "name": "Supporting Documents",
+                        "type": "file",
+                        "data": "{{ data.documents }}",
+                        "fieldActions": [
+                            {
+                                "operation": "upload"
+                            },
+                            {
+                                "operation": "replace"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "rmSection": {
+                "fields": [
+                    {
+                        "id": "rmDecision",
+                        "name": "RM Decision",
+                        "type": "select",
+                        "data": "{{ data.rm.decision }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "rmRemarks",
+                        "name": "RM Remarks",
+                        "type": "textarea",
+                        "data": "{{ data.rm.remarks }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "rmAdditionalDocs",
+                        "name": "Additional Documents",
+                        "type": "file",
+                        "data": "{{ data.rm.additionalDocs }}",
+                        "fieldActions": [
+                            {
+                                "operation": "upload"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "businessSection": {
+                "fields": [
+                    {
+                        "id": "thDecision",
+                        "name": "Team Head/Business Lead Decision",
+                        "type": "select",
+                        "data": "{{ data.th.decision }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "recommendation",
+                        "name": "Recommendation",
+                        "type": "textarea",
+                        "data": "{{ data.th.recommendation }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "assignedRecommender",
+                        "name": "Assign Recommender (CBO/HOD)",
+                        "type": "select",
+                        "data": "{{ data.th.recommender }}",
+                        "fieldActions": [
+                            {
+                                "operation": "assign"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "cboSection": {
+                "fields": [
+                    {
+                        "id": "cboDecision",
+                        "name": "CBO/HOD Decision",
+                        "type": "select",
+                        "data": "{{ data.cbo.decision }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "cboRecommendation",
+                        "name": "CBO/HOD Recommendation",
+                        "type": "textarea",
+                        "data": "{{ data.cbo.recommendation }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "crmAssignment": {
+                "fields": [
+                    {
+                        "id": "assignThCrm",
+                        "name": "Assign Team Head, CRM",
+                        "type": "select",
+                        "data": "{{ data.crm.teamHead }}",
+                        "fieldActions": [
+                            {
+                                "operation": "assign"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "assignCm",
+                        "name": "Assign Credit Manager",
+                        "type": "select",
+                        "data": "{{ data.crm.creditManager }}",
+                        "fieldActions": [
+                            {
+                                "operation": "assign"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "cmSection": {
+                "fields": [
+                    {
+                        "id": "cmDecision",
+                        "name": "Credit Manager Decision",
+                        "type": "select",
+                        "data": "{{ data.cm.decision }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "cmRemarks",
+                        "name": "CM Remarks/Observation",
+                        "type": "textarea",
+                        "data": "{{ data.cm.remarks }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "riskAssessment",
+                        "name": "Risk Assessment",
+                        "type": "textarea",
+                        "data": "{{ data.cm.risk }}",
+                        "fieldActions": [
+                            {
+                                "operation": "calculate"
+                            },
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "resubmissionSection": {
+                "fields": [
+                    {
+                        "id": "correctionDetails",
+                        "name": "Correction Details",
+                        "type": "textarea",
+                        "data": "{{ data.rm.correction }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            },
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "updatedDocs",
+                        "name": "Updated Documents",
+                        "type": "file",
+                        "data": "{{ data.rm.updatedDocs }}",
+                        "fieldActions": [
+                            {
+                                "operation": "upload"
+                            },
+                            {
+                                "operation": "replace"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "thcrmSection": {
+                "fields": [
+                    {
+                        "id": "thcrmDecision",
+                        "name": "Team Head–CRM Decision",
+                        "type": "select",
+                        "data": "{{ data.thcrm.decision }}",
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "thcrmNotes",
+                        "name": "Notes",
+                        "type": "textarea",
+                        "data": "{{ data.thcrm.notes }}",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputs": {
+                "fields": [
+                    {
+                        "id": "finalMemo",
+                        "name": "Credit Memo",
+                        "type": "file",
+                        "data": "{{ data.outputs.creditMemo }}",
+                        "fieldActions": [
+                            {
+                                "operation": "download"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "states": {
+            "ARMDraft": {
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {
+                            "applicantLegalName": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "groupName": {
+                                "status": "editable"
+                            },
+                            "businessSegment": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "registrationNo": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "tin": {
+                                "status": "editable"
+                            },
+                            "sectorCode": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "incorporationDate": {
+                                "status": "editable"
+                            },
+                            "registeredAddress": {
+                                "status": "editable"
+                            }
+                        }
+                    },
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {
+                            "facilityType": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "requestedAmount": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "currency": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "tenorMonths": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "facilityPurpose": {
+                                "status": "editable"
+                            },
+                            "collateralType": {
+                                "status": "editable"
+                            },
+                            "collateralValue": {
+                                "status": "editable"
+                            },
+                            "exposureExisting": {
+                                "status": "editable"
+                            },
+                            "exposureProposed": {
+                                "status": "editable"
+                            }
+                        }
+                    },
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {
+                            "icrrScore": {
+                                "status": "readonly"
+                            },
+                            "icrrGrade": {
+                                "status": "readonly"
+                            },
+                            "icrrDate": {
+                                "status": "readonly"
+                            },
+                            "esrmCategory": {
+                                "status": "editable"
+                            },
+                            "esrmScreeningRef": {
+                                "status": "editable"
+                            },
+                            "kycStatus": {
+                                "status": "editable"
+                            },
+                            "amlSanctionsRef": {
+                                "status": "editable"
+                            },
+                            "pepFlag": {
+                                "status": "editable"
+                            }
+                        }
+                    },
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "proposalDetails": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "supportingDocuments": {
+                                "status": "actionable",
+                                "required": true
+                            }
+                        }
+                    },
+                    {
+                        "formName": "rmSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "businessSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "cboSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "crmAssignment",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
+                    }
+                ],
+                "actions": {
+                    "submitToRm": {
+                        "nextState": "RMReview",
+                        "operation": "Validate draft; save; notify RM"
                     }
                 }
             },
             "RMReview": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {
+                            "applicantLegalName": {
+                                "status": "readonly"
+                            },
+                            "groupName": {
+                                "status": "readonly"
+                            },
+                            "businessSegment": {
+                                "status": "readonly"
+                            },
+                            "registrationNo": {
+                                "status": "readonly"
+                            },
+                            "tin": {
+                                "status": "readonly"
+                            },
+                            "sectorCode": {
+                                "status": "readonly"
+                            },
+                            "incorporationDate": {
+                                "status": "readonly"
+                            },
+                            "registeredAddress": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {
+                            "facilityType": {
+                                "status": "readonly"
+                            },
+                            "requestedAmount": {
+                                "status": "readonly"
+                            },
+                            "currency": {
+                                "status": "readonly"
+                            },
+                            "tenorMonths": {
+                                "status": "readonly"
+                            },
+                            "facilityPurpose": {
+                                "status": "readonly"
+                            },
+                            "collateralType": {
+                                "status": "readonly"
+                            },
+                            "collateralValue": {
+                                "status": "readonly"
+                            },
+                            "exposureExisting": {
+                                "status": "readonly"
+                            },
+                            "exposureProposed": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {
+                            "icrrScore": {
+                                "status": "readonly"
+                            },
+                            "icrrGrade": {
+                                "status": "readonly"
+                            },
+                            "icrrDate": {
+                                "status": "readonly"
+                            },
+                            "esrmCategory": {
+                                "status": "readonly"
+                            },
+                            "esrmScreeningRef": {
+                                "status": "readonly"
+                            },
+                            "kycStatus": {
+                                "status": "readonly"
+                            },
+                            "amlSanctionsRef": {
+                                "status": "readonly"
+                            },
+                            "pepFlag": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "proposalDetails": {
+                                "status": "readonly"
+                            },
+                            "supportingDocuments": {
+                                "status": "actionable"
+                            }
+                        }
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {
+                            "rmDecision": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "rmRemarks": {
+                                "status": "editable"
+                            },
+                            "rmAdditionalDocs": {
+                                "status": "actionable"
+                            }
+                        }
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "visibility": "hidden"
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "visibility": "hidden"
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "visibility": "hidden"
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "actionable"
-                    },
-                    "rm_decision": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "rm_remarks": {
-                        "status": "editable"
-                    },
-                    "rm_additional_docs": {
-                        "status": "actionable"
-                    },
-                    "th_decision": {
-                        "status": "hidden"
-                    },
-                    "recommendation": {
-                        "status": "hidden"
-                    },
-                    "assigned_recommender": {
-                        "status": "hidden"
-                    },
-                    "cbo_decision": {
-                        "status": "hidden"
-                    },
-                    "cbo_recommendation": {
-                        "status": "hidden"
-                    },
-                    "assign_th_crm": {
-                        "status": "hidden"
-                    },
-                    "assign_cm": {
-                        "status": "hidden"
-                    },
-                    "cm_decision": {
-                        "status": "hidden"
-                    },
-                    "cm_remarks": {
-                        "status": "hidden"
-                    },
-                    "risk_assessment": {
-                        "status": "hidden"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
                     }
-                },
-                "Actions": {
-                    "RMReject": {
-                        "NextState": "ARMDraft",
-                        "Operation": "Return to ARM with fields to correct; notify ARM & RM"
+                ],
+                "actions": {
+                    "rmReject": {
+                        "nextState": "ARMDraft",
+                        "operation": "Return to ARM with fields to correct; notify ARM & RM"
                     },
-                    "RMFinalize": {
-                        "NextState": "BusinessReview",
-                        "Operation": "Finalize proposal; update application if needed; attach additional docs"
+                    "rmFinalize": {
+                        "nextState": "BusinessReview",
+                        "operation": "Finalize proposal; update application if needed; attach additional docs"
                     }
                 }
             },
             "BusinessReview": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {
+                            "applicantLegalName": {
+                                "status": "readonly"
+                            },
+                            "groupName": {
+                                "status": "readonly"
+                            },
+                            "businessSegment": {
+                                "status": "readonly"
+                            },
+                            "registrationNo": {
+                                "status": "readonly"
+                            },
+                            "tin": {
+                                "status": "readonly"
+                            },
+                            "sectorCode": {
+                                "status": "readonly"
+                            },
+                            "incorporationDate": {
+                                "status": "readonly"
+                            },
+                            "registeredAddress": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {
+                            "facilityType": {
+                                "status": "readonly"
+                            },
+                            "requestedAmount": {
+                                "status": "readonly"
+                            },
+                            "currency": {
+                                "status": "readonly"
+                            },
+                            "tenorMonths": {
+                                "status": "readonly"
+                            },
+                            "facilityPurpose": {
+                                "status": "readonly"
+                            },
+                            "collateralType": {
+                                "status": "readonly"
+                            },
+                            "collateralValue": {
+                                "status": "readonly"
+                            },
+                            "exposureExisting": {
+                                "status": "readonly"
+                            },
+                            "exposureProposed": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {
+                            "icrrScore": {
+                                "status": "readonly"
+                            },
+                            "icrrGrade": {
+                                "status": "readonly"
+                            },
+                            "icrrDate": {
+                                "status": "readonly"
+                            },
+                            "esrmCategory": {
+                                "status": "readonly"
+                            },
+                            "esrmScreeningRef": {
+                                "status": "readonly"
+                            },
+                            "kycStatus": {
+                                "status": "readonly"
+                            },
+                            "amlSanctionsRef": {
+                                "status": "readonly"
+                            },
+                            "pepFlag": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "proposalDetails": {
+                                "status": "readonly"
+                            },
+                            "supportingDocuments": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {
+                            "rmDecision": {
+                                "status": "readonly"
+                            },
+                            "rmRemarks": {
+                                "status": "readonly"
+                            },
+                            "rmAdditionalDocs": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {
+                            "thDecision": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "recommendation": {
+                                "status": "editable"
+                            },
+                            "assignedRecommender": {
+                                "status": "editable"
+                            }
+                        }
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "visibility": "hidden"
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "visibility": "hidden"
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "recommendation": {
-                        "status": "editable"
-                    },
-                    "assigned_recommender": {
-                        "status": "editable"
-                    },
-                    "cbo_decision": {
-                        "status": "hidden"
-                    },
-                    "cbo_recommendation": {
-                        "status": "hidden"
-                    },
-                    "assign_th_crm": {
-                        "status": "hidden"
-                    },
-                    "assign_cm": {
-                        "status": "hidden"
-                    },
-                    "cm_decision": {
-                        "status": "hidden"
-                    },
-                    "cm_remarks": {
-                        "status": "hidden"
-                    },
-                    "risk_assessment": {
-                        "status": "hidden"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
                     }
-                },
-                "Actions": {
-                    "THReject": {
-                        "NextState": "RMReview",
-                        "Operation": "Send back to RM for correction; notify RM (CC ARM)"
+                ],
+                "actions": {
+                    "thReject": {
+                        "nextState": "RMReview",
+                        "operation": "Send back to RM for correction; notify RM (CC ARM)"
                     },
-                    "THApprove": {
-                        "NextState": "CBOReview",
-                        "Operation": "Record recommendation; assign recommender; update application if needed"
+                    "thApprove": {
+                        "nextState": "CBOReview",
+                        "operation": "Record recommendation; assign recommender; update application if needed"
                     }
                 }
             },
             "CBOReview": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {}
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {}
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {}
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {
+                            "thDecision": {
+                                "status": "readonly"
+                            },
+                            "recommendation": {
+                                "status": "readonly"
+                            },
+                            "assignedRecommender": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {
+                            "cboDecision": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "cboRecommendation": {
+                                "status": "editable"
+                            }
+                        }
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "visibility": "hidden"
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "cbo_recommendation": {
-                        "status": "editable"
-                    },
-                    "assign_th_crm": {
-                        "status": "hidden"
-                    },
-                    "assign_cm": {
-                        "status": "hidden"
-                    },
-                    "cm_decision": {
-                        "status": "hidden"
-                    },
-                    "cm_remarks": {
-                        "status": "hidden"
-                    },
-                    "risk_assessment": {
-                        "status": "hidden"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
                     }
-                },
-                "Actions": {
-                    "CBOReject": {
-                        "NextState": "BusinessReview",
-                        "Operation": "Send back to Team Head/Business Lead for correction"
+                ],
+                "actions": {
+                    "cboReject": {
+                        "nextState": "BusinessReview",
+                        "operation": "Send back to Team Head/Business Lead for correction"
                     },
-                    "CBOSubmitToCRM": {
-                        "NextState": "THCRMAssignment",
-                        "Operation": "Provide recommendation and submit to CRM; route: if Fresh/Name Clearance -> HoCRM only; else HoCRM CC Team Head and CC Credit Manager"
+                    "cboSubmitToCrm": {
+                        "nextState": "THCRMAssignment",
+                        "operation": "Provide recommendation and submit to CRM; route: if Fresh/Name Clearance -> HoCRM only; else HoCRM CC Team Head and CC Credit Manager"
                     }
                 }
             },
             "THCRMAssignment": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {}
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {}
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {}
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {}
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {}
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "fieldOverrides": {
+                            "assignThCrm": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "assignCm": {
+                                "status": "hidden"
+                            }
+                        }
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "readonly"
-                    },
-                    "cbo_recommendation": {
-                        "status": "readonly"
-                    },
-                    "assign_th_crm": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "assign_cm": {
-                        "status": "hidden"
-                    },
-                    "cm_decision": {
-                        "status": "hidden"
-                    },
-                    "cm_remarks": {
-                        "status": "hidden"
-                    },
-                    "risk_assessment": {
-                        "status": "hidden"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
                     }
-                },
-                "Actions": {
-                    "AssignTeamHeadCRM": {
-                        "NextState": "CMAssignment",
-                        "Operation": "HoCRM or TH-CRM assigns Team Head, CRM"
+                ],
+                "actions": {
+                    "assignTeamHeadCrm": {
+                        "nextState": "CMAssignment",
+                        "operation": "HoCRM or TH-CRM assigns Team Head, CRM"
                     }
                 }
             },
             "CMAssignment": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {}
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {}
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {}
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {}
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {}
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "fieldOverrides": {
+                            "assignThCrm": {
+                                "status": "readonly"
+                            },
+                            "assignCm": {
+                                "status": "editable",
+                                "required": true
+                            }
+                        }
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "readonly"
-                    },
-                    "cbo_recommendation": {
-                        "status": "readonly"
-                    },
-                    "assign_th_crm": {
-                        "status": "readonly"
-                    },
-                    "assign_cm": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "cm_decision": {
-                        "status": "hidden"
-                    },
-                    "cm_remarks": {
-                        "status": "hidden"
-                    },
-                    "risk_assessment": {
-                        "status": "hidden"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
                     }
-                },
-                "Actions": {
-                    "AssignCreditManager": {
-                        "NextState": "CMReview",
-                        "Operation": "Assigned Team Head, CRM assigns Credit Manager"
+                ],
+                "actions": {
+                    "assignCreditManager": {
+                        "nextState": "CMReview",
+                        "operation": "Assigned Team Head, CRM assigns Credit Manager"
                     }
                 }
             },
             "CMReview": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {
+                            "icrrScore": {
+                                "status": "editable"
+                            },
+                            "icrrGrade": {
+                                "status": "editable"
+                            },
+                            "icrrDate": {
+                                "status": "editable"
+                            },
+                            "esrmCategory": {
+                                "status": "readonly"
+                            },
+                            "esrmScreeningRef": {
+                                "status": "readonly"
+                            },
+                            "kycStatus": {
+                                "status": "readonly"
+                            },
+                            "amlSanctionsRef": {
+                                "status": "readonly"
+                            },
+                            "pepFlag": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "supportingDocuments": {
+                                "status": "readonly"
+                            },
+                            "proposalDetails": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {
+                            "rmDecision": {
+                                "status": "readonly"
+                            },
+                            "rmRemarks": {
+                                "status": "readonly"
+                            },
+                            "rmAdditionalDocs": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {
+                            "thDecision": {
+                                "status": "readonly"
+                            },
+                            "recommendation": {
+                                "status": "readonly"
+                            },
+                            "assignedRecommender": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {
+                            "cboDecision": {
+                                "status": "readonly"
+                            },
+                            "cboRecommendation": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "fieldOverrides": {
+                            "cmDecision": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "cmRemarks": {
+                                "status": "editable"
+                            },
+                            "riskAssessment": {
+                                "status": "editable"
+                            }
+                        }
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "fieldOverrides": {
+                            "assignThCrm": {
+                                "status": "readonly"
+                            },
+                            "assignCm": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "visibility": "hidden"
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "visibility": "hidden"
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "editable"
-                    },
-                    "icrr_grade": {
-                        "status": "editable"
-                    },
-                    "icrr_date": {
-                        "status": "editable"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "readonly"
-                    },
-                    "cbo_recommendation": {
-                        "status": "readonly"
-                    },
-                    "assign_th_crm": {
-                        "status": "readonly"
-                    },
-                    "assign_cm": {
-                        "status": "readonly"
-                    },
-                    "cm_decision": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "cm_remarks": {
-                        "status": "editable"
-                    },
-                    "risk_assessment": {
-                        "status": "editable"
-                    },
-                    "correction_details": {
-                        "status": "hidden"
-                    },
-                    "updated_docs": {
-                        "status": "hidden"
-                    },
-                    "thcrm_decision": {
-                        "status": "hidden"
-                    },
-                    "thcrm_notes": {
-                        "status": "hidden"
-                    },
-                    "final_memo": {
-                        "status": "hidden"
+                    {
+                        "formName": "outputs",
+                        "visibility": "hidden"
                     }
-                },
-                "Actions": {
-                    "CMObservation": {
-                        "NextState": "RMResubmission",
-                        "Operation": "Return to RM with observations"
+                ],
+                "actions": {
+                    "cmObservation": {
+                        "nextState": "RMResubmission",
+                        "operation": "Return to RM with observations"
                     },
-                    "CMRecommend": {
-                        "NextState": "THCRMDecision",
-                        "Operation": "Send to Team Head–CRM for decision"
+                    "cmRecommend": {
+                        "nextState": "THCRMDecision",
+                        "operation": "Send to Team Head–CRM for decision"
                     }
                 }
             },
             "RMResubmission": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {}
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "supportingDocuments": {
+                                "status": "readonly"
+                            },
+                            "proposalDetails": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {
+                            "rmDecision": {
+                                "status": "readonly"
+                            },
+                            "rmRemarks": {
+                                "status": "readonly"
+                            },
+                            "rmAdditionalDocs": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {
+                            "thDecision": {
+                                "status": "readonly"
+                            },
+                            "recommendation": {
+                                "status": "readonly"
+                            },
+                            "assignedRecommender": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {
+                            "cboDecision": {
+                                "status": "readonly"
+                            },
+                            "cboRecommendation": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "fieldOverrides": {
+                            "assignThCrm": {
+                                "status": "readonly"
+                            },
+                            "assignCm": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "fieldOverrides": {
+                            "cmDecision": {
+                                "status": "readonly"
+                            },
+                            "cmRemarks": {
+                                "status": "readonly"
+                            },
+                            "riskAssessment": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "fieldOverrides": {
+                            "correctionDetails": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "updatedDocs": {
+                                "status": "actionable"
+                            }
+                        }
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "fieldOverrides": {
+                            "thcrmDecision": {
+                                "status": "readonly"
+                            },
+                            "thcrmNotes": {
+                                "status": "readonly"
+                            }
+                        }
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "readonly"
-                    },
-                    "cbo_recommendation": {
-                        "status": "readonly"
-                    },
-                    "assign_th_crm": {
-                        "status": "readonly"
-                    },
-                    "assign_cm": {
-                        "status": "readonly"
-                    },
-                    "cm_decision": {
-                        "status": "readonly"
-                    },
-                    "cm_remarks": {
-                        "status": "readonly"
-                    },
-                    "risk_assessment": {
-                        "status": "readonly"
-                    },
-                    "correction_details": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "updated_docs": {
-                        "status": "actionable"
-                    },
-                    "thcrm_decision": {
-                        "status": "readonly"
-                    },
-                    "thcrm_notes": {
-                        "status": "readonly"
-                    },
-                    "final_memo": {
-                        "status": "readonly"
+                    {
+                        "formName": "outputs",
+                        "fieldOverrides": {
+                            "finalMemo": {
+                                "status": "readonly"
+                            }
+                        }
                     }
-                },
-                "Actions": {
-                    "RMResubmit": {
-                        "NextState": "CMReview",
-                        "Operation": "Resubmit corrected proposal to CM"
+                ],
+                "actions": {
+                    "rmResubmit": {
+                        "nextState": "CMReview",
+                        "operation": "Resubmit corrected proposal to CM"
                     }
                 }
             },
             "THCRMDecision": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {}
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {}
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {}
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {}
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {}
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "fieldOverrides": {}
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "fieldOverrides": {}
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "fieldOverrides": {}
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "fieldOverrides": {
+                            "thcrmDecision": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "thcrmNotes": {
+                                "status": "editable"
+                            }
+                        }
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "readonly"
-                    },
-                    "cbo_recommendation": {
-                        "status": "readonly"
-                    },
-                    "assign_th_crm": {
-                        "status": "readonly"
-                    },
-                    "assign_cm": {
-                        "status": "readonly"
-                    },
-                    "cm_decision": {
-                        "status": "readonly"
-                    },
-                    "cm_remarks": {
-                        "status": "readonly"
-                    },
-                    "risk_assessment": {
-                        "status": "readonly"
-                    },
-                    "correction_details": {
-                        "status": "readonly"
-                    },
-                    "updated_docs": {
-                        "status": "readonly"
-                    },
-                    "thcrm_decision": {
-                        "status": "editable",
-                        "required": true
-                    },
-                    "thcrm_notes": {
-                        "status": "editable"
-                    },
-                    "final_memo": {
-                        "status": "readonly"
+                    {
+                        "formName": "outputs",
+                        "fieldOverrides": {
+                            "finalMemo": {
+                                "status": "readonly"
+                            }
+                        }
                     }
-                },
-                "Actions": {
-                    "THCRMSendBack": {
-                        "NextState": "RMReview",
-                        "Operation": "Send back to RM for correction"
+                ],
+                "actions": {
+                    "thcrmSendBack": {
+                        "nextState": "RMReview",
+                        "operation": "Send back to RM for correction"
                     },
-                    "THCRMApprove": {
-                        "NextState": "Completed",
-                        "Operation": "Approve and finalize workflow"
+                    "thcrmApprove": {
+                        "nextState": "Completed",
+                        "operation": "Approve and finalize workflow"
                     }
                 }
             },
             "Completed": {
-                "Fields": {
-                    "applicant_legal_name": {
-                        "status": "readonly"
+                "forms": [
+                    {
+                        "formName": "applicationCore",
+                        "fieldOverrides": {}
                     },
-                    "group_name": {
-                        "status": "readonly"
+                    {
+                        "formName": "facilityDetails",
+                        "fieldOverrides": {}
                     },
-                    "business_segment": {
-                        "status": "readonly"
+                    {
+                        "formName": "riskCompliance",
+                        "fieldOverrides": {}
                     },
-                    "registration_no": {
-                        "status": "readonly"
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {}
                     },
-                    "tin": {
-                        "status": "readonly"
+                    {
+                        "formName": "rmSection",
+                        "fieldOverrides": {}
                     },
-                    "sector_code": {
-                        "status": "readonly"
+                    {
+                        "formName": "businessSection",
+                        "fieldOverrides": {}
                     },
-                    "facility_type": {
-                        "status": "readonly"
+                    {
+                        "formName": "cboSection",
+                        "fieldOverrides": {}
                     },
-                    "requested_amount": {
-                        "status": "readonly"
+                    {
+                        "formName": "crmAssignment",
+                        "fieldOverrides": {}
                     },
-                    "currency": {
-                        "status": "readonly"
+                    {
+                        "formName": "cmSection",
+                        "fieldOverrides": {}
                     },
-                    "tenor_months": {
-                        "status": "readonly"
+                    {
+                        "formName": "resubmissionSection",
+                        "fieldOverrides": {}
                     },
-                    "facility_purpose": {
-                        "status": "readonly"
+                    {
+                        "formName": "thcrmSection",
+                        "fieldOverrides": {}
                     },
-                    "collateral_type": {
-                        "status": "readonly"
-                    },
-                    "collateral_value": {
-                        "status": "readonly"
-                    },
-                    "exposure_existing": {
-                        "status": "readonly"
-                    },
-                    "exposure_proposed": {
-                        "status": "readonly"
-                    },
-                    "icrr_score": {
-                        "status": "readonly"
-                    },
-                    "icrr_grade": {
-                        "status": "readonly"
-                    },
-                    "icrr_date": {
-                        "status": "readonly"
-                    },
-                    "esrm_category": {
-                        "status": "readonly"
-                    },
-                    "esrm_screening_ref": {
-                        "status": "readonly"
-                    },
-                    "kyc_status": {
-                        "status": "readonly"
-                    },
-                    "aml_sanctions_ref": {
-                        "status": "readonly"
-                    },
-                    "pep_flag": {
-                        "status": "readonly"
-                    },
-                    "incorporation_date": {
-                        "status": "readonly"
-                    },
-                    "registered_address": {
-                        "status": "readonly"
-                    },
-                    "proposal_details": {
-                        "status": "readonly"
-                    },
-                    "supporting_documents": {
-                        "status": "readonly"
-                    },
-                    "rm_decision": {
-                        "status": "readonly"
-                    },
-                    "rm_remarks": {
-                        "status": "readonly"
-                    },
-                    "rm_additional_docs": {
-                        "status": "readonly"
-                    },
-                    "th_decision": {
-                        "status": "readonly"
-                    },
-                    "recommendation": {
-                        "status": "readonly"
-                    },
-                    "assigned_recommender": {
-                        "status": "readonly"
-                    },
-                    "cbo_decision": {
-                        "status": "readonly"
-                    },
-                    "cbo_recommendation": {
-                        "status": "readonly"
-                    },
-                    "assign_th_crm": {
-                        "status": "readonly"
-                    },
-                    "assign_cm": {
-                        "status": "readonly"
-                    },
-                    "cm_decision": {
-                        "status": "readonly"
-                    },
-                    "cm_remarks": {
-                        "status": "readonly"
-                    },
-                    "risk_assessment": {
-                        "status": "readonly"
-                    },
-                    "correction_details": {
-                        "status": "readonly"
-                    },
-                    "updated_docs": {
-                        "status": "readonly"
-                    },
-                    "thcrm_decision": {
-                        "status": "readonly"
-                    },
-                    "thcrm_notes": {
-                        "status": "readonly"
-                    },
-                    "final_memo": {
-                        "status": "actionable"
+                    {
+                        "formName": "outputs",
+                        "fieldOverrides": {
+                            "finalMemo": {
+                                "status": "actionable"
+                            }
+                        }
                     }
-                },
-                "Actions": {}
+                ],
+                "actions": {}
             }
         }
     }
