@@ -201,6 +201,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
                   nodeTypes={nodeTypes}
                   fitView
                   fitViewOptions={{ padding: 0.2 }}
+                  proOptions={{ hideAttribution: true }}
                 >
                   <Background gap={12} size={1} />
                   <Controls />

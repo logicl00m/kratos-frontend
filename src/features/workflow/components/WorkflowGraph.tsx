@@ -95,6 +95,7 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
         nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
         fitView
+        proOptions={{ hideAttribution: true }}
       >
         <Background gap={12} size={1} />
         <Controls />
