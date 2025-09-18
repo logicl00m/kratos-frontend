@@ -1,7 +1,13 @@
 // src/features/running-workflows/components/RunningWorkflowsPage.tsx
 
 import React, { useState } from "react";
-import ReactFlow, { Controls, Background, MiniMap } from "reactflow";
+import ReactFlow, {
+  Controls,
+  Background,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+} from "reactflow";
 import "reactflow/dist/style.css";
 import { RefreshCw, Grid, List, Search } from "lucide-react";
 import RunningStateNode from "./RunningStateNode";
@@ -44,12 +50,22 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
 
   const workflowConfig = getDefaultWorkflow();
 
-  // Directly calculate nodes and edges without state management
-  const { nodes, edges } = React.useMemo(() => {
+  // Calculate initial nodes and edges
+  const { nodes: graphNodes, edges: graphEdges } = React.useMemo(() => {
     return selectedInstance
       ? parseRunningWorkflowToGraph(selectedInstance, workflowConfig)
       : { nodes: [], edges: [] };
   }, [selectedInstance, workflowConfig]);
+
+  // State management for draggable nodes
+  const [nodes, setNodes, onNodesChange] = useNodesState(graphNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(graphEdges);
+
+  // Update nodes/edges when selected instance changes
+  React.useEffect(() => {
+    setNodes(graphNodes);
+    setEdges(graphEdges);
+  }, [selectedInstance]); // Only depend on selectedInstance change
 
   const filteredInstances = runningWorkflowsData.instances.filter(
     (instance) => {
@@ -188,11 +204,12 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = ({
                 <ReactFlow
                   nodes={nodes}
                   edges={edges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
                   nodeTypes={nodeTypes}
                   fitView
                   fitViewOptions={{ padding: 0.2 }}
                   proOptions={{ hideAttribution: true }}
-                  nodesDraggable={false}
                   nodesConnectable={false}
                   elementsSelectable={true}
                 >
