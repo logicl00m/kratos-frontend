@@ -1,3 +1,4 @@
+// src/app/App.tsx
 import { useState } from "react";
 import WorkflowGraph from "@features/workflow/components/WorkflowGraph";
 import FormViewer from "@features/form/components/FormViewer";
@@ -5,6 +6,7 @@ import JsonEditor from "@features/workflow/components/JsonEditor";
 import Dashboard from "@features/dashboard/components/Dashboard";
 import ApplicationDetails from "@features/application-details/components/ApplicationDetails";
 import RunningWorkflowsPage from "@features/running-workflows/components/RunningWorkflowsPage";
+import WorkflowBuilder from "@features/workflow-config-edit/components/builder/WorkflowBuilder";
 import {
   parseWorkflowToGraph,
   getDefaultWorkflow,
@@ -13,6 +15,13 @@ import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
 import type { LoanApplication } from "@features/dashboard/types/dashboard.types";
 import "./App.css";
 import TopBar from "@shared/components/layout/TopBar";
+// Local helper type to match FormViewer expected prop shape
+type FormViewerWorkflowProp = {
+  workflow: {
+    forms: Record<string, unknown>;
+    states: Record<string, unknown>;
+  };
+};
 
 function App() {
   const [workflow, setWorkflow] = useState<WorkflowConfig>(
@@ -24,7 +33,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<
-    "dashboard" | "graph" | "form" | "details" | "running"
+    "dashboard" | "graph" | "form" | "details" | "running" | "builder"
   >("dashboard");
   const [selectedApplication, setSelectedApplication] =
     useState<LoanApplication | null>(null);
@@ -64,9 +73,53 @@ function App() {
     }
   };
 
+  const handleWorkflowExport = (workflowJson: unknown) => {
+    // Accept either a string (JSON) or an object
+    let parsed: unknown = workflowJson;
+    try {
+      if (typeof workflowJson === "string") {
+        parsed = JSON.parse(workflowJson);
+      }
+
+      // Basic validation: ensure it has a workflow object with states
+      if (
+        !parsed ||
+        typeof parsed !== "object" ||
+        (parsed as Record<string, unknown>) === null ||
+        !("workflow" in (parsed as Record<string, unknown>))
+      ) {
+        throw new Error("Invalid workflow format: missing 'workflow' property");
+      }
+
+      // Update state: reset current state index so graph/form stay in sync
+      setWorkflow(parsed as WorkflowConfig);
+      setJsonText(JSON.stringify(parsed, null, 2));
+      setError(null);
+      setCurrentStateIndex(0);
+      // Switch to graph view to see the result
+      setViewMode("graph");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error("Failed to import workflow:", message);
+      setError(
+        message || "Failed to import workflow. Provide valid JSON or object."
+      );
+    }
+  };
+
   const { nodes, edges } = parseWorkflowToGraph(workflow);
 
-  // Running Workflows view
+  // Workflow Builder view
+  if (viewMode === "builder") {
+    return (
+      <div className="app" style={{ overflow: "hidden" }}>
+        <WorkflowBuilder
+          onExport={handleWorkflowExport}
+          onBack={() => setViewMode("dashboard")}
+        />
+      </div>
+    );
+  }
   if (viewMode === "running") {
     return <RunningWorkflowsPage onBack={() => setViewMode("dashboard")} />;
   }
@@ -91,6 +144,13 @@ function App() {
             <div style={{ display: "flex", gap: 8 }}>
               <button
                 className="toggle-button"
+                onClick={() => setViewMode("builder")}
+                style={{ background: "#8b5cf6" }}
+              >
+                Workflow Builder
+              </button>
+              <button
+                className="toggle-button"
                 onClick={() => setViewMode("running")}
                 style={{ background: "#3b82f6" }}
               >
@@ -101,7 +161,7 @@ function App() {
                 onClick={() => setViewMode("graph")}
                 style={{ background: "#10b981" }}
               >
-                Workflow Editor
+                Workflow Viewer
               </button>
             </div>
           }
@@ -126,6 +186,13 @@ function App() {
               style={{ background: "#6366f1", marginRight: 12 }}
             >
               Dashboard
+            </button>
+            <button
+              className="toggle-button"
+              onClick={() => setViewMode("builder")}
+              style={{ background: "#8b5cf6", marginRight: 12 }}
+            >
+              Workflow Builder
             </button>
             <button
               className="toggle-button"
@@ -157,7 +224,7 @@ function App() {
           <div style={{ width: "100%" }}>
             <FormViewer
               stateName={currentState}
-              workflow={workflow}
+              workflow={workflow as unknown as FormViewerWorkflowProp}
               currentState={currentState}
               onSubmit={(data) => console.log("Submit:", data)}
               onReject={(data) => console.log("Reject:", data)}
