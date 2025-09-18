@@ -20,11 +20,11 @@ describe("DetailPanel", () => {
         hasForm: true,
         fields: [
           {
-            ID: "field1",
-            Name: "Test Field",
-            Type: "text",
-            DataSource: "{{ data.field1 }}",
-            FieldActions: [{ Operation: "validate" }],
+            id: "field1",
+            name: "Test Field",
+            type: "text",
+            data: "{{ data.field1 }}",
+            fieldActions: [{ operation: "validate" }],
           },
         ],
       },
@@ -84,5 +84,117 @@ describe("DetailPanel", () => {
       />
     );
     expect(screen.getByLabelText("Close details")).toBeInTheDocument();
+  });
+
+  it("renders node without fields", () => {
+    const mockNode: Node = {
+      id: "test-node",
+      position: { x: 0, y: 0 },
+      data: {
+        label: "Test State",
+        hasForm: true,
+        fields: [],
+      },
+    };
+
+    render(
+      <DetailPanel
+        selectedNode={mockNode}
+        selectedEdge={null}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("State Details")).toBeInTheDocument();
+    expect(screen.getByText("Test State")).toBeInTheDocument();
+    expect(screen.getByText("Visible Fields (0)")).toBeInTheDocument();
+  });
+
+  it("renders node with null fields", () => {
+    const mockNode: Node = {
+      id: "test-node",
+      position: { x: 0, y: 0 },
+      data: {
+        label: "Test State",
+        hasForm: true,
+        fields: null,
+      },
+    };
+
+    render(
+      <DetailPanel
+        selectedNode={mockNode}
+        selectedEdge={null}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("State Details")).toBeInTheDocument();
+    expect(screen.getByText("Test State")).toBeInTheDocument();
+    expect(screen.getByText("Visible Fields (0)")).toBeInTheDocument();
+  });
+
+  it("renders node without form", () => {
+    const mockNode: Node = {
+      id: "test-node",
+      position: { x: 0, y: 0 },
+      data: {
+        label: "Test State",
+        hasForm: false,
+      },
+    };
+
+    render(
+      <DetailPanel
+        selectedNode={mockNode}
+        selectedEdge={null}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("State Details")).toBeInTheDocument();
+    expect(screen.getByText("Test State")).toBeInTheDocument();
+    expect(screen.getByText("No fields visible in this state")).toBeInTheDocument();
+  });
+
+  it("renders edge without operation", () => {
+    const mockEdge: Edge = {
+      id: "e1-2",
+      source: "source-state",
+      target: "target-state",
+      label: "Test Action",
+      data: {},
+    };
+
+    render(
+      <DetailPanel
+        selectedNode={null}
+        selectedEdge={mockEdge}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("Action Details")).toBeInTheDocument();
+    expect(screen.getByText("Test Action")).toBeInTheDocument();
+    expect(screen.getByText("source-state")).toBeInTheDocument();
+    expect(screen.getByText("target-state")).toBeInTheDocument();
+  });
+
+  it("renders edge with null data", () => {
+    const mockEdge: Edge = {
+      id: "e1-2",
+      source: "source-state",
+      target: "target-state",
+      label: "Test Action",
+      data: null,
+    };
+
+    render(
+      <DetailPanel
+        selectedNode={null}
+        selectedEdge={mockEdge}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("Action Details")).toBeInTheDocument();
+    expect(screen.getByText("Test Action")).toBeInTheDocument();
+    expect(screen.getByText("source-state")).toBeInTheDocument();
+    expect(screen.getByText("target-state")).toBeInTheDocument();
   });
 });

@@ -3,24 +3,89 @@ import { render, screen } from "@testing-library/react";
 import FormViewer from "@features/form/components/FormViewer";
 
 describe("FormViewer", () => {
-  const mockState = {
-    Form: {
-      Fields: [
-        {
-          ID: "name",
-          Name: "Applicant Name",
-          Type: "text",
-          DataSource: "{{ data.applicant.name }}",
-          FieldActions: [{ Operation: "validate" }],
+  const mockWorkflow = {
+    workflow: {
+      forms: {
+        "test-form": {
+          fields: [
+            {
+              id: "name",
+              name: "Applicant Name",
+              type: "text",
+              data: "{{ data.applicant.name }}",
+              fieldActions: [{ operation: "validate" }],
+            },
+            {
+              id: "amount",
+              name: "Loan Amount",
+              type: "number",
+              data: "{{ data.loan.amount }}",
+              fieldActions: [{ operation: "validate" }],
+            },
+          ],
         },
-        {
-          ID: "amount",
-          Name: "Loan Amount",
-          Type: "number",
-          DataSource: "{{ data.loan.amount }}",
-          FieldActions: [{ Operation: "validate" }],
+      },
+      states: {
+        "test-state": {
+          forms: [
+            {
+              formName: "test-form",
+            },
+          ],
+          actions: {
+            Save: {
+              nextState: "next-state",
+              operation: "save",
+            },
+            Submit: {
+              nextState: "next-state",
+              operation: "submit",
+            },
+            Reject: {
+              nextState: "next-state",
+              operation: "reject",
+            },
+            Approve: {
+              nextState: "next-state",
+              operation: "approve",
+            },
+          },
         },
-      ],
+        "finalized-state": {
+          forms: [
+            {
+              formName: "test-form",
+            },
+          ],
+          actions: {},
+        },
+      },
+    },
+  };
+
+  const mockWorkflowWithoutState = {
+    workflow: {
+      forms: {
+        "test-form": {
+          fields: [
+            {
+              id: "name",
+              name: "Applicant Name",
+              type: "text",
+              data: "{{ data.applicant.name }}",
+              fieldActions: [{ operation: "validate" }],
+            },
+          ],
+        },
+      },
+      states: {},
+    },
+  };
+
+  const mockInvalidWorkflow = {
+    workflow: {
+      forms: null,
+      states: null,
     },
   };
 
@@ -29,7 +94,8 @@ describe("FormViewer", () => {
       render(
         <FormViewer
           stateName="Test State"
-          state={mockState}
+          workflow={mockWorkflow}
+          currentState="test-state"
           onSubmit={vi.fn()}
           onReject={vi.fn()}
           onBack={vi.fn()}
@@ -42,7 +108,8 @@ describe("FormViewer", () => {
     render(
       <FormViewer
         stateName="Test State"
-        state={mockState}
+        workflow={mockWorkflow}
+        currentState="test-state"
         onSubmit={vi.fn()}
         onReject={vi.fn()}
         onBack={vi.fn()}
@@ -56,7 +123,8 @@ describe("FormViewer", () => {
     render(
       <FormViewer
         stateName="Test State"
-        state={mockState}
+        workflow={mockWorkflow}
+        currentState="test-state"
         onSubmit={vi.fn()}
         onReject={vi.fn()}
         onBack={vi.fn()}
@@ -71,7 +139,8 @@ describe("FormViewer", () => {
     render(
       <FormViewer
         stateName="Test State"
-        state={mockState}
+        workflow={mockWorkflow}
+        currentState="test-state"
         onSubmit={vi.fn()}
         onReject={vi.fn()}
         onBack={vi.fn()}
@@ -88,7 +157,8 @@ describe("FormViewer", () => {
     render(
       <FormViewer
         stateName="Test State"
-        state={mockState}
+        workflow={mockWorkflow}
+        currentState="test-state"
         onSubmit={vi.fn()}
         onReject={vi.fn()}
         onBack={vi.fn()}
@@ -98,17 +168,65 @@ describe("FormViewer", () => {
     expect(screen.getByText("Back to Graph")).toBeInTheDocument();
   });
 
-  it("shows 'Finalized' status badge", () => {
+  it("shows state status badge", () => {
     render(
       <FormViewer
         stateName="Test State"
-        state={mockState}
+        workflow={mockWorkflow}
+        currentState="test-state"
         onSubmit={vi.fn()}
         onReject={vi.fn()}
         onBack={vi.fn()}
       />
     );
 
-    expect(screen.getByText("Finalized")).toBeInTheDocument();
+    expect(screen.getByText("State: test-state")).toBeInTheDocument();
+  });
+
+  it("shows error message when workflow is invalid", () => {
+    render(
+      <FormViewer
+        stateName="Test State"
+        workflow={mockInvalidWorkflow}
+        currentState="test-state"
+        onSubmit={vi.fn()}
+        onReject={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Error: Invalid workflow configuration structure")).toBeInTheDocument();
+  });
+
+  it("shows error message when state is not found", () => {
+    render(
+      <FormViewer
+        stateName="Test State"
+        workflow={mockWorkflowWithoutState}
+        currentState="non-existent-state"
+        onSubmit={vi.fn()}
+        onReject={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Error: State 'non-existent-state' not found in workflow")).toBeInTheDocument();
+  });
+
+  it("shows fallback buttons when no state actions defined", () => {
+    render(
+      <FormViewer
+        stateName="Test State"
+        workflow={mockWorkflow}
+        currentState="finalized-state"
+        onSubmit={vi.fn()}
+        onReject={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Save")).toBeInTheDocument();
+    expect(screen.getByText("Submit")).toBeInTheDocument();
+    expect(screen.getByText("Reject")).toBeInTheDocument();
   });
 });
