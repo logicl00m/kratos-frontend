@@ -1,5 +1,78 @@
 // src/features/running-workflows/types/runningWorkflow.types.ts
 
+// New JSON structure types
+export interface WorkflowAssignee {
+  subjectId: string;
+  employeeName: string;
+  role: string;
+  email: string;
+  primary?: boolean;
+  since?: string;
+}
+
+export interface WorkflowHistoryEntry {
+  id: string;
+  at: string;
+  byUser: {
+    id: string;
+    name: string;
+    role: string;
+  };
+  action: string;
+  stateFrom: string | null;
+  stateTo: string;
+  changes?: Array<{
+    fieldId: string;
+    old: any;
+    new: any;
+  }>;
+}
+
+export interface WorkflowState {
+  assignees: WorkflowAssignee[];
+  forms: Array<{
+    formName: string;
+    visibility?: string;
+    fieldOverrides?: Record<string, any>;
+  }>;
+  actions: Record<string, {
+    nextState: string;
+    operation: string;
+    allowedRoles?: string[];
+  }>;
+  history: WorkflowHistoryEntry[];
+  assigneePolicy?: {
+    requiredRoles: string[];
+  };
+}
+
+export interface WorkflowField {
+  id: string;
+  name: string;
+  type: string;
+  data: any;
+  fieldActions: Array<{
+    operation: string;
+  }>;
+}
+
+export interface WorkflowForm {
+  fields: WorkflowField[];
+}
+
+export interface WorkflowData {
+  workflow: {
+    id: string;
+    version: number;
+    initialState: string;
+    currentState: string;
+    currentStateEnteredAt: string;
+    forms: Record<string, WorkflowForm>;
+    states: Record<string, WorkflowState>;
+  };
+}
+
+// Types for UI components (keeping existing interface for compatibility)
 export interface Actor {
   id: string;
   name: string;

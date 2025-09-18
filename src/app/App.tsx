@@ -157,7 +157,7 @@ function App() {
           <div style={{ width: "100%" }}>
             <FormViewer
               stateName={currentState}
-              workflow={workflow} // Pass full workflow object
+              workflow={workflow}
               currentState={currentState}
               onSubmit={(data) => console.log("Submit:", data)}
               onReject={(data) => console.log("Reject:", data)}

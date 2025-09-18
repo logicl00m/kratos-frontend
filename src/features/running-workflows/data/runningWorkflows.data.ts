@@ -1,468 +1,507 @@
 // src/features/running-workflows/data/runningWorkflows.data.ts
 
-import type { RunningWorkflowsData } from "../types/runningWorkflow.types";
+import type { RunningWorkflowsData, WorkflowData } from "../types/runningWorkflow.types";
+import { transformWorkflowsToInstances } from "../utils/workflowTransformer";
 
-export const runningWorkflowsData: RunningWorkflowsData = {
-  lastUpdated: "2025-01-15T10:30:00Z",
-  instances: [
-    {
-      id: "WF-2025-001",
-      workflowName: "Loan Application Workflow",
-      currentState: "RMReview",
-      status: "active",
-      priority: "high",
-      createdAt: "2025-01-10T09:00:00Z",
-      updatedAt: "2025-01-14T16:45:00Z",
-      dueDate: "2025-01-16T18:00:00Z",
-      owner: {
-        id: "u_arm_001",
-        name: "John Doe",
-        role: "ARM",
-        email: "john.doe@company.com",
-        department: "Credit Operations"
-      },
-      currentAssignee: {
-        id: "u_rm_001",
-        name: "Jane Smith",
-        role: "RM",
-        email: "jane.smith@company.com",
-        department: "Relationship Management"
-      },
-      data: {
-        proposal_details: "Business expansion loan for retail store chain. Amount: $500,000. Term: 5 years.",
-        supporting_documents: ["business_plan.pdf", "financial_statements.xlsx", "collateral_docs.pdf"],
-        loan_amount: 500000,
-        loan_term_months: 60,
-        applicant_name: "ABC Retail Corp",
-        application_date: "2025-01-10",
-        arm_comments: "Initial review completed. Documents verified.",
-      },
-      history: [
-        {
-          id: "evt_0001",
-          timestamp: "2025-01-10T09:00:00Z",
-          actor: {
-            id: "u_arm_001",
-            name: "John Doe",
-            role: "ARM",
-            email: "john.doe@company.com"
+// Import or define your workflow JSON data
+const sampleWorkflowData: WorkflowData = {
+  "workflow": {
+    "id": "loan_workflow_v1",
+    "version": 1,
+    "initialState": "ARMDraft",
+    "currentState": "RMReview",
+    "currentStateEnteredAt": "2025-09-18T09:22:31+06:00",
+    "forms": {
+      "coreDetails": {
+        "fields": [
+          {
+            "id": "applicantLegalName",
+            "name": "Applicant Legal Name",
+            "type": "text",
+            "data": "ABC Textiles Ltd.",
+            "fieldActions": [
+              { "operation": "save" },
+              { "operation": "validate" }
+            ]
           },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "SubmitToRM",
-            from: "ARMDraft",
-            to: "RMReview"
-          },
-          changes: [
-            {
-              fieldId: "proposal_details",
-              fieldName: "Proposal Details",
-              oldValue: null,
-              newValue: "Business expansion loan for retail store chain. Amount: $500,000. Term: 5 years.",
-              changeType: "CREATE"
-            }
-          ],
-          validation: {
-            passed: true,
-            errors: []
-          },
-          notes: "Application submitted for RM review",
-          metadata: {
-            source: "UI"
+          {
+            "id": "requestedAmount",
+            "name": "Requested Amount",
+            "type": "number",
+            "data": 50000000,
+            "fieldActions": [
+              { "operation": "save" },
+              { "operation": "validate" }
+            ]
           }
-        },
-        {
-          id: "evt_0002",
-          timestamp: "2025-01-14T16:45:00Z",
-          actor: {
-            id: "u_rm_001",
-            name: "Jane Smith",
-            role: "RM",
-            email: "jane.smith@company.com"
-          },
-          event: {
-            type: "COMMENT_ADDED"
-          },
-          notes: "Under review by relationship manager"
-        }
-      ],
-      metrics: {
-        totalDuration: 384300000,
-        statesDuration: {
-          "ARMDraft": 0,
-          "RMReview": 384300000
-        },
-        revisitCount: {
-          "ARMDraft": 1,
-          "RMReview": 1
-        }
+        ]
       },
-      context: {
-        businessUnit: "Corporate Banking",
-        category: "Business Expansion",
-        tags: ["retail", "expansion", "high-value"],
-        externalReferences: {
-          crmId: "CRM-2025-001"
-        }
+      "proposalDocs": {
+        "fields": [
+          {
+            "id": "proposalDetails",
+            "name": "Proposal Details",
+            "type": "textarea",
+            "data": "Working capital enhancement for seasonal purchase of cotton. Expected turnover uplift 18% YoY.",
+            "fieldActions": [
+              { "operation": "save" },
+              { "operation": "validate" }
+            ]
+          },
+          {
+            "id": "supportingDocuments",
+            "name": "Supporting Documents",
+            "type": "file",
+            "data": [
+              {
+                "name": "audited_financials_2024.pdf",
+                "uri": "s3://loan-docs/ABC/audited_financials_2024.pdf",
+                "sha256": "b3a1..."
+              },
+              {
+                "name": "trade_license.pdf",
+                "uri": "s3://loan-docs/ABC/trade_license.pdf",
+                "sha256": "9f2c..."
+              }
+            ],
+            "fieldActions": [
+              { "operation": "upload" },
+              { "operation": "replace" },
+              { "operation": "validate" }
+            ]
+          }
+        ]
+      },
+      "rmSection": {
+        "fields": [
+          {
+            "id": "rmDecision",
+            "name": "RM Decision",
+            "type": "select",
+            "data": "RecommendApproval",
+            "fieldActions": [
+              { "operation": "validate" }
+            ]
+          },
+          {
+            "id": "rmRemarks",
+            "name": "RM Remarks",
+            "type": "textarea",
+            "data": "Client has steady cashflows and clean track record.",
+            "fieldActions": [
+              { "operation": "save" }
+            ]
+          }
+        ]
+      },
+      "cmSection": {
+        "fields": [
+          {
+            "id": "cmDecision",
+            "name": "Credit Manager Decision",
+            "type": "select",
+            "data": null,
+            "fieldActions": [
+              { "operation": "validate" }
+            ]
+          },
+          {
+            "id": "cmRemarks",
+            "name": "CM Remarks/Observation",
+            "type": "textarea",
+            "data": null,
+            "fieldActions": [
+              { "operation": "save" }
+            ]
+          }
+        ]
       }
     },
-    {
-      id: "WF-2025-002",
-      workflowName: "Loan Application Workflow",
-      currentState: "BusinessReview",
-      status: "active",
-      priority: "medium",
-      createdAt: "2025-01-08T10:30:00Z",
-      updatedAt: "2025-01-13T14:20:00Z",
-      owner: {
-        id: "u_arm_002",
-        name: "Alice Johnson",
-        role: "ARM",
-        email: "alice.johnson@company.com"
-      },
-      currentAssignee: {
-        id: "u_bh_001",
-        name: "Tom Brown",
-        role: "Business Head",
-        email: "tom.brown@company.com"
-      },
-      data: {
-        proposal_details: "Equipment financing for manufacturing unit. Amount: $250,000. Term: 3 years.",
-        supporting_documents: ["equipment_quote.pdf", "purchase_order.pdf"],
-        loan_amount: 250000,
-        loan_term_months: 36,
-        applicant_name: "XYZ Manufacturing Ltd",
-        application_date: "2025-01-08",
-        rm_decision: "Approved",
-        rm_remarks: "Strong financials, approved for business review",
-        arm_comments: "All documents verified and complete",
-      },
-      history: [
-        {
-          id: "evt_0001",
-          timestamp: "2025-01-08T10:30:00Z",
-          actor: {
-            id: "u_arm_002",
-            name: "Alice Johnson",
-            role: "ARM",
-            email: "alice.johnson@company.com"
+    "states": {
+      "ARMDraft": {
+        "assignees": [
+          {
+            "subjectId": "u_arm_102",
+            "employeeName": "Sadia Rahman",
+            "role": "ARM",
+            "email": "sadia.rahman@example.com",
+            "primary": true,
+            "since": "2025-09-18T09:00:05+06:00"
+          }
+        ],
+        "forms": [
+          {
+            "formName": "coreDetails",
+            "fieldOverrides": {
+              "applicantLegalName": { "status": "editable", "required": true },
+              "requestedAmount": { "status": "editable", "required": true }
+            }
           },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "SubmitToRM",
-            to: "RMReview"
+          {
+            "formName": "proposalDocs",
+            "fieldOverrides": {
+              "proposalDetails": { "status": "editable", "required": true },
+              "supportingDocuments": { "status": "actionable", "required": true }
+            }
           },
-          notes: "Initial submission"
+          { "formName": "rmSection", "visibility": "hidden" },
+          { "formName": "cmSection", "visibility": "hidden" }
+        ],
+        "actions": {
+          "submitToRm": {
+            "nextState": "RMReview",
+            "operation": "Validate draft; save; notify RM",
+            "allowedRoles": ["ARM"]
+          }
         },
-        {
-          id: "evt_0002",
-          timestamp: "2025-01-12T11:00:00Z",
-          actor: {
-            id: "u_rm_002",
-            name: "Bob Wilson",
-            role: "RM",
-            email: "bob.wilson@company.com"
+        "history": [
+          {
+            "id": "evt_0000",
+            "at": "2025-09-18T09:00:05+06:00",
+            "byUser": {
+              "id": "system",
+              "name": "Workflow Engine",
+              "role": "SYSTEM"
+            },
+            "action": "enterState",
+            "stateFrom": null,
+            "stateTo": "ARMDraft"
           },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "RMFinalize",
-            from: "RMReview",
-            to: "BusinessReview"
+          {
+            "id": "evt_0001",
+            "at": "2025-09-18T09:00:05+06:00",
+            "byUser": {
+              "id": "u_arm_102",
+              "name": "Sadia Rahman",
+              "role": "ARM"
+            },
+            "action": "create",
+            "stateFrom": null,
+            "stateTo": "ARMDraft"
           },
-          changes: [
+          {
+            "id": "evt_0002",
+            "at": "2025-09-18T09:22:31+06:00",
+            "byUser": {
+              "id": "u_arm_102",
+              "name": "Sadia Rahman",
+              "role": "ARM"
+            },
+            "action": "submitToRm",
+            "stateFrom": "ARMDraft",
+            "stateTo": "RMReview"
+          }
+        ]
+      },
+      "RMReview": {
+        "assignees": [
+          {
+            "subjectId": "u_rm_221",
+            "employeeName": "Fahim Ahmed",
+            "role": "RM",
+            "email": "fahim.ahmed@example.com",
+            "primary": true,
+            "since": "2025-09-18T10:40:00+06:00"
+          }
+        ],
+        "forms": [
+          {
+            "formName": "coreDetails",
+            "fieldOverrides": {
+              "applicantLegalName": { "status": "readonly" },
+              "requestedAmount": { "status": "readonly" }
+            }
+          },
+          {
+            "formName": "proposalDocs",
+            "fieldOverrides": {
+              "proposalDetails": { "status": "readonly" },
+              "supportingDocuments": { "status": "actionable" }
+            }
+          },
+          {
+            "formName": "rmSection",
+            "fieldOverrides": {
+              "rmDecision": { "status": "editable", "required": true },
+              "rmRemarks": { "status": "editable" }
+            }
+          }
+        ],
+        "actions": {
+          "rmReject": {
+            "nextState": "ARMDraft",
+            "operation": "Return to ARM with fields to correct",
+            "allowedRoles": ["RM"]
+          },
+          "rmFinalize": {
+            "nextState": "CMReview",
+            "operation": "Finalize proposal",
+            "allowedRoles": ["RM"]
+          }
+        },
+        "history": [
+          {
+            "id": "evt_0003",
+            "at": "2025-09-18T09:22:31+06:00",
+            "byUser": {
+              "id": "system",
+              "name": "Workflow Engine",
+              "role": "SYSTEM"
+            },
+            "action": "enterState",
+            "stateFrom": "ARMDraft",
+            "stateTo": "RMReview"
+          },
+          {
+            "id": "evt_0004",
+            "at": "2025-09-18T10:41:45+06:00",
+            "byUser": {
+              "id": "u_rm_221",
+              "name": "Fahim Ahmed",
+              "role": "RM"
+            },
+            "action": "updateFields",
+            "stateFrom": "RMReview",
+            "stateTo": "RMReview",
+            "changes": [
+              {
+                "fieldId": "rmDecision",
+                "old": null,
+                "new": "RecommendApproval"
+              },
+              {
+                "fieldId": "rmRemarks",
+                "old": null,
+                "new": "Client has steady cashflows and clean track record."
+              }
+            ]
+          }
+        ]
+      },
+      "CMReview": {
+        "assigneePolicy": {
+          "requiredRoles": ["CM"]
+        },
+        "assignees": [],
+        "forms": [
+          {
+            "formName": "cmSection",
+            "fieldOverrides": {
+              "cmDecision": { "status": "editable", "required": true },
+              "cmRemarks": { "status": "editable" }
+            }
+          }
+        ],
+        "actions": {
+          "cmObservation": {
+            "nextState": "RMResubmission",
+            "operation": "Return to RM with observations",
+            "allowedRoles": ["CM"]
+          },
+          "cmRecommend": {
+            "nextState": "THCRMDecision",
+            "operation": "Send to Team Head–CRM for decision",
+            "allowedRoles": ["CM"]
+          }
+        },
+        "history": []
+      },
+      "RMResubmission": {
+        "assigneePolicy": {
+          "requiredRoles": ["ARM"]
+        },
+        "assignees": [],
+        "forms": [
+          {
+            "formName": "proposalDocs",
+            "fieldOverrides": {
+              "supportingDocuments": { "status": "actionable" }
+            }
+          }
+        ],
+        "actions": {
+          "rmResubmit": {
+            "nextState": "CMReview",
+            "operation": "Resubmit corrected proposal to CM",
+            "allowedRoles": ["ARM"]
+          }
+        },
+        "history": []
+      },
+      "THCRMDecision": {
+        "assigneePolicy": {
+          "requiredRoles": ["TeamHeadCRM"]
+        },
+        "assignees": [],
+        "forms": [],
+        "actions": {
+          "thcrmSendBack": {
+            "nextState": "RMReview",
+            "operation": "Send back to RM for correction",
+            "allowedRoles": ["TeamHeadCRM"]
+          },
+          "thcrmApprove": {
+            "nextState": "Completed",
+            "operation": "Approve and finalize workflow",
+            "allowedRoles": ["TeamHeadCRM"]
+          }
+        },
+        "history": []
+      },
+      "Completed": {
+        "assignees": [],
+        "forms": [
+          {
+            "formName": "coreDetails",
+            "fieldOverrides": {
+              "applicantLegalName": { "status": "readonly" },
+              "requestedAmount": { "status": "readonly" }
+            }
+          }
+        ],
+        "actions": {},
+        "history": []
+      }
+    }
+  }
+};
+
+// Additional sample workflows with different states
+const additionalSamples: WorkflowData[] = [
+  {
+    ...sampleWorkflowData,
+    workflow: {
+      ...sampleWorkflowData.workflow,
+      id: "loan_workflow_v2",
+      currentState: "CMReview",
+      currentStateEnteredAt: "2025-09-19T14:30:00+06:00",
+      forms: {
+        ...sampleWorkflowData.workflow.forms,
+        coreDetails: {
+          fields: [
             {
-              fieldId: "rm_decision",
-              fieldName: "RM Decision",
-              oldValue: null,
-              newValue: "Approved",
-              changeType: "UPDATE"
+              "id": "applicantLegalName",
+              "name": "Applicant Legal Name",
+              "type": "text",
+              "data": "XYZ Manufacturing Ltd.",
+              "fieldActions": [
+                { "operation": "save" },
+                { "operation": "validate" }
+              ]
             },
             {
-              fieldId: "rm_remarks",
-              fieldName: "RM Remarks",
-              oldValue: null,
-              newValue: "Strong financials, approved for business review",
-              changeType: "UPDATE"
-            }
-          ],
-          validation: {
-            passed: true,
-            errors: []
-          },
-          notes: "Approved and forwarded to business review"
-        },
-        {
-          id: "evt_0003",
-          timestamp: "2025-01-13T14:20:00Z",
-          actor: {
-            id: "u_bh_001",
-            name: "Tom Brown",
-            role: "Business Head",
-            email: "tom.brown@company.com"
-          },
-          event: {
-            type: "COMMENT_ADDED"
-          },
-          notes: "Business review in progress"
-        }
-      ],
-      metrics: {
-        totalDuration: 450600000,
-        statesDuration: {
-          "ARMDraft": 0,
-          "RMReview": 345600000,
-          "BusinessReview": 105000000
-        }
-      }
-    },
-    {
-      id: "WF-2025-003",
-      workflowName: "Loan Application Workflow",
-      currentState: "Completed",
-      status: "completed",
-      priority: "low",
-      createdAt: "2025-01-05T08:00:00Z",
-      updatedAt: "2025-01-12T17:30:00Z",
-      completedAt: "2025-01-12T17:30:00Z",
-      owner: {
-        id: "u_arm_003",
-        name: "Sarah Davis",
-        role: "ARM",
-        email: "sarah.davis@company.com"
-      },
-      data: {
-        proposal_details: "Working capital loan. Amount: $100,000. Term: 2 years.",
-        supporting_documents: ["cash_flow.pdf", "bank_statements.pdf"],
-        loan_amount: 100000,
-        loan_term_months: 24,
-        applicant_name: "Quick Mart Stores",
-        application_date: "2025-01-05",
-        rm_decision: "Approved",
-        rm_remarks: "Good credit history, approved",
-        business_approval: "Approved",
-        final_amount: 100000,
-        interest_rate: 8.5,
-      },
-      history: [
-        {
-          id: "evt_0001",
-          timestamp: "2025-01-05T08:00:00Z",
-          actor: {
-            id: "u_arm_003",
-            name: "Sarah Davis",
-            role: "ARM",
-            email: "sarah.davis@company.com"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "SubmitToRM",
-            to: "RMReview"
-          }
-        },
-        {
-          id: "evt_0002",
-          timestamp: "2025-01-09T10:00:00Z",
-          actor: {
-            id: "u_rm_003",
-            name: "Mike Lee",
-            role: "RM",
-            email: "mike.lee@company.com"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "RMFinalize",
-            from: "RMReview",
-            to: "BusinessReview"
-          },
-          changes: [
-            {
-              fieldId: "rm_decision",
-              oldValue: null,
-              newValue: "Approved",
-              changeType: "UPDATE"
+              "id": "requestedAmount",
+              "name": "Requested Amount",
+              "type": "number",
+              "data": 25000000,
+              "fieldActions": [
+                { "operation": "save" },
+                { "operation": "validate" }
+              ]
             }
           ]
-        },
-        {
-          id: "evt_0003",
-          timestamp: "2025-01-12T17:30:00Z",
-          actor: {
-            id: "u_dir_001",
-            name: "Director",
-            role: "DIRECTOR",
-            email: "director@company.com"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "THApprove",
-            from: "BusinessReview",
-            to: "Completed"
-          },
-          notes: "Final approval granted"
-        },
-        {
-          id: "evt_0004",
-          timestamp: "2025-01-12T17:30:00Z",
-          actor: {
-            id: "system",
-            name: "System",
-            role: "SYSTEM"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            to: "Completed"
-          },
-          notes: "Workflow completed successfully"
         }
-      ]
-    },
-    {
-      id: "WF-2025-004",
-      workflowName: "Loan Application Workflow",
-      currentState: "ARMDraft",
-      status: "rejected",
-      priority: "low",
-      createdAt: "2025-01-11T13:00:00Z",
-      updatedAt: "2025-01-14T10:00:00Z",
-      owner: {
-        id: "u_arm_004",
-        name: "Peter Wong",
-        role: "ARM",
-        email: "peter.wong@company.com"
       },
-      data: {
-        proposal_details: "Personal loan for home renovation. Amount: $75,000.",
-        supporting_documents: ["income_proof.pdf"],
-        loan_amount: 75000,
-        applicant_name: "John Customer",
-        application_date: "2025-01-11",
-        rm_decision: "Rejected",
-        rm_remarks: "Insufficient documentation and credit score below threshold",
-      },
-      history: [
-        {
-          id: "evt_0001",
-          timestamp: "2025-01-11T13:00:00Z",
-          actor: {
-            id: "u_arm_004",
-            name: "Peter Wong",
-            role: "ARM",
-            email: "peter.wong@company.com"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "SubmitToRM",
-            to: "RMReview"
-          }
-        },
-        {
-          id: "evt_0002",
-          timestamp: "2025-01-14T10:00:00Z",
-          actor: {
-            id: "u_rm_001",
-            name: "Jane Smith",
-            role: "RM",
-            email: "jane.smith@company.com"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "RMReject",
-            from: "RMReview",
-            to: "ARMDraft"
-          },
-          changes: [
+      states: {
+        ...sampleWorkflowData.workflow.states,
+        CMReview: {
+          ...sampleWorkflowData.workflow.states.CMReview,
+          assignees: [
             {
-              fieldId: "rm_decision",
-              newValue: "Rejected",
-              oldValue: null,
-              changeType: "UPDATE"
+              "subjectId": "u_cm_301",
+              "employeeName": "Rafiq Khan",
+              "role": "CM",
+              "email": "rafiq.khan@example.com",
+              "primary": true,
+              "since": "2025-09-19T14:30:00+06:00"
             }
           ],
-          validation: {
-            passed: false,
-            errors: ["Insufficient documentation", "Credit score below threshold"]
-          },
-          notes: "Application rejected, sent back to ARM"
-        },
-        {
-          id: "evt_0003",
-          timestamp: "2025-01-14T10:00:00Z",
-          actor: {
-            id: "system",
-            name: "System",
-            role: "SYSTEM"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            to: "ARMDraft"
-          },
-          notes: "Returned for revision"
+          history: [
+            {
+              "id": "evt_cm_001",
+              "at": "2025-09-19T14:30:00+06:00",
+              "byUser": {
+                "id": "system",
+                "name": "Workflow Engine",
+                "role": "SYSTEM"
+              },
+              "action": "enterState",
+              "stateFrom": "RMReview",
+              "stateTo": "CMReview"
+            }
+          ]
         }
-      ]
-    },
-    {
-      id: "WF-2025-005",
-      workflowName: "Loan Application Workflow",
-      currentState: "RMReview",
-      status: "pending",
-      priority: "critical",
-      createdAt: "2025-01-13T15:00:00Z",
-      updatedAt: "2025-01-14T09:00:00Z",
-      dueDate: "2025-01-15T18:00:00Z",
-      owner: {
-        id: "u_arm_005",
-        name: "Emma White",
-        role: "ARM",
-        email: "emma.white@company.com"
-      },
-      currentAssignee: {
-        id: "u_srm_001",
-        name: "Senior RM",
-        role: "Senior RM",
-        email: "senior.rm@company.com"
-      },
-      data: {
-        proposal_details: "Construction loan for commercial property. Amount: $1,200,000. Term: 7 years.",
-        supporting_documents: ["construction_plan.pdf", "permits.pdf", "contractor_quotes.pdf"],
-        loan_amount: 1200000,
-        loan_term_months: 84,
-        applicant_name: "Prime Developers Inc",
-        application_date: "2025-01-13",
-        arm_comments: "Large loan amount, requires detailed review",
-        priority: "high",
-      },
-      history: [
-        {
-          id: "evt_0001",
-          timestamp: "2025-01-13T15:00:00Z",
-          actor: {
-            id: "u_arm_005",
-            name: "Emma White",
-            role: "ARM",
-            email: "emma.white@company.com"
-          },
-          event: {
-            type: "STATE_TRANSITION",
-            action: "SubmitToRM",
-            to: "RMReview"
-          },
-          notes: "High priority application submitted"
-        },
-        {
-          id: "evt_0002",
-          timestamp: "2025-01-14T09:00:00Z",
-          actor: {
-            id: "u_srm_001",
-            name: "Senior RM",
-            role: "Senior RM",
-            email: "senior.rm@company.com"
-          },
-          event: {
-            type: "COMMENT_ADDED"
-          },
-          notes: "Awaiting additional documentation from client"
-        }
-      ]
+      }
     }
-  ]
+  },
+  {
+    ...sampleWorkflowData,
+    workflow: {
+      ...sampleWorkflowData.workflow,
+      id: "loan_workflow_v3",
+      currentState: "Completed",
+      currentStateEnteredAt: "2025-09-17T16:45:00+06:00",
+      forms: {
+        ...sampleWorkflowData.workflow.forms,
+        coreDetails: {
+          fields: [
+            {
+              "id": "applicantLegalName",
+              "name": "Applicant Legal Name",
+              "type": "text",
+              "data": "Quick Mart Stores",
+              "fieldActions": [
+                { "operation": "save" },
+                { "operation": "validate" }
+              ]
+            },
+            {
+              "id": "requestedAmount",
+              "name": "Requested Amount",
+              "type": "number",
+              "data": 10000000,
+              "fieldActions": [
+                { "operation": "save" },
+                { "operation": "validate" }
+              ]
+            }
+          ]
+        }
+      },
+      states: {
+        ...sampleWorkflowData.workflow.states,
+        Completed: {
+          ...sampleWorkflowData.workflow.states.Completed,
+          history: [
+            {
+              "id": "evt_comp_001",
+              "at": "2025-09-17T16:45:00+06:00",
+              "byUser": {
+                "id": "u_thcrm_610",
+                "name": "Rahat Iqbal",
+                "role": "TeamHeadCRM"
+              },
+              "action": "thcrmApprove",
+              "stateFrom": "THCRMDecision",
+              "stateTo": "Completed"
+            }
+          ]
+        }
+      }
+    }
+  }
+];
+
+// Transform the workflow data to instances
+export const allWorkflows: WorkflowData[] = [
+  sampleWorkflowData,
+  ...additionalSamples
+];
+
+const transformedInstances = transformWorkflowsToInstances(allWorkflows);
+
+export const runningWorkflowsData: RunningWorkflowsData = {
+  lastUpdated: new Date().toISOString(),
+  instances: transformedInstances
 };
+

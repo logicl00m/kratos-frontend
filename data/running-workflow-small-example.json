@@ -1,5 +1,10 @@
 {
     "workflow": {
+        "id": "loan_workflow_v1",
+        "version": 1,
+        "initialState": "ARMDraft",
+        "currentState": "RMReview",
+        "currentStateEnteredAt": "2025-09-18T09:22:31+06:00",
         "forms": {
             "coreDetails": {
                 "fields": [
@@ -30,7 +35,11 @@
                                 "operation": "validate"
                             }
                         ]
-                    },
+                    }
+                ]
+            },
+            "proposalDocs": {
+                "fields": [
                     {
                         "id": "proposalDetails",
                         "name": "Proposal Details",
@@ -75,7 +84,7 @@
                     }
                 ]
             },
-            "reviewOutputs": {
+            "rmSection": {
                 "fields": [
                     {
                         "id": "rmDecision",
@@ -89,14 +98,51 @@
                         ]
                     },
                     {
+                        "id": "rmRemarks",
+                        "name": "RM Remarks",
+                        "type": "textarea",
+                        "data": "Client has steady cashflows and clean track record.",
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "cmSection": {
+                "fields": [
+                    {
+                        "id": "cmDecision",
+                        "name": "Credit Manager Decision",
+                        "type": "select",
+                        "data": null,
+                        "fieldActions": [
+                            {
+                                "operation": "validate"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "cmRemarks",
+                        "name": "CM Remarks/Observation",
+                        "type": "textarea",
+                        "data": null,
+                        "fieldActions": [
+                            {
+                                "operation": "save"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "outputs": {
+                "fields": [
+                    {
                         "id": "finalMemo",
                         "name": "Credit Memo",
                         "type": "file",
-                        "data": {
-                            "name": "credit_memo_ABC_2025-09-18.pdf",
-                            "uri": "s3://loan-docs/ABC/credit_memo_2025-09-18.pdf",
-                            "sha256": "77ad..."
-                        },
+                        "data": null,
                         "fieldActions": [
                             {
                                 "operation": "download"
@@ -108,15 +154,16 @@
         },
         "states": {
             "ARMDraft": {
-                "assignees": {
-                    "list": [
-                        {
-                            "subjectId": "u_arm_102",
-                            "employeeName": "Sadia Rahman",
-                            "role": "ARM"
-                        }
-                    ]
-                },
+                "assignees": [
+                    {
+                        "subjectId": "u_arm_102",
+                        "employeeName": "Sadia Rahman",
+                        "role": "ARM",
+                        "email": "sadia.rahman@example.com",
+                        "primary": true,
+                        "since": "2025-09-18T09:00:05+06:00"
+                    }
+                ],
                 "forms": [
                     {
                         "formName": "coreDetails",
@@ -124,24 +171,64 @@
                             "applicantLegalName": {
                                 "status": "editable",
                                 "required": true
+                            },
+                            "requestedAmount": {
+                                "status": "editable",
+                                "required": true
                             }
                         }
                     },
                     {
-                        "formName": "reviewOutputs",
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "proposalDetails": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "supportingDocuments": {
+                                "status": "actionable",
+                                "required": true
+                            }
+                        }
+                    },
+                    {
+                        "formName": "rmSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "cmSection",
+                        "visibility": "hidden"
+                    },
+                    {
+                        "formName": "outputs",
                         "visibility": "hidden"
                     }
                 ],
                 "actions": {
                     "submitToRm": {
-                        "nextState": "rmReview",
-                        "operation": "Validate draft; save; notify RM"
+                        "nextState": "RMReview",
+                        "operation": "Validate draft; save; notify RM",
+                        "allowedRoles": [
+                            "ARM"
+                        ]
                     }
                 },
                 "history": [
                     {
+                        "id": "evt_0000",
+                        "at": "2025-09-18T09:00:05+06:00",
+                        "byUser": {
+                            "id": "system",
+                            "name": "Workflow Engine",
+                            "role": "SYSTEM"
+                        },
+                        "action": "enterState",
+                        "stateFrom": null,
+                        "stateTo": "ARMDraft"
+                    },
+                    {
                         "id": "evt_0001",
-                        "at": "2025-09-18T09:14:22+06:00",
+                        "at": "2025-09-18T09:00:05+06:00",
                         "byUser": {
                             "id": "u_arm_102",
                             "name": "Sadia Rahman",
@@ -153,7 +240,7 @@
                     },
                     {
                         "id": "evt_0002",
-                        "at": "2025-09-18T09:26:10+06:00",
+                        "at": "2025-09-18T09:22:31+06:00",
                         "byUser": {
                             "id": "u_arm_102",
                             "name": "Sadia Rahman",
@@ -161,91 +248,251 @@
                         },
                         "action": "submitToRm",
                         "stateFrom": "ARMDraft",
-                        "stateTo": "rmReview"
+                        "stateTo": "RMReview"
                     }
                 ]
             },
-            "rmReview": {
-                "assignees": {
-                    "list": [
-                        {
-                            "subjectId": "u_rm_221",
-                            "employeeName": "Fahim Ahmed",
-                            "role": "RM"
-                        }
-                    ]
-                },
+            "RMReview": {
+                "assignees": [
+                    {
+                        "subjectId": "u_rm_221",
+                        "employeeName": "Fahim Ahmed",
+                        "role": "RM",
+                        "email": "fahim.ahmed@example.com",
+                        "primary": true,
+                        "since": "2025-09-18T10:40:00+06:00"
+                    }
+                ],
                 "forms": [
                     {
                         "formName": "coreDetails",
                         "fieldOverrides": {
                             "applicantLegalName": {
                                 "status": "readonly"
+                            },
+                            "requestedAmount": {
+                                "status": "readonly"
                             }
                         }
                     },
                     {
-                        "formName": "reviewOutputs",
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "proposalDetails": {
+                                "status": "readonly"
+                            },
+                            "supportingDocuments": {
+                                "status": "actionable"
+                            }
+                        }
+                    },
+                    {
+                        "formName": "rmSection",
                         "fieldOverrides": {
                             "rmDecision": {
                                 "status": "editable",
                                 "required": true
+                            },
+                            "rmRemarks": {
+                                "status": "editable"
                             }
                         }
                     }
                 ],
                 "actions": {
+                    "rmReject": {
+                        "nextState": "ARMDraft",
+                        "operation": "Return to ARM with fields to correct",
+                        "allowedRoles": [
+                            "RM"
+                        ]
+                    },
                     "rmFinalize": {
-                        "nextState": "completed",
-                        "operation": "Finalize proposal"
+                        "nextState": "CMReview",
+                        "operation": "Finalize proposal",
+                        "allowedRoles": [
+                            "RM"
+                        ]
                     }
                 },
                 "history": [
                     {
                         "id": "evt_0003",
-                        "at": "2025-09-18T10:02:45+06:00",
+                        "at": "2025-09-18T09:22:31+06:00",
+                        "byUser": {
+                            "id": "system",
+                            "name": "Workflow Engine",
+                            "role": "SYSTEM"
+                        },
+                        "action": "enterState",
+                        "stateFrom": "ARMDraft",
+                        "stateTo": "RMReview"
+                    },
+                    {
+                        "id": "evt_0004",
+                        "at": "2025-09-18T10:41:45+06:00",
                         "byUser": {
                             "id": "u_rm_221",
                             "name": "Fahim Ahmed",
                             "role": "RM"
                         },
-                        "action": "rmFinalize",
-                        "stateFrom": "rmReview",
-                        "stateTo": "completed"
+                        "action": "updateFields",
+                        "stateFrom": "RMReview",
+                        "stateTo": "RMReview",
+                        "changes": [
+                            {
+                                "fieldId": "rmDecision",
+                                "old": null,
+                                "new": "RecommendApproval"
+                            },
+                            {
+                                "fieldId": "rmRemarks",
+                                "old": null,
+                                "new": "Client has steady cashflows and clean track record."
+                            }
+                        ]
                     }
                 ]
             },
-            "BusinessReview": {
+            "CMReview": {
+                "assigneePolicy": {
+                    "requiredRoles": [
+                        "CM"
+                    ]
+                },
+                "assignees": [],
                 "forms": [
                     {
-                        "formName": "coreDetails",
-                        "fieldOverrides": {}
+                        "formName": "cmSection",
+                        "fieldOverrides": {
+                            "cmDecision": {
+                                "status": "editable",
+                                "required": true
+                            },
+                            "cmRemarks": {
+                                "status": "editable"
+                            }
+                        }
                     },
                     {
-                        "formName": "reviewOutputs",
+                        "formName": "outputs",
                         "visibility": "hidden"
                     }
                 ],
                 "actions": {
-                    "thApprove": {
-                        "nextState": "CBOReview",
-                        "operation": "Record recommendation"
+                    "cmObservation": {
+                        "nextState": "RMResubmission",
+                        "operation": "Return to RM with observations",
+                        "allowedRoles": [
+                            "CM"
+                        ]
+                    },
+                    "cmRecommend": {
+                        "nextState": "THCRMDecision",
+                        "operation": "Send to Team Head–CRM for decision",
+                        "allowedRoles": [
+                            "CM"
+                        ]
                     }
                 }
-                /* No 'history' here because this state was never entered */
             },
-            "completed": {
+            "RMResubmission": {
+                "assigneePolicy": {
+                    "requiredRoles": [
+                        "ARM"
+                    ]
+                },
+                "assignees": [],
+                "forms": [
+                    {
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "supportingDocuments": {
+                                "status": "actionable"
+                            }
+                        }
+                    }
+                ],
+                "actions": {
+                    "rmResubmit": {
+                        "nextState": "CMReview",
+                        "operation": "Resubmit corrected proposal to CM",
+                        "allowedRoles": [
+                            "ARM"
+                        ]
+                    }
+                }
+            },
+            "THCRMDecision": {
+                "assigneePolicy": {
+                    "requiredRoles": [
+                        "TeamHeadCRM"
+                    ]
+                },
+                "assignees": [
+                    {
+                        "subjectId": "u_thcrm_610",
+                        "employeeName": "Rahat Iqbal",
+                        "role": "TeamHeadCRM",
+                        "email": "rahat.iqbal@example.com",
+                        "primary": true,
+                        "since": "2025-09-18T11:30:00+06:00"
+                    }
+                ],
+                "forms": [
+                    {
+                        "formName": "outputs",
+                        "fieldOverrides": {
+                            "finalMemo": {
+                                "status": "readonly"
+                            }
+                        }
+                    }
+                ],
+                "actions": {
+                    "thcrmSendBack": {
+                        "nextState": "RMReview",
+                        "operation": "Send back to RM for correction",
+                        "allowedRoles": [
+                            "TeamHeadCRM"
+                        ]
+                    },
+                    "thcrmApprove": {
+                        "nextState": "Completed",
+                        "operation": "Approve and finalize workflow",
+                        "allowedRoles": [
+                            "TeamHeadCRM"
+                        ]
+                    }
+                }
+            },
+            "Completed": {
+                "assignees": [],
                 "forms": [
                     {
                         "formName": "coreDetails",
                         "fieldOverrides": {
                             "applicantLegalName": {
                                 "status": "readonly"
+                            },
+                            "requestedAmount": {
+                                "status": "readonly"
                             }
                         }
                     },
                     {
-                        "formName": "reviewOutputs",
+                        "formName": "proposalDocs",
+                        "fieldOverrides": {
+                            "proposalDetails": {
+                                "status": "readonly"
+                            },
+                            "supportingDocuments": {
+                                "status": "readonly"
+                            }
+                        }
+                    },
+                    {
+                        "formName": "outputs",
                         "fieldOverrides": {
                             "finalMemo": {
                                 "status": "actionable"
@@ -253,21 +500,7 @@
                         }
                     }
                 ],
-                "actions": {},
-                "history": [
-                    {
-                        "id": "evt_0004",
-                        "at": "2025-09-18T10:02:46+06:00",
-                        "byUser": {
-                            "id": "system",
-                            "name": "Workflow Engine",
-                            "role": "SYSTEM"
-                        },
-                        "action": "enterState",
-                        "stateFrom": "rmReview",
-                        "stateTo": "completed"
-                    }
-                ]
+                "actions": {}
             }
         }
     }
