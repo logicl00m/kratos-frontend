@@ -3,35 +3,48 @@ import React, { useState } from "react";
 import { Edit, Save, ArrowLeft } from "lucide-react";
 import FieldInput from "./FieldInput";
 
-// Updated type definitions for v2 structure
+// Type definitions matching the JSON structure
 interface FieldDefinition {
-  ID: string;
-  Name: string;
-  Type: string;
-  DataSource?: string;
-  FieldActions?: Array<{ Operation: string }>;
+  id: string;
+  name: string;
+  type: string;
+  data?: string;
+  fieldActions?: Array<{ operation: string }>;
 }
 
-interface FieldConfig {
+interface FormDefinition {
+  fields: FieldDefinition[];
+}
+
+interface FieldOverride {
   status: "editable" | "readonly" | "hidden" | "actionable";
   required?: boolean;
 }
 
-interface StateV2 {
-  Fields: Record<string, FieldConfig>;
-  Actions: Record<string, any>;
+interface StateForm {
+  formName: string;
+  visibility?: "hidden";
+  fieldOverrides?: Record<string, FieldOverride>;
 }
 
-interface WorkflowV2 {
-  Form: {
-    Fields: FieldDefinition[];
-  };
-  States: Record<string, StateV2>;
+interface StateAction {
+  nextState: string;
+  operation: string;
+}
+
+interface State {
+  forms: StateForm[];
+  actions: Record<string, StateAction>;
+}
+
+interface Workflow {
+  forms: Record<string, FormDefinition>;
+  states: Record<string, State>;
 }
 
 interface FormViewerProps {
   stateName: string;
-  workflow: WorkflowV2;
+  workflow: { workflow: Workflow };
   currentState: string;
   onSubmit?: (data: Record<string, unknown>) => void;
   onReject?: (data: Record<string, unknown>) => void;
@@ -49,8 +62,8 @@ const FormViewer: React.FC<FormViewerProps> = ({
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [editMode, setEditMode] = useState(false);
 
-  // Add null checks for workflow
-  if (!workflow) {
+  // Validate workflow structure
+  if (!workflow?.workflow) {
     return (
       <div className="form-viewer">
         <div className="form-header">
@@ -67,7 +80,9 @@ const FormViewer: React.FC<FormViewerProps> = ({
     );
   }
 
-  if (!workflow.States || !workflow.Form) {
+  const { forms, states } = workflow.workflow;
+
+  if (!states || !forms) {
     return (
       <div className="form-viewer">
         <div className="form-header">
@@ -84,8 +99,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
     );
   }
 
-  const state = workflow.States[currentState];
-  const globalFields = workflow.Form.Fields;
+  const state = states[currentState];
 
   if (!state) {
     return (
@@ -111,50 +125,59 @@ const FormViewer: React.FC<FormViewerProps> = ({
     setFormData((prev) => ({ ...prev, [fieldId]: value }));
   };
 
-  // Get visible fields for current state
+  // Get all fields with their configurations for the current state
   const getVisibleFields = () => {
-    if (!state?.Fields || !globalFields) return [];
+    const visibleFields: Array<{
+      field: FieldDefinition;
+      config: FieldOverride | null;
+    }> = [];
 
-    return globalFields.filter((field) => {
-      const fieldConfig = state.Fields[field.ID];
-      return fieldConfig && fieldConfig.status !== "hidden";
+    state.forms.forEach((stateForm) => {
+      // Skip hidden forms
+      if (stateForm.visibility === "hidden") return;
+
+      const formDef = forms[stateForm.formName];
+      if (!formDef) return;
+
+      formDef.fields.forEach((field) => {
+        const override = stateForm.fieldOverrides?.[field.id];
+
+        // Skip hidden fields
+        if (override?.status === "hidden") return;
+
+        visibleFields.push({
+          field,
+          config: override || null,
+        });
+      });
     });
+
+    return visibleFields;
   };
 
-  // Get field configuration for a specific field
-  const getFieldConfig = (fieldId: string): FieldConfig | undefined => {
-    return state?.Fields?.[fieldId];
-  };
+  // Check if field is editable
+  const isFieldEditable = (config: FieldOverride | null): boolean => {
+    if (!config) return false;
 
-  // Check if field is editable based on current state and edit mode
-  const isFieldEditable = (fieldId: string): boolean => {
-    const fieldConfig = getFieldConfig(fieldId);
-    if (!fieldConfig) return false;
-
-    if (fieldConfig.status === "readonly") return false;
-    if (fieldConfig.status === "editable") return editMode;
-    if (fieldConfig.status === "actionable") return true; // actionable fields are always interactive
+    if (config.status === "readonly") return false;
+    if (config.status === "editable") return editMode;
+    if (config.status === "actionable") return true;
 
     return false;
   };
 
-  // Check if field is required
-  const isFieldRequired = (fieldId: string): boolean => {
-    const fieldConfig = getFieldConfig(fieldId);
-    return fieldConfig?.required === true;
-  };
+  // Get field status display text
+  const getFieldStatusDisplay = (
+    fieldId: string,
+    config: FieldOverride | null
+  ): string => {
+    if (!config) return "";
 
-  // Get field status display
-  const getFieldStatusDisplay = (fieldId: string): string => {
-    const fieldConfig = getFieldConfig(fieldId);
-    if (!fieldConfig) return "";
-
-    if (fieldConfig.required && !formData[fieldId]) {
+    if (config.required && !formData[fieldId]) {
       return "Required";
     }
 
-    // You can customize this based on your business logic
-    switch (fieldConfig.status) {
+    switch (config.status) {
       case "actionable":
         return "Action required";
       case "editable":
@@ -166,18 +189,16 @@ const FormViewer: React.FC<FormViewerProps> = ({
     }
   };
 
-  const renderField = (field: FieldDefinition) => {
-    const fieldConfig = getFieldConfig(field.ID);
-
-    return (
-      <FieldInput
-        field={field}
-        value={formData[field.ID]}
-        disabled={!isFieldEditable(field.ID)}
-        onChange={(val) => handleFieldChange(field.ID, val)}
-      />
-    );
-  };
+  // Transform field to match FieldInput expectations
+  const transformField = (field: FieldDefinition) => ({
+    ID: field.id,
+    Name: field.name,
+    Type: field.type,
+    DataSource: field.data,
+    FieldActions: field.fieldActions?.map((action) => ({
+      Operation: action.operation,
+    })),
+  });
 
   const visibleFields = getVisibleFields();
 
@@ -199,35 +220,41 @@ const FormViewer: React.FC<FormViewerProps> = ({
       </div>
 
       <div className="form-content">
-        {visibleFields.map((field) => {
-          const fieldConfig = getFieldConfig(field.ID);
-          const statusText = getFieldStatusDisplay(field.ID);
+        {visibleFields.map(({ field, config }) => {
+          const statusText = getFieldStatusDisplay(field.id, config);
 
           return (
-            <div key={field.ID} className="form-group">
+            <div key={field.id} className="form-group">
               <div className="field-row">
                 <label className="field-label">
-                  {field.Name}
-                  {isFieldRequired(field.ID) && (
+                  {field.name}
+                  {config?.required && (
                     <span className="required-marker"> *</span>
                   )}
                 </label>
-                <div className="field-value">{renderField(field)}</div>
+                <div className="field-value">
+                  <FieldInput
+                    field={transformField(field)}
+                    value={formData[field.id]}
+                    disabled={!isFieldEditable(config)}
+                    onChange={(val) => handleFieldChange(field.id, val)}
+                  />
+                </div>
                 <div className="field-status">
                   {statusText && (
                     <span className="status-text">{statusText}</span>
                   )}
-                  {fieldConfig?.status === "actionable" && (
+                  {config?.status === "actionable" && (
                     <button className="recommend-btn">Action</button>
                   )}
                 </div>
               </div>
 
-              {field.FieldActions && field.FieldActions.length > 0 && (
+              {field.fieldActions && field.fieldActions.length > 0 && (
                 <div className="field-actions">
-                  {field.FieldActions.map((action, index) => (
+                  {field.fieldActions.map((action, index) => (
                     <span key={index} className="action-tag">
-                      {action.Operation}
+                      {action.operation}
                     </span>
                   ))}
                 </div>
@@ -239,19 +266,25 @@ const FormViewer: React.FC<FormViewerProps> = ({
 
       <div className="form-footer">
         {/* Render state actions dynamically */}
-        {state?.Actions &&
-          Object.entries(state.Actions).map(([actionKey, actionData]) => (
+        {state?.actions &&
+          Object.entries(state.actions).map(([actionKey, actionData]) => (
             <button
               key={actionKey}
-              className={`btn-${actionKey.toLowerCase()}`}
+              className={`btn-${actionKey
+                .toLowerCase()
+                .replace(/([A-Z])/g, "-$1")
+                .toLowerCase()}`}
               onClick={() => onSubmit?.(formData)}
             >
-              {actionKey.replace(/([A-Z])/g, " $1").trim()}
+              {actionKey
+                .replace(/([A-Z])/g, " $1")
+                .trim()
+                .replace(/^[a-z]/, (s) => s.toUpperCase())}
             </button>
           ))}
 
         {/* Fallback buttons if no state actions defined */}
-        {(!state?.Actions || Object.keys(state.Actions).length === 0) && (
+        {(!state?.actions || Object.keys(state.actions).length === 0) && (
           <>
             <button className="btn-save" onClick={() => onSubmit?.(formData)}>
               Save

@@ -28,7 +28,7 @@ function App() {
   >("dashboard");
   const [selectedApplication, setSelectedApplication] =
     useState<LoanApplication | null>(null);
-  const stateKeys = Object.keys(workflow.Workflow?.States || {});
+  const stateKeys = Object.keys(workflow.workflow?.states || {});
   const [currentStateIndex, setCurrentStateIndex] = useState<number>(0);
   const currentState = stateKeys[currentStateIndex] || stateKeys[0] || "";
 
@@ -157,7 +157,8 @@ function App() {
           <div style={{ width: "100%" }}>
             <FormViewer
               stateName={currentState}
-              state={workflow.Workflow?.States?.[currentState]}
+              workflow={workflow} // Pass full workflow object
+              currentState={currentState}
               onSubmit={(data) => console.log("Submit:", data)}
               onReject={(data) => console.log("Reject:", data)}
               onBack={handleBackToGraph}
