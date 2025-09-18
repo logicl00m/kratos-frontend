@@ -8,6 +8,7 @@ A dynamic workflow management system for loan applications that:
 - Renders dynamic forms based on state configurations
 - Tracks multiple loan applications through workflow stages
 - Provides dashboard for queue management
+- Manages running workflows with real-time status updates
 
 ## File Structure & Responsibilities
 
@@ -58,6 +59,18 @@ src/
 │   │   └── components/
 │   │       ├── FormViewer.tsx - Main form rendering component
 │   │       └── FieldInput.tsx - Dynamic field input based on field type
+│   ├── running-workflows/
+│   │   ├── components/
+│   │   │   ├── RunningStateNode.tsx - Custom node component for running workflow states
+│   │   │   ├── RunningWorkflowDetailPanel.tsx - Information panel for selected running workflow nodes/edges
+│   │   │   └── RunningWorkflowsPage.tsx - Main view for managing running workflows
+│   │   ├── data/
+│   │   │   └── runningWorkflows.data.ts - Mock data for running workflows
+│   │   ├── types/
+│   │   │   └── runningWorkflow.types.ts - Running workflow-specific TypeScript interfaces
+│   │   └── utils/
+│   │       ├── runningWorkflowParser.ts - Converts running workflow data to React Flow nodes/edges
+│   │       └── workflowTransformer.ts - Transforms workflow data to instance objects
 │   └── workflow/
 │       ├── components/
 │       │   ├── WorkflowGraph.tsx - Main React Flow integration
@@ -139,6 +152,72 @@ interface WorkflowConfig {
 }
 ```
 
+**`features/running-workflows/types/runningWorkflow.types.ts`**
+
+```typescript
+// Running workflow data structures
+interface WorkflowData {
+  workflow: {
+    id: string;
+    version: number;
+    initialState: string;
+    currentState: string;
+    currentStateEnteredAt: string;
+    forms: Record<string, WorkflowForm>;
+    states: Record<string, WorkflowState>;
+  };
+}
+
+interface WorkflowState {
+  assignees: WorkflowAssignee[];
+  forms: Array<{
+    formName: string;
+    visibility?: string;
+    fieldOverrides?: Record<string, any>;
+  }>;
+  actions: Record<
+    string,
+    {
+      nextState: string;
+      operation: string;
+      allowedRoles?: string[];
+    }
+  >;
+  history: WorkflowHistoryEntry[];
+  assigneePolicy?: {
+    requiredRoles: string[];
+  };
+}
+
+interface WorkflowInstance {
+  id: string;
+  workflowName: string;
+  currentState: string;
+  status: "active" | "completed" | "pending" | "rejected";
+  priority?: "low" | "medium" | "high" | "critical";
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+  dueDate?: string;
+  owner: Actor;
+  currentAssignee?: Actor;
+  watchers?: Actor[];
+  data: Record<string, any>;
+  history: WorkflowHistoryItem[];
+  metrics?: {
+    totalDuration?: number;
+    statesDuration?: Record<string, number>;
+    revisitCount?: Record<string, number>;
+  };
+  context?: {
+    businessUnit?: string;
+    category?: string;
+    tags?: string[];
+    externalReferences?: Record<string, string>;
+  };
+}
+```
+
 ### Feature Responsibilities
 
 #### Application Details Feature
@@ -185,6 +264,18 @@ Located in `src/features/workflow/`
 **`graphParser.ts`** - Utility that converts workflow JSON to React Flow nodes/edges
 **`graphExport.ts`** - Utility for exporting workflow graphs to JSON
 
+#### Running Workflows Feature
+
+Located in `src/features/running-workflows/`
+
+**`RunningStateNode.tsx`** - Custom React Flow node component representing running workflow states with visual indicators for visited, current, and pending states
+**`RunningWorkflowDetailPanel.tsx`** - Right-hand details panel for selected running workflow nodes/edges showing comprehensive workflow information
+**`RunningWorkflowsPage.tsx`** - Main view component for managing and monitoring running workflows with both graph and list views
+**`runningWorkflows.data.ts`** - Mock data for running workflows with sample loan workflow instances
+**`runningWorkflow.types.ts`** - TypeScript interfaces for running workflow data including workflow instances, history, and metrics
+**`runningWorkflowParser.ts`** - Utility that converts running workflow data to React Flow nodes/edges with status tracking
+**`workflowTransformer.ts`** - Utility that transforms raw workflow data into instance objects with metrics and history
+
 #### Shared Components and Utilities
 
 Located in `src/shared/`
@@ -212,11 +303,25 @@ Located in `src/shared/`
 - Centralized graph export helper for JSON export
 - Uses shared download utility for file handling
 
+**`features/running-workflows/utils/runningWorkflowParser.ts`**
+
+- Converts running workflow data → React Flow nodes/edges
+- Creates nodes from States with status information
+- Creates edges from State.Actions with execution tracking
+- Auto-layouts using grid positioning
+- Tracks workflow history and metrics
+
+**`features/running-workflows/utils/workflowTransformer.ts`**
+
+- Transforms raw workflow data into instance objects
+- Builds workflow history and metrics
+- Derives workflow context and priority
+
 ### Components
 
 **`app/App.tsx`** - Application Controller
 
-- Manages view modes: dashboard | graph | form | details
+- Manages view modes: dashboard | graph | form | details | running-workflows
 - Handles workflow JSON updates
 - Controls navigation between views
 - Maintains current state selection
@@ -257,6 +362,7 @@ The app converts JSON workflow definitions into an interactive visual graph and 
 - Show state details and dynamic forms driven by JSON
 - Export graph and workflow definitions
 - Dashboard for managing loan applications and navigating to workflows
+- Monitor and manage running workflows with real-time status updates
 
 ## Core Types (summary)
 
@@ -299,6 +405,24 @@ Notes:
 - `src/features/dashboard/components/ApplicationRow.tsx` — Row rendering for application table.
 - `src/features/workflow/components/GraphToolbar.tsx` — Compact toolbar for export/controls in the graph view.
 - `src/shared/components/layout/TopBar.tsx` — Shared top header across major views.
+- `src/features/running-workflows/components/RunningWorkflowsPage.tsx` — Main view for managing and monitoring running workflows.
+- `src/features/running-workflows/components/RunningStateNode.tsx` — Visual node used by React Flow for running workflows; shows state label and status.
+- `src/features/running-workflows/components/RunningWorkflowDetailPanel.tsx` — Right-hand details view for selected running workflow node/edge.
+- `src/features/running-workflows/utils/runningWorkflowParser.ts` — Converts running workflow data into React Flow nodes and edges.
+
+## Planned Workflow Editor Feature
+
+The next major feature planned for implementation is a visual workflow editor that will allow users to create and modify workflows through a drag-and-drop interface. This feature will be implemented in `src/features/workflow-editor/` and will include:
+
+- **Visual Workflow Design**: Drag-and-drop interface for creating and modifying workflows with real-time preview
+- **Dual Node Types**: Process nodes (rectangles) with three connection points and Decision nodes (diamonds) with multiple transitions
+- **Advanced Connection System**: Color-coded connections (red=reject, black=submit, green=approve) with user-defined labels
+- **Configuration Interface**: Enhanced details panel for node/edge configuration and assignee management
+- **Context Menus**: Right-click menus for quick actions with full keyboard accessibility
+- **Validation Engine**: Comprehensive validation with visual error indicators
+- **Export Functionality**: Standardized JSON export compatible with existing system
+
+The workflow editor will build upon the existing React Flow integration and extend it with more advanced editing capabilities while maintaining backward compatibility with the current workflow visualization feature.
 
 ## Data Flow
 
@@ -306,6 +430,10 @@ Notes:
 2. `graphParser` builds nodes and edges from `Workflow.States` and per-state `Actions`.
 3. `WorkflowGraph` renders nodes & edges in React Flow.
 4. User interactions: select node/edge → `DetailPanel` → open `FormViewer` → trigger actions.
+5. For running workflows, data is loaded from the running workflows service.
+6. `runningWorkflowParser` builds nodes and edges from running workflow data.
+7. `RunningWorkflowsPage` renders nodes & edges in React Flow.
+8. User interactions: select node/edge → `RunningWorkflowDetailPanel` → view details.
 
 ## Recent Refactor Highlights
 
@@ -314,8 +442,7 @@ Notes:
 - Reworked `DetailPanel.tsx` to use explicit types (`NodeData` / `EdgeData`) and removed unsafe `any` casts.
 - Consolidated color mapping into `src/shared/utils/colors.ts` (getStageColor) used across UI.
 - Removed unused imports and replaced nested ternaries with clearer conditionals.
-
-These changes improve maintainability, readability, and testability while preserving runtime behavior.
+- Added new running workflows feature with dedicated components and utilities.
 
 ## Known Issues & Code Review Findings
 
@@ -384,7 +511,7 @@ After reviewing the application details feature, several bugs and issues were id
 1. **Incomplete Document Functionality**: Document upload and download buttons don't actually perform any actions.
 2. **Missing API Integration**: All data is hardcoded with no actual backend integration.
 
-For a detailed list of bugs and recommendations, see [APPLICATION_DETAILS_BUGS.md](APPLICATION_DETAILS_BUGS.md).
+For a detailed list of bugs and recommendations, see [CODE_REVIEW.md](CODE_REVIEW.md).
 
 ## Recent Improvements
 
@@ -395,6 +522,7 @@ Since the last review, several significant improvements have been made:
    - Improved type handling in `DetailPanel.tsx` with explicit `NodeData` and `EdgeData` types
    - Better field action handling with proper type checking in `getFieldActions` function
    - Consistent use of TypeScript interfaces throughout the application
+   - Fixed TypeScript import issues with `verbatimModuleSyntax` flag
 
 2. **Comprehensive Testing Coverage**
 
@@ -421,6 +549,7 @@ Short-term (low risk):
 - Extract field action parsing into `src/utils/fieldActions.ts` and reuse from `DetailPanel` and `StateNode`.
 - Complete `FieldInput` coverage for all documented field types and remove hardcoded options.
 - Implement proper API integration to replace hardcoded mock data.
+- Implement proper API integration for running workflows to replace hardcoded mock data.
 
 Medium-term:
 
@@ -428,6 +557,7 @@ Medium-term:
 - Add unit tests for `graphParser` and `graphExport`.
 - Introduce a lightweight global store for shared app state (Zustand or Context + selectors).
 - Implement file upload functionality in the form components.
+- Add unit tests for `runningWorkflowParser`.
 
 Long-term:
 
@@ -435,6 +565,7 @@ Long-term:
 - Implement CI with typecheck, eslint, and build on PRs.
 - Add comprehensive accessibility features and ARIA attributes.
 - Implement theming support for light/dark mode.
+- Implement real-time updates for running workflows using WebSocket connections.
 
 ## Developer Quick Start
 
@@ -482,6 +613,9 @@ npm run build
 - `src/features/workflow/utils/graphParser.ts` — conversion rules and layout logic.
 - `src/features/workflow/components/DetailPanel.tsx` — recently refactored; ensures safe rendering of fields/actions.
 - `src/features/form/components/FieldInput.tsx` — central input renderer; extend to cover missing field types.
+- `src/features/running-workflows/types/runningWorkflow.types.ts` — running workflow data structures.
+- `src/features/running-workflows/utils/runningWorkflowParser.ts` — conversion rules for running workflows.
+- `src/features/running-workflows/components/RunningWorkflowsPage.tsx` — main running workflows view.
 
 ## Appendix: Example Workflow JSON
 
@@ -531,6 +665,21 @@ Maintainers: update this document as the codebase evolves. It is intended to be 
 - Duplicate test files that previously lived in `src/features/**/__tests__` have been removed to avoid test duplication and confusion. The canonical location for tests is now `tests/`.
 - Test status: The full test suite was run after the reorganization and reported all tests passing (21 test files, 92 tests). If you see failures locally, run `npm ci` then `npm test` to reproduce.
 - Code review: The code review findings and prioritized recommendations were added to `CODE_REVIEW.md`. Key topics: type-safety improvements, JSON validation, extracting duplicated logic, and adding CI for checks on PRs.
+- New feature: Added running workflows feature with dedicated components, types, and utilities for managing and monitoring active loan workflows.
+
+## Workflow Editor Status (Sep 18, 2025)
+
+- Plan: A detailed design and implementation plan was added to `docs/WORKFLOW_EDITOR_PLAN.md` (last updated 2025-09-18).
+- Scope: Visual editor supporting Process and Decision nodes, assignee assignment, three canonical actions per Process node (left/center/right), labeled decision transitions, validation rules, and an export transformer to canonical JSON.
+- Current progress: Planning and documentation complete; next steps are scaffolding the editor feature and implementing the React Flow canvas with Process/Decision node components.
+- Acceptance checklist (MVP):
+  - [ ] Add Process and Decision nodes; rename states.
+  - [ ] Assign people via Details Panel and Context Menu; node indicator updates for 0/1/many.
+  - [ ] Configure Left/Center/Right actions on Process node; connect ports to create labeled edges.
+  - [ ] Add multiple labeled transitions from Decision node and edit edge labels/operations.
+  - [ ] Run validation and export canonical JSON per the plan.
+
+Contact: see `docs/WORKFLOW_EDITOR_PLAN.md` for technical tasks and implementation roadmap.
 
 ## Quick verification steps
 
@@ -556,11 +705,13 @@ If tests fail on your machine after a fresh `npm ci`, check that Node version ma
 
 ## Notes for Maintainers
 
-- When adding new tests prefer the `tests/` top-level layout. Group tests by feature (e.g., `tests/dashboard`, `tests/workflow`, `tests/application-details`).
+- When adding new tests prefer the `tests/` top-level layout. Group tests by feature (e.g., `tests/dashboard`, `tests/workflow`, `tests/application-details`, `tests/running-workflows`).
 - Keep MSW handlers under `tests/mocks` and add new API routes there when components need them.
 - Use `tests/test-utils.tsx` helpers (`renderWithProviders`, `createMockLoanApplication`) to ensure consistent test behavior (React Flow provider + deterministic color mocks).
+- For running workflows, maintain consistency with the workflow feature patterns and components.
 
 ## Follow-ups
 
 - Add a CI pipeline that runs `npm ci`, `npm run typecheck`, `npm run lint`, and `npm test` on pull requests.
 - Consider adding E2E tests (Playwright) for the primary flows.
+- Add unit tests for running workflow components and utilities.

@@ -69,6 +69,22 @@ Non-src
 - `vite.config.ts` – Vite configuration, including path aliases
 - `tsconfig.app.json` – TypeScript compiler options and path aliases
 
+## Sample workflow JSON (data/)
+
+The `data/` directory contains example JSON fixtures used for local development, demos, and as test fixtures. Notable files include `data/small-sample.json` which models a workflow with a top-level `workflow` object containing `forms`, `states`, and per-state `actions`.
+
+These sample workflow files are consumed by several parts of the app:
+
+- `@features/workflow/components/JsonEditor` — edit and preview raw workflow JSON.
+- `@features/workflow/components/WorkflowGraph` — renders the workflow graph parsed from the JSON.
+- feature components under `src/features/application-details` — read `forms` and `fieldOverrides` to drive UI rendering of form fields and state-specific behavior.
+
+When extending or adding samples:
+
+- Add new `forms.<name>.fields[]` entries to define form fields and their `fieldActions`.
+- Add or update `states.<stateName>` to control per-state form visibility, `fieldOverrides`, and `actions`.
+- Keep changes compatible with the parser at `@features/workflow/utils/graphParser.ts`.
+
 ## Path aliases
 
 Configured in `vite.config.ts` and `tsconfig.app.json`:
@@ -154,6 +170,20 @@ import { WorkflowGraph } from "@features/workflow/components";
   - Workflow graph export lives at `@features/workflow/utils/graphExport` and uses `@shared/utils/download`.
 - Colors: `getStageColor` in `@shared/utils/colors` centralizes stage color mapping.
 - ESLint: config file renamed to `eslint.config.mjs` for ESM; `eslint.config.js` was removed.
+- TypeScript: Uses `verbatimModuleSyntax` flag which requires type-only imports for types.
+
+## Workflow Editor (new feature)
+
+We are adding a visual Workflow Editor feature for designing, validating, and exporting workflow configurations.
+
+- Location (recommended): `src/features/workflow-config-edit/` — contains editor canvas, custom nodes, details panel, and exporter utilities.
+- Base canvas: React Flow (already in dependencies). Consider `elkjs` for auto-layout improvements.
+- Data model and mapping rules are documented in `docs/WORKFLOW_EDITOR_PLAN.md` (last updated 2025-09-18).
+- Integration notes:
+  - Reuse `@shared` components (TopBar, icons, toasts) and `@features/workflow/utils/*` parsers where possible.
+  - Expose exporter transformer `canvasToWorkflowJSON(nodes, edges)` for consistency with existing `graphExport` utilities.
+
+See `docs/WORKFLOW_EDITOR_PLAN.md` for detailed design, validation rules, accessibility guidance, and an implementation roadmap.
 
 ## Testing
 

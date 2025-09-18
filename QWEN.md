@@ -30,6 +30,15 @@ A web application that transforms JSON workflow specifications into interactive 
 - Audit Trail: Track all actions and comments on applications
 - Workflow Navigation: Move between different workflow states
 
+### Phase 4: Workflow Editor (Planned)
+- Visual Workflow Design: Drag-and-drop interface for creating and modifying workflows
+- Dual Node Types: Process nodes (rectangles) with three connection points and Decision nodes (diamonds) with multiple transitions
+- Advanced Connection System: Color-coded connections (red=reject, black=submit, green=approve) with user-defined labels
+- Configuration Interface: Details panel for node/edge configuration and assignee management
+- Context Menus: Right-click menus for quick actions with full keyboard accessibility
+- Validation Engine: Comprehensive validation with visual error indicators
+- Export Functionality: Standardized JSON export compatible with existing system
+
 ## Technical Architecture
 
 ### Core Data Types
@@ -78,6 +87,16 @@ interface Workflow {
 - `DocumentsSection.tsx` - Component for managing documents
 - `AuditTrail.tsx` - Component for displaying audit trail
 - `utils/graphParser.ts` - Converts workflow JSON to React Flow nodes/edges
+
+### Workflow Editor Components (Planned)
+- `WorkflowEditor.tsx` - Main editor component orchestrating all functionality
+- `ProcessNode.tsx` - Enhanced process node with three connection points (left/center/right)
+- `DecisionNode.tsx` - Decision node with diamond shape and multiple connection points
+- `WorkflowEdge.tsx` - Custom edge component with enhanced labeling
+- `DetailsPanel.tsx` - Enhanced configuration panel for nodes and edges
+- `ContextMenu.tsx` - Right-click context menu with keyboard accessibility
+- `EditorToolbar.tsx` - Toolbar with editor-specific controls
+- `ValidationEngine.tsx` - Workflow validation system
 
 ### Data Flow
 1. JSON Definition (States + Actions)
@@ -145,6 +164,8 @@ kratos-frontend/
 - React Flow (graph visualization)
 - JSON-based configuration
 - Export capabilities (JSON, PNG)
+- Vite (build tool)
+- Tailwind CSS (styling)
 
 ## Path Aliases
 - `@/…` → `src/…`
@@ -172,6 +193,7 @@ The project follows a feature-based architecture where each feature contains its
 - `dashboard/` - Components for the loan application dashboard and queue management
 - `form/` - Components for dynamic form rendering and field input handling
 - `workflow/` - Components for workflow visualization and JSON editing
+- `workflow-editor/` - Components for visual workflow design and editing (Planned)
 
 ### Shared Components
 - `shared/components/layout/` - Layout components like TopBar
