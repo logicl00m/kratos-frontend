@@ -1,4 +1,4 @@
-// src/app/App.tsx
+﻿// src/app/App.tsx
 import { useState } from "react";
 import WorkflowGraph from "@features/workflow/components/WorkflowGraph";
 import FormViewer from "@features/form/components/FormViewer";
@@ -7,6 +7,7 @@ import Dashboard from "@features/dashboard/components/Dashboard";
 import ApplicationDetails from "@features/application-details/components/ApplicationDetails";
 import RunningWorkflowsPage from "@features/running-workflows/components/RunningWorkflowsPage";
 import WorkflowBuilder from "@features/workflow-config-edit/components/builder/WorkflowBuilder";
+import { DynamicFormBuilder } from "@features/dynamic-form-builder";
 import {
   parseWorkflowToGraph,
   getDefaultWorkflow,
@@ -26,7 +27,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<
-    "dashboard" | "graph" | "form" | "details" | "running" | "builder"
+    "dashboard" | "graph" | "form" | "details" | "running" | "builder" | "form-builder"
   >("dashboard");
   const [selectedApplication, setSelectedApplication] =
     useState<LoanApplication | null>(null);
@@ -102,6 +103,10 @@ function App() {
 
   const { nodes, edges } = parseWorkflowToGraph(workflow);
 
+  if (viewMode === "form-builder") {
+    return <DynamicFormBuilder />;
+  }
+
   // Workflow Builder view
   if (viewMode === "builder") {
     return (
@@ -135,6 +140,13 @@ function App() {
           title="Workflow Manager"
           right={
             <div style={{ display: "flex", gap: 8 }}>
+              <button
+                className="toggle-button"
+                onClick={() => setViewMode("form-builder")}
+                style={{ background: "#f59e0b" }}
+              >
+                Form Builder
+              </button>
               <button
                 className="toggle-button"
                 onClick={() => setViewMode("builder")}
@@ -179,6 +191,13 @@ function App() {
               style={{ background: "#6366f1", marginRight: 12 }}
             >
               Dashboard
+            </button>
+            <button
+              className="toggle-button"
+              onClick={() => setViewMode("form-builder")}
+              style={{ background: "#f59e0b", marginRight: 12 }}
+            >
+              Form Builder
             </button>
             <button
               className="toggle-button"
@@ -252,6 +271,12 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
 
 
 
