@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Download, Upload, Plus } from 'lucide-react';
@@ -40,6 +40,20 @@ export function DynamicFormBuilder() {
   const [draggedFieldType, setDraggedFieldType] = useState<string | null>(null);
   const [draggedFieldIndex, setDraggedFieldIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isPreviewOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsPreviewOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPreviewOpen]);
 
   const handleFieldDragStart = (type: string) => {
     setDraggedFieldType(type);
@@ -60,13 +74,16 @@ export function DynamicFormBuilder() {
     setDragOverIndex(null);
   };
 
+  const openPreview = () => setIsPreviewOpen(true);
+  const closePreview = () => setIsPreviewOpen(false);
+
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
 
     if (draggedFieldType) {
       const newField: Field = {
-        id: `field_${Date.now()}`,
-        name: `New ${draggedFieldType} Field`,
+        id: ield_,
+        name: New  Field,
         type: draggedFieldType as Field['type'],
         status: 'default',
         data: '{{ data.field }}',
@@ -83,8 +100,7 @@ export function DynamicFormBuilder() {
     } else if (draggedFieldIndex !== null && draggedFieldIndex !== dropIndex) {
       const newFields = [...fields];
       const [movedField] = newFields.splice(draggedFieldIndex, 1);
-      const adjustedIndex =
-        draggedFieldIndex < dropIndex ? dropIndex - 1 : dropIndex;
+      const adjustedIndex = draggedFieldIndex < dropIndex ? dropIndex - 1 : dropIndex;
       newFields.splice(adjustedIndex, 0, movedField);
       setFields(newFields);
     }
@@ -94,7 +110,7 @@ export function DynamicFormBuilder() {
 
   const addField = () => {
     const newField: Field = {
-      id: `field_${Date.now()}`,
+      id: ield_,
       name: 'New Field',
       type: 'text',
       status: 'default',
@@ -117,8 +133,8 @@ export function DynamicFormBuilder() {
     const fieldToDuplicate = fields[index];
     const newField = {
       ...fieldToDuplicate,
-      id: `field_${Date.now()}`,
-      name: `${fieldToDuplicate.name} (Copy)`,
+      id: ield_,
+      name: ${fieldToDuplicate.name} (Copy),
     };
     const newFields = [...fields];
     newFields.splice(index + 1, 0, newField);
@@ -158,7 +174,7 @@ export function DynamicFormBuilder() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${formName}.json`;
+    link.download = ${formName}.json;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -210,18 +226,39 @@ export function DynamicFormBuilder() {
               </span>
             </div>
             <div className="dfb__actions">
-              <Button variant="outline" size="sm" onClick={importJSON}>
-                <Upload size={16} style={{ marginRight: 6 }} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={importJSON}
+                className="dfb__actions-button dfb__actions-button--ghost"
+              >
+                <Upload size={16} />
                 Import JSON
               </Button>
-              <Button variant="outline" size="sm" onClick={exportJSON}>
-                <Download size={16} style={{ marginRight: 6 }} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={exportJSON}
+                className="dfb__actions-button dfb__actions-button--ghost"
+              >
+                <Download size={16} />
                 Export JSON
               </Button>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="dfb__actions-button dfb__actions-button--outline"
+              >
                 Save to Library
               </Button>
-              <Button size="sm">Preview</Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={openPreview}
+                className="dfb__actions-button dfb__actions-button--primary"
+              >
+                Preview
+              </Button>
             </div>
           </div>
 
@@ -237,12 +274,8 @@ export function DynamicFormBuilder() {
             dragOverIndex={dragOverIndex}
           />
 
-          <Button
-            onClick={addField}
-            variant="outline"
-            className="dfb__add-button"
-          >
-            <Plus size={16} style={{ marginRight: 6 }} />
+          <Button onClick={addField} variant="outline" className="dfb__add-button">
+            <Plus size={16} />
             Add Field
           </Button>
         </div>
@@ -251,8 +284,75 @@ export function DynamicFormBuilder() {
       <FieldInspector
         selectedField={selectedField}
         onUpdateField={updateSelectedField}
+        onPreview={openPreview}
       />
+
+      {isPreviewOpen && (
+        <div className="dfb-preview" role="dialog" aria-modal="true" aria-label="Form preview">
+          <div className="dfb-preview__backdrop" onClick={closePreview} />
+          <div className="dfb-preview__panel">
+            <div className="dfb-preview__heading">
+              <h3 className="dfb-preview__title">{formName} preview</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closePreview}
+                className="dfb__actions-button dfb__actions-button--ghost"
+              >
+                Close
+              </Button>
+            </div>
+            <p className="dfb-inspector__subtitle">
+              Review how this configuration will export and appear to end users.
+            </p>
+            <div className="dfb-preview__fields">
+              {fields.length ? (
+                fields.map((field) => (
+                  <div key={field.id} className="dfb-preview__field">
+                    <h5>{field.name}</h5>
+                    <div>
+                      <p className="dfb-inspector__hint">Path: {field.data}</p>
+                      <p className="dfb-inspector__hint">ID: {field.id}</p>
+                      {!!field.fieldActions.length && (
+                        <p className="dfb-inspector__hint">
+                          Actions: {field.fieldActions.join(', ')}
+                        </p>
+                      )}
+                    </div>
+                    <span className="dfb-preview__field-type">{field.type}</span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '32px', textAlign: 'center' }}>
+                  <p className="dfb-inspector__hint">No fields yet. Add a field to preview the layout.</p>
+                </div>
+              )}
+            </div>
+            <div className="dfb-preview__footer">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closePreview}
+                className="dfb__actions-button dfb__actions-button--ghost"
+              >
+                Close
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  exportJSON();
+                  closePreview();
+                }}
+                className="dfb__actions-button dfb__actions-button--primary"
+              >
+                <Download size={16} />
+                Export JSON
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

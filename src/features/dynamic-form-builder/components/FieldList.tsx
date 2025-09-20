@@ -71,22 +71,24 @@ export default function FieldList({
               <Button
                 size="sm"
                 variant="ghost"
+                aria-label={`Duplicate ${field.name}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDuplicateField(index);
                 }}
               >
-                <Copy size={16} />
+                <Copy size={16} aria-hidden />
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
+                aria-label={`Delete ${field.name}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   onDeleteField(index);
                 }}
               >
-                <Trash2 size={16} />
+                <Trash2 size={16} aria-hidden />
               </Button>
             </div>
           </div>

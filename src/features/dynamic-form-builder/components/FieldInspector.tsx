@@ -14,17 +14,11 @@ import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
 import type { Field } from '../types/form-builder.types';
 
-interface FieldInspectorProps {
-  selectedField: Field | null;
-  onUpdateField: (updates: Partial<Field>) => void;
-}
+interface FieldInspectorProps {\n  selectedField: Field | null;\n  onUpdateField: (updates: Partial<Field>) => void;\n  onPreview: () => void;\n}
 
 const FIELD_ACTIONS = ['save', 'validate', 'upload', 'replace'];
 
-export default function FieldInspector({
-  selectedField,
-  onUpdateField,
-}: FieldInspectorProps) {
+export default function FieldInspector({\n  selectedField,\n  onUpdateField,\n  onPreview,\n}: FieldInspectorProps) {
   if (!selectedField) {
     return (
       <aside className="dfb-inspector__empty">
@@ -35,6 +29,8 @@ export default function FieldInspector({
       </aside>
     );
   }
+
+  const withValidation = selectedField.validation ?? {};
 
   const addOption = () => {
     const newOptions = [
@@ -68,8 +64,6 @@ export default function FieldInspector({
       : [...currentActions, action];
     onUpdateField({ fieldActions: newActions });
   };
-
-  const withValidation = selectedField.validation ?? {};
 
   return (
     <aside className="dfb-inspector">
@@ -172,6 +166,7 @@ export default function FieldInspector({
           <div className="dfb-inspector__row">
             <Label>Required</Label>
             <Switch
+              aria-label="Toggle required"
               checked={withValidation.required || false}
               onCheckedChange={(checked) =>
                 onUpdateField({
@@ -182,7 +177,13 @@ export default function FieldInspector({
           </div>
 
           {selectedField.type === 'number' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                gap: 12,
+              }}
+            >
               <div>
                 <Label htmlFor="field-min">Min</Label>
                 <Input
@@ -284,6 +285,7 @@ export default function FieldInspector({
                 <Button
                   size="sm"
                   variant="ghost"
+                  aria-label={`Remove option ${index + 1}`}
                   onClick={() => removeOption(index)}
                 >
                   <Minus size={16} />
@@ -301,13 +303,14 @@ export default function FieldInspector({
       <section className="dfb-inspector__section">
         <h4>Field Actions</h4>
         <p className="dfb-inspector__hint">
-          Allowed by type: text / number / textarea / select / radio / checkbox / date → save, validate. file → upload, replace, validate.
+          Allowed by type: text / number / textarea / select / radio / checkbox / date (save, validate). file (upload, replace, validate).
         </p>
         <div className="dfb-inspector__options">
           {FIELD_ACTIONS.map((action) => (
             <div key={action} className="dfb-inspector__row">
               <Label style={{ textTransform: 'capitalize' }}>{action}</Label>
               <Switch
+                aria-label={`Toggle ${action}`}
                 checked={selectedField.fieldActions.includes(action)}
                 onCheckedChange={() => toggleFieldAction(action)}
               />
@@ -323,3 +326,5 @@ export default function FieldInspector({
     </aside>
   );
 }
+
+
