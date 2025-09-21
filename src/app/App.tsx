@@ -13,7 +13,7 @@ import {
   getDefaultWorkflow,
 } from "@features/workflow/utils/graphParser";
 import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
-import type { LoanApplication } from "@features/dashboard/types/dashboard.types";
+import type { WorkflowData } from "@features/dashboard/types/dashboard.types";
 import "./App.css";
 import TopBar from "@shared/components/layout/TopBar";
 
@@ -27,10 +27,19 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<
-    "dashboard" | "graph" | "form" | "details" | "running" | "builder" | "form-builder"
+    | "dashboard"
+    | "graph"
+    | "form"
+    | "details"
+    | "running"
+    | "builder"
+    | "form-builder"
   >("dashboard");
-  const [selectedApplication, setSelectedApplication] =
-    useState<LoanApplication | null>(null);
+  // selectedWorkflow holds the raw workflow object (WorkflowData) from the
+  // Dashboard. This is different from the transformed LoanApplication type.
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(
+    null
+  );
   const stateKeys = Object.keys(workflow.workflow?.states || {});
   const [currentStateIndex, setCurrentStateIndex] = useState<number>(0);
   const currentState = stateKeys[currentStateIndex] || stateKeys[0] || "";
@@ -47,14 +56,14 @@ function App() {
     setViewMode("graph");
   };
 
-  const handleApplicationClick = (application: LoanApplication) => {
-    setSelectedApplication(application);
+  const handleApplicationClick = (workflowData: WorkflowData) => {
+    setSelectedWorkflow(workflowData);
     setViewMode("details");
   };
 
   const handleBackToDashboard = () => {
     setViewMode("dashboard");
-    setSelectedApplication(null);
+    setSelectedWorkflow(null);
   };
 
   const handleApplyJson = () => {
@@ -123,10 +132,10 @@ function App() {
   }
 
   // Application Details view
-  if (viewMode === "details" && selectedApplication) {
+  if (viewMode === "details" && selectedWorkflow) {
     return (
       <ApplicationDetails
-        application={selectedApplication}
+        workflowData={selectedWorkflow}
         onBack={handleBackToDashboard}
       />
     );
@@ -271,14 +280,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
