@@ -8,7 +8,6 @@ import Footer from "./Footer";
 type MainLayoutProps = {
   children: ReactNode;
   title?: string;
-  currentView?: string;
   onNavigate?: (viewId: string) => void;
   topBarControls?: ReactNode;
   searchValue?: string;
@@ -18,17 +17,16 @@ type MainLayoutProps = {
   fullHeight?: boolean;
 };
 
-const MainLayout = ({ 
-  children, 
+const MainLayout = ({
+  children,
   title = "Workflow Manager",
-  currentView,
   onNavigate,
   topBarControls,
   searchValue,
   onSearchChange,
   showSearch = false,
   hideFooter = false,
-  fullHeight = false
+  fullHeight = false,
 }: MainLayoutProps) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -42,9 +40,9 @@ const MainLayout = ({
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const handleMenuToggle = () => {
@@ -52,17 +50,20 @@ const MainLayout = ({
   };
 
   return (
-    <div className="app-shell" style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
-      <Sidebar 
-        collapsed={sidebarCollapsed} 
-        onCollapseChange={setSidebarCollapsed} 
+    <div
+      className="app-shell"
+      style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}
+    >
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        onCollapseChange={setSidebarCollapsed}
         mobile={isMobile}
         onNavigate={onNavigate}
       />
-      
-      <div 
+
+      <div
         className="main-content"
-        style={{ 
+        style={{
           display: "flex",
           flexDirection: "column",
           flex: 1,
@@ -74,19 +75,20 @@ const MainLayout = ({
           minWidth: 0,
         }}
       >
-        <TopBar 
+        <TopBar
           title={title}
           right={topBarControls}
           onMenuToggle={handleMenuToggle}
-          showMenuButton={true}
+          // Only show the menu (hamburger) button on mobile to avoid duplication
+          showMenuButton={isMobile}
           searchValue={searchValue}
           onSearchChange={onSearchChange}
           showSearch={showSearch}
         />
-        
-        <main 
+
+        <main
           className="content"
-          style={{ 
+          style={{
             flex: 1,
             padding: fullHeight ? 0 : "24px",
             overflow: fullHeight ? "hidden" : "auto",
@@ -97,7 +99,7 @@ const MainLayout = ({
         >
           {children}
         </main>
-        
+
         {!hideFooter && <Footer />}
       </div>
     </div>
