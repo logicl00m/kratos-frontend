@@ -215,7 +215,7 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
                         marginBottom: "4px",
                       }}
                     >
-                      {item.event.from} -> {item.event.to}
+                      {item.event.from} &rarr; {item.event.to}
                     </div>
                   )}
                   <div className="rdp-history-meta">

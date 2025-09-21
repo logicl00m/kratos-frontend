@@ -1,7 +1,7 @@
 // src/features/dashboard/utils/workflowTransformer.ts
 import type { WorkflowData, LoanApplication } from "@features/dashboard/types/dashboard.types";
 
-export function extractAmount(workflow: WorkflowData): number {
+function extractAmount(workflow: WorkflowData): number {
   // Search through all form fields for amount-related fields using regex
   const forms = workflow.workflow.forms;
   let amount = 0;
@@ -20,7 +20,7 @@ export function extractAmount(workflow: WorkflowData): number {
   return amount;
 }
 
-export function extractApplicantName(workflow: WorkflowData): string {
+function extractApplicantName(workflow: WorkflowData): string {
   // Search for applicant name in form fields
   const forms = workflow.workflow.forms;
   
@@ -37,7 +37,7 @@ export function extractApplicantName(workflow: WorkflowData): string {
   return 'Unknown Applicant';
 }
 
-export function extractProduct(workflow: WorkflowData): string {
+function extractProduct(workflow: WorkflowData): string {
   // Map workflow ID or extract from form fields
   const workflowId = workflow.workflow.id.toLowerCase();
   
@@ -58,7 +58,7 @@ export function extractProduct(workflow: WorkflowData): string {
   return 'Loan Application';
 }
 
-export function getCurrentAssignee(workflow: WorkflowData): string {
+function getCurrentAssignee(workflow: WorkflowData): string {
   const currentState = workflow.workflow.currentState;
   const stateData = workflow.workflow.states[currentState];
   
@@ -69,7 +69,7 @@ export function getCurrentAssignee(workflow: WorkflowData): string {
   return 'Unassigned';
 }
 
-export function getInitiatedBy(workflow: WorkflowData): string {
+function getInitiatedBy(workflow: WorkflowData): string {
   // Find the first assignee from any state
   const states = workflow.workflow.states;
   
@@ -95,7 +95,7 @@ export function getInitiatedBy(workflow: WorkflowData): string {
   return 'System';
 }
 
-export function calculateSLA(workflow: WorkflowData): { 
+function calculateSLA(workflow: WorkflowData): { 
   sla: string; 
   slaStatus: 'ontime' | 'due' | 'overdue' | 'completed' 
 } {
@@ -138,7 +138,7 @@ export function calculateSLA(workflow: WorkflowData): {
   }
 }
 
-export function getDocumentCount(workflow: WorkflowData): number {
+function getDocumentCount(workflow: WorkflowData): number {
   let docCount = 0;
   const forms = workflow.workflow.forms;
   
@@ -153,7 +153,7 @@ export function getDocumentCount(workflow: WorkflowData): number {
   return docCount;
 }
 
-export function transformWorkflowToApplication(workflow: WorkflowData): LoanApplication {
+function transformWorkflowToApplication(workflow: WorkflowData): LoanApplication {
   const { sla, slaStatus } = calculateSLA(workflow);
   
   return {
