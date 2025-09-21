@@ -29,8 +29,8 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
       id: stateKey,
       type: "stateNode",
       position: {
-        x: 250 * (index % 3),
-        y: 200 * Math.floor(index / 3),
+        x: 350 * (index % 3),
+        y: 250 * Math.floor(index / 3),
       },
       data: {
         label: stateKey,

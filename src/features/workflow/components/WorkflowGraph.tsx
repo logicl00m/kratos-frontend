@@ -8,13 +8,11 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
   ConnectionMode,
-  Panel,
 } from "reactflow";
 import type { Node, Edge, Connection } from "reactflow";
 import "reactflow/dist/style.css";
 import StateNode from "./StateNode";
 import DetailPanel from "./DetailPanel";
-import GraphToolbar from "./GraphToolbar";
 import { exportGraphToJson } from "@features/workflow/utils/graphExport";
 
 const nodeTypes = {
@@ -107,10 +105,6 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
           zoomable
           pannable
         />
-
-        <Panel position="top-left">
-          <GraphToolbar onExport={exportGraph} />
-        </Panel>
       </ReactFlow>
 
       <DetailPanel

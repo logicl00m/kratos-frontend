@@ -1,20 +1,62 @@
 /* StateNode styles */
 .state-node {
-  border-radius: 8px;
-  padding: 12px;
-  min-width: 200px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 280px;
+  min-height: 100px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   transition: all 0.2s;
   background: white;
-  border: 2px solid #e5e7eb;
+  border: 3px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
 }
 .state-node.selected { background: #e0e7ff; border-color: #4f46e5; }
-.state-node-title { font-weight: bold; font-size: 14px; margin-bottom: 8px; }
-.state-node-toggle {
-  display: flex; align-items: center; gap: 4px; background: none; border: none; padding: 4px; cursor: pointer; font-size: 12px; color: #6b7280;
+.state-node-title { 
+  font-weight: bold; 
+  font-size: 18px; 
+  margin-bottom: 12px;
+  text-align: center;
 }
-.state-node-fields { margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb; font-size: 11px; }
-.state-node-field { margin-bottom: 6px; padding: 4px; background: #f9fafb; border-radius: 4px; display: flex; align-items: center; gap: 6px; }
-.state-node-field-name { font-weight: 500; color: #374151; }
-.state-node-field-actions { color: #9ca3af; font-size: 10px; }
-.handle-accent { background: #4f46e5 !important; }
+.state-node-toggle {
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  background: none; 
+  border: none; 
+  padding: 8px; 
+  cursor: pointer; 
+  font-size: 14px; 
+  color: #6b7280;
+  margin-top: auto;
+  justify-content: center;
+}
+.state-node-fields { 
+  margin-top: 12px; 
+  padding-top: 12px; 
+  border-top: 1px solid #e5e7eb; 
+  font-size: 13px; 
+}
+.state-node-field { 
+  margin-bottom: 8px; 
+  padding: 8px; 
+  background: #f9fafb; 
+  border-radius: 6px; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+.state-node-field-name { 
+  font-weight: 600; 
+  color: #374151; 
+  font-size: 14px;
+}
+.state-node-field-actions { 
+  color: #9ca3af; 
+  font-size: 12px; 
+}
+.handle-accent { 
+  background: #4f46e5 !important; 
+  width: 16px !important;
+  height: 16px !important;
+}
