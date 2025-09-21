@@ -6,87 +6,90 @@ import ApplicationRow from "./ApplicationRow";
 interface ApplicationTableProps {
   applications: LoanApplication[];
   selectedRows: string[];
-  activeRowId: string | null;
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (id: string) => void;
   onRowClick: (app: LoanApplication) => void;
   getStageColor: (stage: string) => string;
+  getSlaColor: (status: string) => string;
+  getStatusIcon: (status: string) => React.ReactNode;
 }
 
 const ApplicationTable: React.FC<ApplicationTableProps> = ({
   applications,
   selectedRows,
-  activeRowId,
   onSelectAll,
   onSelectRow,
   onRowClick,
   getStageColor,
+  getSlaColor,
+  getStatusIcon,
 }) => {
   return (
-    <table
-      style={{
-        width: "100%",
-        background: "white",
-        borderRadius: "8px",
-        overflow: "hidden",
-        border: "1px solid #e5e7eb",
-      }}
-    >
-      <thead>
-        <tr
-          style={{ background: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}
-        >
-          <th style={{ padding: "12px", textAlign: "left", width: "40px" }}>
-            <input
-              type="checkbox"
-              onChange={(e) => onSelectAll(e.target.checked)}
-              checked={
-                selectedRows.length === applications.length &&
-                applications.length > 0
-              }
-            />
-          </th>
-          {[
-            "Applicant ↕",
-            "Product ↕",
-            "Amount ↕",
-            "Stage ↕",
-            "Assignee ↕",
-            "SLA/Age",
-            "Docs",
-            "Last Update ↕",
-            "Flags",
-            "Action",
-          ].map((h) => (
-            <th
-              key={h}
-              style={{
-                padding: "12px",
-                textAlign: h === "Action" ? "center" : "left",
-                fontSize: "12px",
-                fontWeight: 500,
-                color: "#6b7280",
-              }}
-            >
-              {h}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {applications.map((app) => (
-          <ApplicationRow
-            key={app.id}
-            app={app}
-            isActive={activeRowId === app.id}
-            selected={selectedRows.includes(app.id)}
-            onSelect={onSelectRow}
-            onClick={onRowClick}
-            getStageColor={getStageColor}
-          />
-        ))}
-      </tbody>
-    </table>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-6 py-4 text-left">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500"
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  checked={
+                    selectedRows.length === applications.length &&
+                    applications.length > 0
+                  }
+                />
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Application ID
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Applicant
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Amount
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Current Stage
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Assignee
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Initiated By
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                SLA Status
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Docs
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Last Update
+              </th>
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 bg-white">
+            {applications.map((app) => (
+              <ApplicationRow
+                key={app.id}
+                app={app}
+                selected={selectedRows.includes(app.id)}
+                onSelect={onSelectRow}
+                onClick={onRowClick}
+                getStageColor={getStageColor}
+                getSlaColor={getSlaColor}
+                getStatusIcon={getStatusIcon}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 

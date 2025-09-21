@@ -1,14 +1,18 @@
 // src/features/dashboard/components/ResultsCount.tsx
 import React from "react";
 
-type Props = { filteredCount: number; totalCount: number };
+type ResultsCountProps = {
+  filteredCount: number;
+  totalCount: number;
+};
 
-const ResultsCount: React.FC<Props> = ({ filteredCount, totalCount }) => (
-  <div
-    data-testid="results-count"
-    style={{ padding: "12px 24px", color: "#6b7280", fontSize: "12px" }}
-  >
-    Showing <strong>{filteredCount}</strong> of <strong>{totalCount}</strong>{" "}
+const ResultsCount: React.FC<ResultsCountProps> = ({
+  filteredCount,
+  totalCount,
+}) => (
+  <div data-testid="results-count" className="mb-4 text-sm text-gray-600">
+    Showing <span className="font-semibold text-gray-900">{filteredCount}</span>{" "}
+    of <span className="font-semibold text-gray-900">{totalCount}</span>{" "}
     applications
   </div>
 );

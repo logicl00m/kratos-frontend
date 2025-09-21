@@ -36,7 +36,15 @@ const FIELD_ACTION_OPTIONS: FieldActionOption[] = [
   {
     value: "save",
     label: "Save",
-    types: ["text", "number", "textarea", "select", "radio", "checkbox", "date"],
+    types: [
+      "text",
+      "number",
+      "textarea",
+      "select",
+      "radio",
+      "checkbox",
+      "date",
+    ],
   },
   {
     value: "validate",
@@ -64,7 +72,11 @@ const FIELD_ACTION_OPTIONS: FieldActionOption[] = [
   },
 ];
 
-const FIELD_TYPES_WITH_OPTIONS: Field["type"][] = ["select", "radio", "checkbox"];
+const FIELD_TYPES_WITH_OPTIONS: Field["type"][] = [
+  "select",
+  "radio",
+  "checkbox",
+];
 
 function getAllowedActions(fieldType: Field["type"]) {
   return FIELD_ACTION_OPTIONS.filter((option) =>
@@ -79,7 +91,12 @@ interface FieldActionsSelectorProps {
   options: FieldActionOption[];
 }
 
-function FieldActionsSelector({ value, onChange, disabled, options }: FieldActionsSelectorProps) {
+function FieldActionsSelector({
+  value,
+  onChange,
+  disabled,
+  options,
+}: FieldActionsSelectorProps) {
   const toggleAction = (action: string, checked: boolean) => {
     if (checked) {
       onChange(Array.from(new Set([...value, action])));
@@ -106,7 +123,10 @@ function FieldActionsSelector({ value, onChange, disabled, options }: FieldActio
           <ChevronDown size={14} aria-hidden />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="dfb-inspector__actions-menu" align="start">
+      <DropdownMenuContent
+        className="dfb-inspector__actions-menu"
+        align="start"
+      >
         {options.map((option) => (
           <DropdownMenuCheckboxItem
             key={option.value}
@@ -117,7 +137,9 @@ function FieldActionsSelector({ value, onChange, disabled, options }: FieldActio
           </DropdownMenuCheckboxItem>
         ))}
         {!options.length && (
-          <div className="dfb-inspector__actions-empty">No actions available</div>
+          <div className="dfb-inspector__actions-empty">
+            No actions available
+          </div>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -141,7 +163,8 @@ export default function FieldInspector({
   }
 
   const withValidation = selectedField.validation ?? {};
-  const isStructuralField = selectedField.type === "section" || selectedField.type === "divider";
+  const isStructuralField =
+    selectedField.type === "section" || selectedField.type === "divider";
   const allowedActions = getAllowedActions(selectedField.type);
   const fieldActions = selectedField.fieldActions ?? [];
 
@@ -179,10 +202,10 @@ export default function FieldInspector({
       <div>
         <h3 className="dfb-inspector__title">Inspector - Field properties</h3>
         <p className="dfb-inspector__subtitle">
-          Configure the selected field. Status affects runtime behaviour; actions are constrained by type.
+          Configure the selected field. Status affects runtime behaviour;
+          actions are constrained by type.
         </p>
       </div>
-
       <section className="dfb-inspector__section">
         <h4>General</h4>
         <div className="dfb-inspector__options">
@@ -199,7 +222,9 @@ export default function FieldInspector({
           <div>
             <Label htmlFor="field-id">Field ID</Label>
             <Input id="field-id" value={selectedField.id} disabled />
-            <p className="dfb-inspector__hint">Managed by backend. IDs are read-only here.</p>
+            <p className="dfb-inspector__hint">
+              Managed by backend. IDs are read-only here.
+            </p>
           </div>
 
           <div>
@@ -273,7 +298,6 @@ export default function FieldInspector({
           </div>
         </div>
       </section>
-
       <section className="dfb-inspector__section">
         <h4>Data binding</h4>
         <div className="dfb-inspector__options">
@@ -282,7 +306,9 @@ export default function FieldInspector({
             <Input
               id="field-path"
               value={selectedField.data}
-              placeholder={isStructuralField ? "" : "{{ data.borrower.property }}"}
+              placeholder={
+                isStructuralField ? "" : "{{ data.borrower.property }}"
+              }
               onChange={(event) => onUpdateField({ data: event.target.value })}
               disabled={isStructuralField}
             />
@@ -294,7 +320,6 @@ export default function FieldInspector({
           </div>
         </div>
       </section>
-
       <section className="dfb-inspector__section">
         <h4>Validation</h4>
         <div className="dfb-inspector__options">
@@ -324,7 +349,10 @@ export default function FieldInspector({
                     onUpdateField({
                       validation: {
                         ...withValidation,
-                        min: event.target.value === "" ? undefined : Number(event.target.value),
+                        min:
+                          event.target.value === ""
+                            ? undefined
+                            : Number(event.target.value),
                       },
                     })
                   }
@@ -340,7 +368,10 @@ export default function FieldInspector({
                     onUpdateField({
                       validation: {
                         ...withValidation,
-                        max: event.target.value === "" ? undefined : Number(event.target.value),
+                        max:
+                          event.target.value === ""
+                            ? undefined
+                            : Number(event.target.value),
                       },
                     })
                   }
@@ -372,7 +403,19 @@ export default function FieldInspector({
           )}
         </div>
       </section>
-
+      <section className="dfb-inspector__section">
+        <h4>Help text</h4>
+        <Textarea
+          id="field-help"
+          value={selectedField.helpText || ""}
+          onChange={(event) => onUpdateField({ helpText: event.target.value })}
+          placeholder="Provide guidance for form users."
+          rows={3}
+        />
+        <p className="dfb-inspector__hint">
+          Displayed to the end user as supporting copy.
+        </p>
+      </section>{" "}
       {FIELD_TYPES_WITH_OPTIONS.includes(selectedField.type) && (
         <section className="dfb-inspector__section">
           <h4>Options</h4>
@@ -427,7 +470,6 @@ export default function FieldInspector({
           </div>
         </section>
       )}
-
       <footer className="dfb-inspector__footer">
         <div className="dfb-inspector__actions">
           <Button variant="outline" size="sm" onClick={onPreview}>
