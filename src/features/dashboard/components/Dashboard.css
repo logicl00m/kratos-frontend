@@ -22,6 +22,8 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  padding-bottom: 5.5rem; 
+  margin-bottom: 70px;
 }
 
 .dashboard-header-content {
@@ -676,4 +678,12 @@
   .dashboard-pagination-controls {
     justify-content: center;
   }
+}
+
+/* Ensure a small visible gap at the bottom of the page so the last
+   rows/pagination/footer aren't flush with the viewport edge. This
+   uses a slightly more specific selector to avoid duplicating
+   existing top-level selectors in this file. */
+body .dashboard-main-content {
+  padding-bottom: 1.5rem;
 }
