@@ -129,9 +129,17 @@ function App() {
   // Dashboard view with integrated layout
   if (viewMode === "dashboard") {
     return (
-      <Dashboard 
-        onApplicationClick={handleApplicationClick}
-      />
+      <MainLayout 
+        title="Dashboard" 
+        showMenuButton={true}
+        onNavigate={handleNavigation}
+        sidebarCollapsed={sidebarCollapsed}
+        onSidebarCollapseChange={setSidebarCollapsed}
+      >
+        <Dashboard 
+          onApplicationClick={handleApplicationClick}
+        />
+      </MainLayout>
     );
   }
 
