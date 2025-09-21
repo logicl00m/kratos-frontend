@@ -1,12 +1,18 @@
 // src/features/dashboard/components/Dashboard.tsx
 import React, { useState, useMemo } from "react";
 import { mockWorkflowData as mockWorkflowRawData } from "../data/mockWorkflowData";
-import type { WorkflowData, LoanApplication } from "@features/dashboard/types/dashboard.types";
+import type {
+  WorkflowData,
+  LoanApplication,
+} from "@features/dashboard/types/dashboard.types";
 import { transformWorkflowsToApplications } from "@features/dashboard/utils/workflowTransformer";
-import { getStageColor, getSlaColor, getStatusIcon } from "@features/dashboard/utils/styleHelpers";
+import {
+  getStageColor,
+  getSlaColor,
+  getStatusIcon,
+} from "@features/dashboard/utils/styleHelpers";
 import DashboardFilters from "./DashboardFilters";
 import DashboardMain from "./DashboardMain";
-import MainLayout from "@shared/components/layout/MainLayout";
 import "./Dashboard.css";
 
 const Dashboard: React.FC<{
@@ -18,7 +24,8 @@ const Dashboard: React.FC<{
   const [myQueueOnly, setMyQueueOnly] = useState<boolean>(false);
   const [selectedStage, setSelectedStage] = useState<string>("All Stages");
   const [selectedStatus, setSelectedStatus] = useState<string>("All Status");
-  const [selectedProduct, setSelectedProduct] = useState<string>("All Products");
+  const [selectedProduct, setSelectedProduct] =
+    useState<string>("All Products");
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
 
   const workflows = mockWorkflowRawData;
@@ -70,7 +77,7 @@ const Dashboard: React.FC<{
   const handleToggleAllSelection = (checked: boolean) => {
     setSelectedRows(checked ? filteredApplications.map((a) => a.id) : []);
   };
-  
+
   const handleToggleRow = (id: string) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -108,34 +115,22 @@ const Dashboard: React.FC<{
   );
 
   return (
-    <MainLayout 
-      title="Applications Queue"
-      showMenuButton={true}
-      searchValue={searchTerm}
-      onSearchChange={setSearchTerm}
-      showSearch={true}
-      topBarControls={filterControls}
-      fullHeight={true}
-    >
-      <div style={{ 
-        display: "flex", 
-        flexDirection: "column", 
-        height: "100%",
-        overflow: "hidden"
-      }}>
-        <DashboardMain
-          stats={stats}
-          filteredApplications={filteredApplications}
-          selectedRows={selectedRows}
-          handleToggleAllSelection={handleToggleAllSelection}
-          handleToggleRow={handleToggleRow}
-          handleApplicationClick={handleApplicationClick}
-          getStageColor={getStageColor}
-          getSlaColor={getSlaColor}
-          getStatusIcon={getStatusIcon}
-        />
-      </div>
-    </MainLayout>
+    <div className="flex flex-col h-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50 p-6 rounded-xl">
+      <DashboardMain
+        stats={stats}
+        filteredApplications={filteredApplications}
+        selectedRows={selectedRows}
+        handleToggleAllSelection={handleToggleAllSelection}
+        handleToggleRow={handleToggleRow}
+        handleApplicationClick={handleApplicationClick}
+        getStageColor={getStageColor}
+        getSlaColor={(s: string) => getSlaColor(s as unknown as LoanApplication['slaStatus'])}
+        getStatusIcon={(s: string) => getStatusIcon(s as unknown as LoanApplication['slaStatus'])}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        filterControls={filterControls}
+      />
+    </div>
   );
 };
 

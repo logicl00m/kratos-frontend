@@ -244,3 +244,10 @@ The project follows a feature-based architecture where each feature contains its
 ### Action Properties
 - **NextState**: Target state after action execution
 - **Operation**: Business logic executed during transition
+
+## Important Notes for Qwen
+
+1. **Do not run `npm run dev`**: This command should not be executed during development sessions.
+2. **Layout Components**: All layout components (MainLayout, TopBar, Sidebar, Footer) have been updated to use Tailwind CSS classes for consistent styling.
+3. **Sidebar Positioning**: The sidebar has been fixed to properly handle both desktop and mobile views with correct positioning and z-index stacking.
+4. **Responsive Design**: Layout components now properly adapt to different screen sizes.
