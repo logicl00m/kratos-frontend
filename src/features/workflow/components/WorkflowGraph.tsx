@@ -82,7 +82,7 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   const exportGraph = () => exportGraphToJson(exportData);
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div style={{ width: "100%", height: "calc(100vh - 120px)", position: "relative" }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
