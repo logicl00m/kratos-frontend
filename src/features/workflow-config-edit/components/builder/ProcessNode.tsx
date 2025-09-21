@@ -26,7 +26,6 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
         position={Position.Left}
         id="left"
         className="process-handle handle-left"
-        style={{ background: "#ef4444" }}
       />
 
       {/* Center port - Submit (Black) */}
@@ -35,7 +34,6 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
         position={Position.Bottom}
         id="center"
         className="process-handle handle-center"
-        style={{ background: "#111827" }}
       />
 
       {/* Right port - Approve (Green) */}
@@ -44,7 +42,6 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
         position={Position.Right}
         id="right"
         className="process-handle handle-right"
-        style={{ background: "#10b981" }}
       />
 
       {/* Target handle at top */}
@@ -63,7 +60,7 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
 
       <div className="node-actions">
         <div className="action-label left">
-          <span className="action-indicator" style={{ background: "#fecaca" }}>
+          <span className="action-indicator">
             L
           </span>
           <span className="action-text">
@@ -71,7 +68,7 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
           </span>
         </div>
         <div className="action-label center">
-          <span className="action-indicator" style={{ background: "#e5e7eb" }}>
+          <span className="action-indicator">
             C
           </span>
           <span className="action-text">
@@ -79,7 +76,7 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
           </span>
         </div>
         <div className="action-label right">
-          <span className="action-indicator" style={{ background: "#bbf7d0" }}>
+          <span className="action-indicator">
             R
           </span>
           <span className="action-text">

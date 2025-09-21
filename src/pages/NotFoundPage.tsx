@@ -1,5 +1,8 @@
 import React from "react";
+import "./NotFoundPage.css";
+
 const NotFoundPage: React.FC = () => (
-  <div style={{ padding: 24 }}>Not Found</div>
+  <div className="not-found-container">Not Found</div>
 );
+
 export default NotFoundPage;

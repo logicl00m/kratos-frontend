@@ -1,6 +1,7 @@
 // src/features/dashboard/components/DashboardFilters.tsx
 import React from "react";
 import { Filter } from "lucide-react";
+import "./DashboardFilters.css";
 
 interface DashboardFiltersProps {
   myQueueOnly: boolean;
@@ -30,22 +31,15 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
   onOwnerChange,
 }) => {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+    <div className="dashboard-filters">
       <label
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          cursor: "pointer",
-          fontSize: "14px",
-          color: "#4b5563",
-        }}
+        className="filter-label"
       >
         <input
           type="checkbox"
           checked={myQueueOnly}
           onChange={(e) => onMyQueueToggle(e.target.checked)}
-          style={{ cursor: "pointer" }}
+          className="filter-checkbox"
         />
         <span>My Queue</span>
       </label>
@@ -53,14 +47,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       <select
         value={selectedStage}
         onChange={(e) => onStageChange(e.target.value)}
-        style={{
-          padding: "6px 10px",
-          border: "1px solid #d1d5db",
-          borderRadius: "6px",
-          fontSize: "14px",
-          backgroundColor: "white",
-          cursor: "pointer",
-        }}
+        className="filter-select"
       >
         <option>All Stages</option>
         <option>ARMDraft</option>
@@ -74,14 +61,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       <select
         value={selectedStatus}
         onChange={(e) => onStatusChange(e.target.value)}
-        style={{
-          padding: "6px 10px",
-          border: "1px solid #d1d5db",
-          borderRadius: "6px",
-          fontSize: "14px",
-          backgroundColor: "white",
-          cursor: "pointer",
-        }}
+        className="filter-select"
       >
         <option>All Status</option>
         <option>Overdue</option>
@@ -93,14 +73,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       <select
         value={selectedProduct}
         onChange={(e) => onProductChange(e.target.value)}
-        style={{
-          padding: "6px 10px",
-          border: "1px solid #d1d5db",
-          borderRadius: "6px",
-          fontSize: "14px",
-          backgroundColor: "white",
-          cursor: "pointer",
-        }}
+        className="filter-select"
       >
         <option>All Products</option>
         <option>Business Loan</option>
@@ -111,14 +84,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       <select
         value={selectedOwner}
         onChange={(e) => onOwnerChange(e.target.value)}
-        style={{
-          padding: "6px 10px",
-          border: "1px solid #d1d5db",
-          borderRadius: "6px",
-          fontSize: "14px",
-          backgroundColor: "white",
-          cursor: "pointer",
-        }}
+        className="filter-select"
       >
         {ownerOptions.map((o) => (
           <option key={o}>{o}</option>
@@ -126,17 +92,7 @@ const DashboardFilters: React.FC<DashboardFiltersProps> = ({
       </select>
 
       <button
-        style={{
-          padding: "6px 12px",
-          border: "1px solid #d1d5db",
-          borderRadius: "6px",
-          fontSize: "14px",
-          backgroundColor: "white",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-        }}
+        className="filter-button"
       >
         <Filter size={14} />
         More

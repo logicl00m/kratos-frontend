@@ -124,8 +124,12 @@ const Dashboard: React.FC<{
         handleToggleRow={handleToggleRow}
         handleApplicationClick={handleApplicationClick}
         getStageColor={getStageColor}
-        getSlaColor={(s: string) => getSlaColor(s as unknown as LoanApplication['slaStatus'])}
-        getStatusIcon={(s: string) => getStatusIcon(s as unknown as LoanApplication['slaStatus'])}
+        getSlaColor={(s: string) =>
+          getSlaColor(s as unknown as LoanApplication["slaStatus"])
+        }
+        getStatusIcon={(s: string) =>
+          getStatusIcon(s as unknown as LoanApplication["slaStatus"])
+        }
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         filterControls={filterControls}

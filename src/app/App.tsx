@@ -160,7 +160,7 @@ function App() {
         sidebarCollapsed={sidebarCollapsed}
         onSidebarCollapseChange={setSidebarCollapsed}
       >
-        <div style={{ overflow: "hidden", height: "100%" }}>
+        <div className="app-container">
           <WorkflowBuilder
             onExport={handleWorkflowExport}
             onBack={() => setViewMode("dashboard")}
@@ -216,7 +216,6 @@ function App() {
           <button
             className="toggle-button"
             onClick={() => setViewMode("dashboard")}
-            style={{ background: "#6366f1" }}
           >
             Dashboard
           </button>
@@ -237,9 +236,9 @@ function App() {
         </>
       }
     >
-      <div style={{ display: "flex", height: "100%" }}>
+      <div className="view-container">
         {viewMode === "form" ? (
-          <div style={{ width: "100%" }}>
+          <div className="form-container">
             <FormViewer
               stateName={currentState}
               workflow={workflow}

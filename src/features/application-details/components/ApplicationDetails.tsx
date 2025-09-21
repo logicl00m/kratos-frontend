@@ -11,6 +11,7 @@ import FinancialDetails from "./FinancialDetails";
 import RiskSnapshot from "./RiskSnapshot";
 import DocumentsSection from "./DocumentsSection";
 import AuditTrail from "./AuditTrail";
+import "./ApplicationDetails.css";
 
 interface AppDocument {
   name: string;
@@ -97,11 +98,11 @@ const ApplicationDetails: React.FC<ApplicationDetailsProps> = ({
 
   if (!app) {
     return (
-      <div style={{ padding: "24px", textAlign: "center" }}>
+      <div className="no-workflow-data">
         <h3>No workflow data available</h3>
         <button
           onClick={onBack}
-          style={{ marginTop: "16px", padding: "8px 16px" }}
+          className="back-button"
         >
           Back to Dashboard
         </button>
@@ -275,52 +276,21 @@ const ApplicationDetails: React.FC<ApplicationDetailsProps> = ({
   }
 
   return (
-    <div
-      style={{
-        background: "#f9fafb",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-      }}
-    >
+    <div className="application-details-container">
       <ApplicationHeader application={applicationForHeader} onBack={onBack} />
       <WorkflowProgress workflowStages={workflowStages} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "24px",
-          padding: "24px",
-          flex: 1,
-          minHeight: 0,
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "24px",
-            minHeight: "28vh",
-          }}
-        >
+      <div className="application-details-content">
+        <div className="application-details-grid">
           <ContactInfo applicant={applicantName} />
           <FinancialDetails amount={amount} />
           <RiskSnapshot />
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: "24px",
-            flex: 1,
-            minHeight: 0,
-          }}
-        >
-          <div style={{ minHeight: 0 }}>
+        <div className="application-details-documents-grid">
+          <div className="application-details-section">
             <DocumentsSection documents={documents} />
           </div>
-          <div style={{ minHeight: 0 }}>
+          <div className="application-details-section">
             <AuditTrail auditTrail={auditTrail.slice(0, 10)} />
           </div>
         </div>

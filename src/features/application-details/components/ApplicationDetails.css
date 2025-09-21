@@ -1,0 +1,44 @@
+.application-details-container {
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.application-details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+.application-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  min-height: 28vh;
+}
+
+.application-details-documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+.application-details-section {
+  min-height: 0;
+}
+
+.no-workflow-data {
+  padding: 24px;
+  text-align: center;
+}
+
+.back-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+}

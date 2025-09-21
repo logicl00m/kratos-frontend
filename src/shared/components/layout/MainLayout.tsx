@@ -1,5 +1,6 @@
 // src/shared/components/layout/MainLayout.tsx
-import { useState, ReactNode, useEffect } from "react";
+import { useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import TopBar from "./TopBar";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
@@ -7,10 +8,12 @@ import Footer from "./Footer";
 type MainLayoutProps = {
   children: ReactNode;
   title?: string;
-  showMenuButton?: boolean;
+  currentView?: string;
+  onNavigate?: (viewId: string) => void;
   topBarControls?: ReactNode;
-  sidebarCollapsed?: boolean;
-  onSidebarCollapseChange?: (collapsed: boolean) => void;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  showSearch?: boolean;
   hideFooter?: boolean;
   fullHeight?: boolean;
 };
@@ -18,20 +21,23 @@ type MainLayoutProps = {
 const MainLayout = ({ 
   children, 
   title = "Workflow Manager",
-  showMenuButton = true,
+  currentView,
+  onNavigate,
   topBarControls,
-  sidebarCollapsed = false,
-  onSidebarCollapseChange,
+  searchValue,
+  onSearchChange,
+  showSearch = false,
   hideFooter = false,
   fullHeight = false
 }: MainLayoutProps) => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
       if (window.innerWidth < 768) {
-        onSidebarCollapseChange?.(true);
+        setSidebarCollapsed(true);
       }
     };
 
@@ -42,15 +48,16 @@ const MainLayout = ({
   }, []);
 
   const handleMenuToggle = () => {
-    onSidebarCollapseChange?.(!sidebarCollapsed);
+    setSidebarCollapsed(!sidebarCollapsed);
   };
 
   return (
-    <div className="app-shell" style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="app-shell" style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
       <Sidebar 
         collapsed={sidebarCollapsed} 
-        onCollapseChange={onSidebarCollapseChange} 
+        onCollapseChange={setSidebarCollapsed} 
         mobile={isMobile}
+        onNavigate={onNavigate}
       />
       
       <div 
@@ -59,7 +66,10 @@ const MainLayout = ({
           display: "flex",
           flexDirection: "column",
           flex: 1,
-          marginLeft: isMobile ? 0 : (sidebarCollapsed ? "64px" : "240px"),
+          marginLeft: (() => {
+            if (isMobile) return 0;
+            return sidebarCollapsed ? "64px" : "240px";
+          })(),
           transition: "margin-left 0.3s ease",
           minWidth: 0,
         }}
@@ -68,14 +78,17 @@ const MainLayout = ({
           title={title}
           right={topBarControls}
           onMenuToggle={handleMenuToggle}
-          showMenuButton={showMenuButton}
+          showMenuButton={true}
+          searchValue={searchValue}
+          onSearchChange={onSearchChange}
+          showSearch={showSearch}
         />
         
         <main 
           className="content"
           style={{ 
             flex: 1,
-            padding: fullHeight ? 0 : "0 24px 24px",
+            padding: fullHeight ? 0 : "24px",
             overflow: fullHeight ? "hidden" : "auto",
             display: "flex",
             flexDirection: "column",
