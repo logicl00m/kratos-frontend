@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Download, Upload, Plus } from 'lucide-react';
@@ -82,8 +82,8 @@ export function DynamicFormBuilder() {
 
     if (draggedFieldType) {
       const newField: Field = {
-        id: ield_,
-        name: New  Field,
+        id: 'field_' + Date.now(),
+        name: 'New Field',
         type: draggedFieldType as Field['type'],
         status: 'default',
         data: '{{ data.field }}',
@@ -110,7 +110,7 @@ export function DynamicFormBuilder() {
 
   const addField = () => {
     const newField: Field = {
-      id: ield_,
+      id: 'field_' + Date.now(),
       name: 'New Field',
       type: 'text',
       status: 'default',
@@ -133,8 +133,8 @@ export function DynamicFormBuilder() {
     const fieldToDuplicate = fields[index];
     const newField = {
       ...fieldToDuplicate,
-      id: ield_,
-      name: ${fieldToDuplicate.name} (Copy),
+      id: 'field_' + Date.now(),
+      name: `${fieldToDuplicate.name} (Copy)`,
     };
     const newFields = [...fields];
     newFields.splice(index + 1, 0, newField);
@@ -174,7 +174,7 @@ export function DynamicFormBuilder() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = ${formName}.json;
+    link.download = `${formName}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
