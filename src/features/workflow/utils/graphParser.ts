@@ -29,8 +29,8 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
       id: stateKey,
       type: "stateNode",
       position: {
-        x: 350 * (index % 3),
-        y: 250 * Math.floor(index / 3),
+        x: 500 * (index % 3),  // Much wider spacing
+        y: 350 * Math.floor(index / 3),  // Much taller spacing
       },
       data: {
         label: stateKey,
@@ -40,27 +40,130 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
     });
   });
 
-  // Create edges from actions
+  // Create edges from actions with better routing for loops
+  const edgeCountMap = new Map<string, number>();
+  const directedEdgeMap = new Map<string, number>();
+
   stateKeys.forEach((stateKey) => {
     const state = states[stateKey];
     if (state?.actions && typeof state.actions === "object") {
       Object.entries(state.actions).forEach(([actionName, actionData]) => {
         if (actionData?.nextState && states[actionData.nextState]) {
           let stroke = "#6b7280";
+          let strokeWidth = 2;
           if (actionName.includes("Reject")) {
             stroke = "#ef4444";
           } else if (actionName.includes("Approve") || actionName.includes("Finalize")) {
             stroke = "#10b981";
           }
+
+          // Track directed edges (A->B is different from B->A)
+          const directedKey = `${stateKey}->${actionData.nextState}`;
+          const reverseKey = `${actionData.nextState}->${stateKey}`;
+
+          // Check if reverse edge exists (for loops)
+          const hasReverseEdge = directedEdgeMap.has(reverseKey);
+
+          // Count edges for this specific direction
+          const directedCount = directedEdgeMap.get(directedKey) || 0;
+          directedEdgeMap.set(directedKey, directedCount + 1);
+
+          let edgeType = "step"; // Use step edges by default for node avoidance
+          const edgeStyle: any = {
+            stroke,
+            strokeWidth,
+          };
+
+          // Handle self-loops (node pointing to itself)
+          if (stateKey === actionData.nextState) {
+            edgeType = "bezier";
+            edgeStyle.strokeDasharray = "3 3";
+            curvature = 0.8; // High curvature for self-loops
+          }
+          // Handle bidirectional edges (loops between different nodes)
+          else if (hasReverseEdge || directedCount > 0) {
+            // Use step edge for better control and no overlap
+            edgeType = "step";
+
+            // Add curvature offset for bidirectional edges
+            if (hasReverseEdge) {
+              // First edge of a bidirectional pair gets positive curvature
+              edgeStyle.stroke = stroke;
+            }
+
+            // Multiple edges in same direction
+            if (directedCount > 0) {
+              edgeStyle.strokeDasharray = directedCount > 1 ? "5 5" : "10 5";
+            }
+          }
+
+          // Calculate curvature and offsets for better edge separation
+          let curvature = 0;
+          let offset = 0;
+          let labelOffset = 0;
+
+          if (hasReverseEdge) {
+            // Offset edges that form loops
+            curvature = 0.5;
+            offset = 40;
+            labelOffset = 30;
+          }
+
+          if (directedCount > 0) {
+            // Further offset for multiple edges in same direction
+            offset = (directedCount - 1) * 30;
+            labelOffset = directedCount * 40;
+            curvature += directedCount * 0.2;
+          }
+
+          // Determine source handle based on action type
+          let sourceHandle = "other"; // default to bottom center
+          const targetHandle = "input"; // always use top input
+
+          if (actionName.toLowerCase().includes("reject")) {
+            sourceHandle = "reject"; // left handle
+          } else if (actionName.toLowerCase().includes("approve") ||
+                     actionName.toLowerCase().includes("finalize") ||
+                     actionName.toLowerCase().includes("accept")) {
+            sourceHandle = "approve"; // right handle
+          }
+
           edges.push({
-            id: `${stateKey}-${actionName}-${actionData.nextState}`,
+            id: `${stateKey}-${actionName}-${actionData.nextState}-${directedCount}`,
             source: stateKey,
             target: actionData.nextState,
+            sourceHandle: sourceHandle,
+            targetHandle: targetHandle,
             label: actionName,
-            type: "smoothstep",
-            animated: true,
-            style: { stroke },
-            data: { operation: actionData.operation },
+            type: edgeType,
+            animated: actionName.includes("Approve") || actionName.includes("Finalize"),
+            updatable: 'target',
+            style: edgeStyle,
+            labelStyle: {
+              fill: '#1f2937',
+              fontWeight: 600,
+              fontSize: 14,
+            },
+            labelBgStyle: {
+              fill: '#ffffff',
+              fillOpacity: 1,
+              padding: 4,
+              borderRadius: 3,
+              borderWidth: 1,
+              borderColor: '#e5e7eb',
+            },
+            labelShowBg: true,
+            markerEnd: {
+              type: "arrowclosed" as any,
+              color: stroke,
+            },
+            data: {
+              operation: actionData.operation,
+              curvature: curvature,
+              offset: offset,
+              edgeIndex: directedCount,
+              labelOffset: labelOffset,
+            },
           });
         }
       });

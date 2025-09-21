@@ -90,7 +90,13 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
 
   return (
     <div className={`state-node ${selected ? "selected" : ""}`}>
-      <Handle type="target" position={Position.Top} className="handle-accent" />
+      {/* Single input handle at top */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="input"
+        className="handle-accent"
+      />
 
       <div className="state-node-title">{data.label}</div>
 
@@ -198,10 +204,29 @@ const StateNode: React.FC<NodeProps> = ({ data, selected }) => {
         </div>
       )}
 
+      {/* Output handles */}
+      <Handle
+        type="source"
+        position={Position.Left}
+        id="reject"
+        style={{ top: '50%', background: '#ef4444' }}
+        className="handle-reject"
+        title="Rejection"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="approve"
+        style={{ top: '50%', background: '#10b981' }}
+        className="handle-approve"
+        title="Approval"
+      />
       <Handle
         type="source"
         position={Position.Bottom}
+        id="other"
         className="handle-accent"
+        title="Other Actions"
       />
     </div>
   );

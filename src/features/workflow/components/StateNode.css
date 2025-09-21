@@ -55,8 +55,30 @@
   color: #9ca3af; 
   font-size: 12px; 
 }
-.handle-accent { 
-  background: #4f46e5 !important; 
+.handle-accent {
+  background: #4f46e5 !important;
   width: 16px !important;
   height: 16px !important;
+  border: 2px solid white !important;
+}
+
+.handle-reject {
+  background: #ef4444 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid white !important;
+}
+
+.handle-approve {
+  background: #10b981 !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid white !important;
+}
+
+/* Make handles more visible on hover */
+.react-flow__handle:hover {
+  width: 20px !important;
+  height: 20px !important;
+  transition: all 0.2s ease;
 }

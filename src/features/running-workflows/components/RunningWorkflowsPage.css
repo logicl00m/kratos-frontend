@@ -3,11 +3,12 @@
 .running-workflows-page {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
   color: #0f172a;
   font-size: 15px;
   line-height: 1.45;
+  overflow: hidden;
 }
 
 .rwp-header {
@@ -308,6 +309,7 @@
 .rwp-graph-canvas {
   flex: 1 1 auto;
   min-height: 0;
+  height: 100%;
   position: relative;
   overflow: hidden;
 }
@@ -411,21 +413,7 @@
   font-weight: 500;
 }
 
-/* Detail panel styles (shared with dedicated component) */
-.rdp-enhanced-panel,
-.running-detail-panel {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 460px;
-  background: rgba(255, 255, 255, 0.98);
-  border-left: 1px solid #e2e8f0;
-  box-shadow: -16px 0 32px rgba(15, 23, 42, 0.08);
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-}
+/* Detail panel reference - styles in RunningWorkflowDetailPanel.css */
 
 .rdp-header {
   padding: 24px 28px;

@@ -213,38 +213,14 @@ function App() {
 
   // Graph/Form view
   return (
-    <MainLayout 
+    <MainLayout
       title="Workflow Visualizer"
       showMenuButton={true}
       onNavigate={handleNavigation}
       sidebarCollapsed={sidebarCollapsed}
       onSidebarCollapseChange={setSidebarCollapsed}
-      topBarControls={
-        <>
-          <button
-            className="toggle-button"
-            onClick={() => setViewMode("dashboard")}
-          >
-            Dashboard
-          </button>
-          <button
-            className="toggle-button"
-            onClick={() =>
-              setViewMode(viewMode === "graph" ? "form" : "graph")
-            }
-          >
-            {viewMode === "graph" ? "View Form" : "View Graph"}
-          </button>
-          <button
-            className="toggle-button"
-            onClick={() => setShowEditor(!showEditor)}
-          >
-            {showEditor ? "Hide" : "Show"} Editor
-          </button>
-        </>
-      }
     >
-      <div className="view-container">
+      <div className="workflow-viewer-container">
         {viewMode === "form" ? (
           <div className="form-container">
             <FormViewer
@@ -257,9 +233,19 @@ function App() {
             />
           </div>
         ) : (
-          <>
+          <div className="workflow-graph-container">
             {showEditor && (
-              <div className="editor-panel">
+              <div className="json-editor-panel">
+                <div className="editor-header">
+                  <h3>JSON Editor</h3>
+                  <button
+                    className="editor-toggle-btn"
+                    onClick={() => setShowEditor(false)}
+                    aria-label="Close editor"
+                  >
+                    ×
+                  </button>
+                </div>
                 <JsonEditor
                   value={jsonText}
                   onChange={setJsonText}
@@ -268,14 +254,23 @@ function App() {
                 />
               </div>
             )}
-            <div className="graph-panel">
+            <div className="graph-main-panel">
               <WorkflowGraph
                 nodes={nodes}
                 edges={edges}
                 onNodeFormView={handleNodeFormView}
               />
+              {!showEditor && (
+                <button
+                  className="show-editor-btn"
+                  onClick={() => setShowEditor(true)}
+                  title="Show JSON Editor"
+                >
+                  {'</>'}
+                </button>
+              )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </MainLayout>
