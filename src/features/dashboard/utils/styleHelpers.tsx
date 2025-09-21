@@ -12,14 +12,14 @@ type SLAStatus = "ontime" | "due" | "overdue" | "completed";
 
 export const getStageColor = (stage: string) => {
   const colors: Record<string, string> = {
-    ARMDraft: "bg-indigo-500",
-    RMReview: "bg-blue-500",
-    CMReview: "bg-purple-500",
-    RMResubmission: "bg-amber-500",
-    THCRMDecision: "bg-pink-500",
-    Completed: "bg-emerald-500",
+    ARMDraft: "bg-indigo-600",
+    RMReview: "bg-blue-600",
+    CMReview: "bg-purple-600",
+    RMResubmission: "bg-amber-600",
+    THCRMDecision: "bg-pink-600",
+    Completed: "bg-emerald-600",
   };
-  return colors[stage] || "bg-gray-500";
+  return colors[stage] || "bg-gray-600";
 };
 
 export const getSlaColor = (status: SLAStatus) => {
