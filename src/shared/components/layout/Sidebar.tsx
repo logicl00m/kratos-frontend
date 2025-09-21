@@ -35,6 +35,7 @@ const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNaviga
     { id: "applications", label: "Applications", icon: <FileText size={20} /> },
     { id: "running", label: "Running Workflows", icon: <PlayCircle size={20} /> },
     { id: "builder", label: "Workflow Builder", icon: <PlusCircle size={20} /> },
+    { id: "form-builder", label: "Form Builder", icon: <FileText size={20} /> },
     { id: "viewer", label: "Workflow Viewer", icon: <Workflow size={20} /> },
     { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} /> },
     { id: "users", label: "Users", icon: <Users size={20} /> },

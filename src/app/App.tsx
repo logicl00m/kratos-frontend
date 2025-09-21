@@ -116,6 +116,9 @@ function App() {
       case "builder":
         setViewMode("builder");
         break;
+      case "form-builder":
+        setViewMode("form-builder");
+        break;
       case "viewer":
         setViewMode("graph");
         break;

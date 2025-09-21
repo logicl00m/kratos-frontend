@@ -84,6 +84,7 @@ const MainLayout = ({
           searchValue={searchValue}
           onSearchChange={onSearchChange}
           showSearch={showSearch}
+          onNavigate={onNavigate}
         />
 
         <main
