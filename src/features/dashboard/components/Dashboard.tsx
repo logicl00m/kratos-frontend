@@ -4,8 +4,9 @@ import { mockWorkflowData as mockWorkflowRawData } from "../data/mockWorkflowDat
 import type { WorkflowData, LoanApplication } from "@features/dashboard/types/dashboard.types";
 import { transformWorkflowsToApplications } from "@features/dashboard/utils/workflowTransformer";
 import { getStageColor, getSlaColor, getStatusIcon } from "@features/dashboard/utils/styleHelpers";
-import DashboardHeader from "./DashboardHeader";
+import DashboardFilters from "./DashboardFilters";
 import DashboardMain from "./DashboardMain";
+import MainLayout from "@shared/components/layout/MainLayout";
 import "./Dashboard.css";
 
 const Dashboard: React.FC<{
@@ -17,19 +18,15 @@ const Dashboard: React.FC<{
   const [myQueueOnly, setMyQueueOnly] = useState<boolean>(false);
   const [selectedStage, setSelectedStage] = useState<string>("All Stages");
   const [selectedStatus, setSelectedStatus] = useState<string>("All Status");
-  const [selectedProduct, setSelectedProduct] =
-    useState<string>("All Products");
+  const [selectedProduct, setSelectedProduct] = useState<string>("All Products");
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
 
-  // Keep a reference to the original raw workflows so we can pass the
-  // untransformed data to details view when requested.
   const workflows = mockWorkflowRawData;
   const applications = useMemo(
     () => transformWorkflowsToApplications(workflows),
     [workflows]
   );
 
-  // Owners list derived from current data
   const ownerOptions = useMemo(() => {
     const set = new Set<string>();
     applications.forEach((a) => {
@@ -70,12 +67,10 @@ const Dashboard: React.FC<{
     );
   });
 
-  // Handlers to reduce nested lambdas in JSX
   const handleToggleAllSelection = (checked: boolean) => {
-    setSelectedRows(
-      checked ? filteredApplications.map((a) => a.id) : []
-    );
+    setSelectedRows(checked ? filteredApplications.map((a) => a.id) : []);
   };
+  
   const handleToggleRow = (id: string) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
@@ -83,13 +78,7 @@ const Dashboard: React.FC<{
   };
 
   const handleApplicationClick = (app: LoanApplication) => {
-    // Find the original raw workflow object by id and pass
-    // it to the parent. ApplicationDetails expects the raw
-    // workflow data (workflowData) rather than the
-    // transformed `app` object.
-    const workflow = workflows.find(
-      (w) => w.workflow.id === app.id
-    );
+    const workflow = workflows.find((w) => w.workflow.id === app.id);
     if (workflow && onApplicationClick) {
       onApplicationClick(workflow);
     }
@@ -102,26 +91,38 @@ const Dashboard: React.FC<{
     overdue: applications.filter((a) => a.slaStatus === "overdue").length,
   };
 
+  const filterControls = (
+    <DashboardFilters
+      myQueueOnly={myQueueOnly}
+      selectedStage={selectedStage}
+      selectedStatus={selectedStatus}
+      selectedProduct={selectedProduct}
+      selectedOwner={selectedOwner}
+      ownerOptions={ownerOptions}
+      onMyQueueToggle={setMyQueueOnly}
+      onStageChange={setSelectedStage}
+      onStatusChange={setSelectedStatus}
+      onProductChange={setSelectedProduct}
+      onOwnerChange={setSelectedOwner}
+    />
+  );
+
   return (
-    <div className="dashboard-container">
-      <DashboardHeader
-        searchTerm={searchTerm}
-        myQueueOnly={myQueueOnly}
-        selectedStage={selectedStage}
-        selectedStatus={selectedStatus}
-        selectedProduct={selectedProduct}
-        selectedOwner={selectedOwner}
-        ownerOptions={ownerOptions}
-        onSearchChange={setSearchTerm}
-        onMyQueueToggle={setMyQueueOnly}
-        onStageChange={setSelectedStage}
-        onStatusChange={setSelectedStatus}
-        onProductChange={setSelectedProduct}
-        onOwnerChange={setSelectedOwner}
-      />
-      
-      {/* Main Content */}
-      <div className="dashboard-main-content">
+    <MainLayout 
+      title="Applications Queue"
+      showMenuButton={true}
+      searchValue={searchTerm}
+      onSearchChange={setSearchTerm}
+      showSearch={true}
+      topBarControls={filterControls}
+      fullHeight={true}
+    >
+      <div style={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        height: "100%",
+        overflow: "hidden"
+      }}>
         <DashboardMain
           stats={stats}
           filteredApplications={filteredApplications}
@@ -134,7 +135,7 @@ const Dashboard: React.FC<{
           getStatusIcon={getStatusIcon}
         />
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

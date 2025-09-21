@@ -15,7 +15,7 @@ import {
 import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
 import type { WorkflowData } from "@features/dashboard/types/dashboard.types";
 import "./App.css";
-import TopBar from "@shared/components/layout/TopBar";
+import MainLayout from "@shared/components/layout/MainLayout";
 
 function App() {
   const [workflow, setWorkflow] = useState<WorkflowConfig>(
@@ -35,14 +35,13 @@ function App() {
     | "builder"
     | "form-builder"
   >("dashboard");
-  // selectedWorkflow holds the raw workflow object (WorkflowData) from the
-  // Dashboard. This is different from the transformed LoanApplication type.
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(
     null
   );
   const stateKeys = Object.keys(workflow.workflow?.states || {});
   const [currentStateIndex, setCurrentStateIndex] = useState<number>(0);
   const currentState = stateKeys[currentStateIndex] || stateKeys[0] || "";
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
   const handleNodeFormView = (nodeId: string) => {
     const index = stateKeys.indexOf(nodeId);
@@ -77,14 +76,12 @@ function App() {
   };
 
   const handleWorkflowExport = (workflowJson: unknown) => {
-    // Accept either a string (JSON) or an object
     let parsed: unknown = workflowJson;
     try {
       if (typeof workflowJson === "string") {
         parsed = JSON.parse(workflowJson);
       }
 
-      // Basic validation: ensure it has a workflow object with states
       if (
         !parsed ||
         typeof parsed !== "object" ||
@@ -94,12 +91,10 @@ function App() {
         throw new Error("Invalid workflow format: missing 'workflow' property");
       }
 
-      // Update state: reset current state index so graph/form stay in sync
       setWorkflow(parsed as WorkflowConfig);
       setJsonText(JSON.stringify(parsed, null, 2));
       setError(null);
       setCurrentStateIndex(0);
-      // Switch to graph view to see the result
       setViewMode("graph");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -110,137 +105,139 @@ function App() {
     }
   };
 
+  const handleNavigation = (itemId: string) => {
+    switch (itemId) {
+      case "dashboard":
+        setViewMode("dashboard");
+        break;
+      case "running":
+        setViewMode("running");
+        break;
+      case "builder":
+        setViewMode("builder");
+        break;
+      case "viewer":
+        setViewMode("graph");
+        break;
+      default:
+        break;
+    }
+  };
+
   const { nodes, edges } = parseWorkflowToGraph(workflow);
 
+  // Dashboard view with integrated layout
+  if (viewMode === "dashboard") {
+    return (
+      <Dashboard 
+        onApplicationClick={handleApplicationClick}
+      />
+    );
+  }
+
+  // Form builder view
   if (viewMode === "form-builder") {
-    return <DynamicFormBuilder />;
+    return (
+      <MainLayout 
+        title="Form Builder" 
+        showMenuButton={true}
+        onNavigate={handleNavigation}
+        sidebarCollapsed={sidebarCollapsed}
+        onSidebarCollapseChange={setSidebarCollapsed}
+      >
+        <DynamicFormBuilder />
+      </MainLayout>
+    );
   }
 
   // Workflow Builder view
   if (viewMode === "builder") {
     return (
-      <div className="app" style={{ overflow: "hidden" }}>
-        <WorkflowBuilder
-          onExport={handleWorkflowExport}
-          onBack={() => setViewMode("dashboard")}
-        />
-      </div>
+      <MainLayout 
+        title="Workflow Builder" 
+        showMenuButton={false}
+        onNavigate={handleNavigation}
+        sidebarCollapsed={sidebarCollapsed}
+        onSidebarCollapseChange={setSidebarCollapsed}
+      >
+        <div style={{ overflow: "hidden", height: "100%" }}>
+          <WorkflowBuilder
+            onExport={handleWorkflowExport}
+            onBack={() => setViewMode("dashboard")}
+          />
+        </div>
+      </MainLayout>
     );
   }
+
+  // Running workflows view
   if (viewMode === "running") {
-    return <RunningWorkflowsPage onBack={() => setViewMode("dashboard")} />;
+    return (
+      <MainLayout 
+        title="Running Workflows" 
+        showMenuButton={true}
+        onNavigate={handleNavigation}
+        sidebarCollapsed={sidebarCollapsed}
+        onSidebarCollapseChange={setSidebarCollapsed}
+      >
+        <RunningWorkflowsPage onBack={() => setViewMode("dashboard")} />
+      </MainLayout>
+    );
   }
 
   // Application Details view
   if (viewMode === "details" && selectedWorkflow) {
     return (
-      <ApplicationDetails
-        workflowData={selectedWorkflow}
-        onBack={handleBackToDashboard}
-      />
-    );
-  }
-
-  // Dashboard view - no editor panel
-  if (viewMode === "dashboard") {
-    return (
-      <div className="app">
-        <TopBar
-          title="Workflow Manager"
-          right={
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                className="toggle-button"
-                onClick={() => setViewMode("form-builder")}
-                style={{ background: "#f59e0b" }}
-              >
-                Form Builder
-              </button>
-              <button
-                className="toggle-button"
-                onClick={() => setViewMode("builder")}
-                style={{ background: "#8b5cf6" }}
-              >
-                Workflow Builder
-              </button>
-              <button
-                className="toggle-button"
-                onClick={() => setViewMode("running")}
-                style={{ background: "#3b82f6" }}
-              >
-                Running Workflows
-              </button>
-              <button
-                className="toggle-button"
-                onClick={() => setViewMode("graph")}
-                style={{ background: "#10b981" }}
-              >
-                Workflow Viewer
-              </button>
-            </div>
-          }
+      <MainLayout 
+        title="Application Details" 
+        showMenuButton={true}
+        onNavigate={handleNavigation}
+        sidebarCollapsed={sidebarCollapsed}
+        onSidebarCollapseChange={setSidebarCollapsed}
+      >
+        <ApplicationDetails
+          workflowData={selectedWorkflow}
+          onBack={handleBackToDashboard}
         />
-        <div style={{ flex: 1, overflow: "hidden" }}>
-          <Dashboard onApplicationClick={handleApplicationClick} />
-        </div>
-      </div>
+      </MainLayout>
     );
   }
 
   // Graph/Form view
   return (
-    <div className="app">
-      <TopBar
-        title="Workflow Visualizer"
-        right={
-          <>
-            <button
-              className="toggle-button"
-              onClick={() => setViewMode("dashboard")}
-              style={{ background: "#6366f1", marginRight: 12 }}
-            >
-              Dashboard
-            </button>
-            <button
-              className="toggle-button"
-              onClick={() => setViewMode("form-builder")}
-              style={{ background: "#f59e0b", marginRight: 12 }}
-            >
-              Form Builder
-            </button>
-            <button
-              className="toggle-button"
-              onClick={() => setViewMode("builder")}
-              style={{ background: "#8b5cf6", marginRight: 12 }}
-            >
-              Workflow Builder
-            </button>
-            <button
-              className="toggle-button"
-              onClick={() => setViewMode("running")}
-              style={{ background: "#3b82f6", marginRight: 12 }}
-            >
-              Running Workflows
-            </button>
-            <button
-              className="toggle-button"
-              onClick={() =>
-                setViewMode(viewMode === "graph" ? "form" : "graph")
-              }
-            >
-              {viewMode === "graph" ? "View Form" : "View Graph"}
-            </button>
-            <button
-              className="toggle-button"
-              onClick={() => setShowEditor(!showEditor)}
-            >
-              {showEditor ? "Hide" : "Show"} Editor
-            </button>
-          </>
-        }
-      />
-
-      <div className="app-body">
+    <MainLayout 
+      title="Workflow Visualizer"
+      showMenuButton={true}
+      onNavigate={handleNavigation}
+      sidebarCollapsed={sidebarCollapsed}
+      onSidebarCollapseChange={setSidebarCollapsed}
+      topBarControls={
+        <>
+          <button
+            className="toggle-button"
+            onClick={() => setViewMode("dashboard")}
+            style={{ background: "#6366f1" }}
+          >
+            Dashboard
+          </button>
+          <button
+            className="toggle-button"
+            onClick={() =>
+              setViewMode(viewMode === "graph" ? "form" : "graph")
+            }
+          >
+            {viewMode === "graph" ? "View Form" : "View Graph"}
+          </button>
+          <button
+            className="toggle-button"
+            onClick={() => setShowEditor(!showEditor)}
+          >
+            {showEditor ? "Hide" : "Show"} Editor
+          </button>
+        </>
+      }
+    >
+      <div style={{ display: "flex", height: "100%" }}>
         {viewMode === "form" ? (
           <div style={{ width: "100%" }}>
             <FormViewer
@@ -264,7 +261,6 @@ function App() {
                 />
               </div>
             )}
-
             <div className="graph-panel">
               <WorkflowGraph
                 nodes={nodes}
@@ -275,7 +271,7 @@ function App() {
           </>
         )}
       </div>
-    </div>
+    </MainLayout>
   );
 }
 
