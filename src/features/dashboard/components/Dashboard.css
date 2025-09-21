@@ -2,6 +2,9 @@
 .dashboard-container {
   min-height: 100vh;
   background-color: #f9fafb;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-header {
@@ -11,6 +14,13 @@
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.dashboard-main-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-header-content {
@@ -33,29 +43,32 @@
   gap: 0.75rem;
 }
 
-.dashboard-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.dashboard-header-actions {
+.dashboard-container {
+  /* Let the document (page) handle vertical scrolling.
+     Keep layout flexible but avoid forcing viewport-sized height.
+     This allows the browser scrollbar to appear when content overflows.
+  */
+  min-height: 100vh;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  overflow: visible; /* allow page to scroll */
 }
 
-.dashboard-view-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background-color: white;
-  color: #374151;
+.dashboard-main-content {
+  /* Allow normal flow so the page scrolls when content overflows.
+     Keep flex behavior so header stays sticky but content grows naturally.
+  */
+  flex: 1 1 auto;
+  min-height: 0; /* keep flex children behaving correctly */
+  overflow: visible;
 }
 
+/* Avoid nested vertical scrollbars: let horizontal overflow remain scrollable for tables */
+.dashboard-table-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  max-height: none;
+}
 .dashboard-view-button:hover {
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
@@ -162,6 +175,10 @@
   padding-right: 1.5rem;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-stats-grid {
@@ -169,6 +186,7 @@
   grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
@@ -281,6 +299,7 @@
   margin-bottom: 1rem;
   font-size: 0.875rem;
   color: #6b7280;
+  flex-shrink: 0;
 }
 
 .dashboard-results-count-highlight {
@@ -294,15 +313,23 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   border: 1px solid #e5e7eb;
   overflow: hidden;
+  overflow-x: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 70vh;
+  flex: 1;
 }
 
 .dashboard-table {
   width: 100%;
   border-collapse: collapse;
+  flex: 1;
 }
 
 .dashboard-table-header {
@@ -343,6 +370,7 @@
   border-width: 0px;
   border-top-width: 1px;
   border-color: #e5e7eb;
+  flex: 1;
 }
 
 .dashboard-table-row {
@@ -435,4 +463,30 @@
 .dashboard-table-action-icon {
   width: 1rem;
   height: 1rem;
+}
+
+/* Dashboard.css */
+.dashboard-container {
+  /* was: min-height: 100vh; overflow-y: auto; */
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;         /* better than 100vh on mobile */
+  overflow: hidden;       /* content area will scroll, not the container */
+}
+
+.dashboard-main-content {
+  /* was: flex: 1; overflow-y: auto; */
+  flex: 1 1 auto;
+  min-height: 0;          /* critical so overflow works in flex children */
+  overflow: auto;         /* <— this is now the single vertical scrollbar */
+}
+
+/* Optional: avoid nested scrollbars */
+.dashboard-stats-container { overflow-y: visible; }   /* or just remove the rule */
+
+/* If you want the table to scroll inside the page scroller, prefer only horizontal here */
+.dashboard-table-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;     /* remove the vertical scroller to avoid doubles */
+  max-height: none;        /* let the page scroller handle height */
 }

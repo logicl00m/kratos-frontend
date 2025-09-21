@@ -353,212 +353,215 @@ const Dashboard: React.FC<{
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="dashboard-stats-container">
-        <div className="dashboard-stats-grid">
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-content">
-              <div className="dashboard-stat-text-container">
-                <p className="dashboard-stat-label">Total Applications</p>
-                <p className="dashboard-stat-value">
-                  {stats.total}
-                </p>
+      {/* Main Content */}
+      <div className="dashboard-main-content">
+        {/* Stats Cards */}
+        <div className="dashboard-stats-container">
+          <div className="dashboard-stats-grid">
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-content">
+                <div className="dashboard-stat-text-container">
+                  <p className="dashboard-stat-label">Total Applications</p>
+                  <p className="dashboard-stat-value">
+                    {stats.total}
+                  </p>
+                </div>
+                <div className="dashboard-stat-icon-container">
+                  <FileText className="dashboard-stat-icon-blue" />
+                </div>
               </div>
-              <div className="dashboard-stat-icon-container">
-                <FileText className="dashboard-stat-icon-blue" />
+            </div>
+
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-content">
+                <div className="dashboard-stat-text-container">
+                  <p className="dashboard-stat-label">Completed</p>
+                  <p className="dashboard-stat-value dashboard-stat-value-completed">
+                    {stats.completed}
+                  </p>
+                </div>
+                <div className="dashboard-stat-icon-completed">
+                  <CheckCircle className="dashboard-stat-icon-emerald" />
+                </div>
+              </div>
+            </div>
+
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-content">
+                <div className="dashboard-stat-text-container">
+                  <p className="dashboard-stat-label">In Progress</p>
+                  <p className="dashboard-stat-value dashboard-stat-value-pending">
+                    {stats.pending}
+                  </p>
+                </div>
+                <div className="dashboard-stat-icon-pending">
+                  <Clock className="dashboard-stat-icon-amber" />
+                </div>
+              </div>
+            </div>
+
+            <div className="dashboard-stat-card">
+              <div className="dashboard-stat-content">
+                <div className="dashboard-stat-text-container">
+                  <p className="dashboard-stat-label">Overdue</p>
+                  <p className="dashboard-stat-value dashboard-stat-value-overdue">
+                    {stats.overdue}
+                  </p>
+                </div>
+                <div className="dashboard-stat-icon-overdue">
+                  <AlertCircle className="dashboard-stat-icon-red" />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-content">
-              <div className="dashboard-stat-text-container">
-                <p className="dashboard-stat-label">Completed</p>
-                <p className="dashboard-stat-value dashboard-stat-value-completed">
-                  {stats.completed}
-                </p>
-              </div>
-              <div className="dashboard-stat-icon-completed">
-                <CheckCircle className="dashboard-stat-icon-emerald" />
-              </div>
-            </div>
+          {/* Results Count */}
+          <div className="dashboard-results-count">
+            Showing{" "}
+            <span className="dashboard-results-count-highlight">
+              {filteredApplications.length}
+            </span>{" "}
+            of{" "}
+            <span className="dashboard-results-count-highlight">
+              {applications.length}
+            </span>{" "}
+            applications
           </div>
 
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-content">
-              <div className="dashboard-stat-text-container">
-                <p className="dashboard-stat-label">In Progress</p>
-                <p className="dashboard-stat-value dashboard-stat-value-pending">
-                  {stats.pending}
-                </p>
-              </div>
-              <div className="dashboard-stat-icon-pending">
-                <Clock className="dashboard-stat-icon-amber" />
-              </div>
-            </div>
-          </div>
-
-          <div className="dashboard-stat-card">
-            <div className="dashboard-stat-content">
-              <div className="dashboard-stat-text-container">
-                <p className="dashboard-stat-label">Overdue</p>
-                <p className="dashboard-stat-value dashboard-stat-value-overdue">
-                  {stats.overdue}
-                </p>
-              </div>
-              <div className="dashboard-stat-icon-overdue">
-                <AlertCircle className="dashboard-stat-icon-red" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Results Count */}
-        <div className="dashboard-results-count">
-          Showing{" "}
-          <span className="dashboard-results-count-highlight">
-            {filteredApplications.length}
-          </span>{" "}
-          of{" "}
-          <span className="dashboard-results-count-highlight">
-            {applications.length}
-          </span>{" "}
-          applications
-        </div>
-
-        {/* Table */}
-        <div className="dashboard-table-container">
-          <div className="dashboard-table-wrapper">
-            <table className="dashboard-table">
-              <thead className="dashboard-table-header">
-                <tr>
-                  <th className="dashboard-table-header-cell">
-                    <input
-                      type="checkbox"
-                      className="dashboard-table-header-checkbox"
-                      onChange={(e) =>
-                        handleToggleAllSelection(e.target.checked)
-                      }
-                      checked={
-                        selectedRows.length === filteredApplications.length &&
-                        filteredApplications.length > 0
-                      }
-                    />
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Application ID
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Applicant
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Amount
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Current Stage
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Assignee
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Initiated By
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    SLA Status
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Docs
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row">
-                    Last Update
-                  </th>
-                  <th className="dashboard-table-header-cell dashboard-table-header-row text-center">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="dashboard-table-body">
-                {filteredApplications.map((app: TransformedApp) => (
-                  <tr
-                    key={app.id}
-                    className="dashboard-table-row"
-                  >
-                    <td className="dashboard-table-cell">
+          {/* Table */}
+          <div className="dashboard-table-container">
+            <div className="dashboard-table-wrapper">
+              <table className="dashboard-table">
+                <thead className="dashboard-table-header">
+                  <tr>
+                    <th className="dashboard-table-header-cell">
                       <input
                         type="checkbox"
-                        className="dashboard-table-checkbox"
-                        checked={selectedRows.includes(app.id)}
-                        onChange={() => handleToggleRow(app.id)}
+                        className="dashboard-table-header-checkbox"
+                        onChange={(e) =>
+                          handleToggleAllSelection(e.target.checked)
+                        }
+                        checked={
+                          selectedRows.length === filteredApplications.length &&
+                          filteredApplications.length > 0
+                        }
                       />
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="text-sm font-medium text-gray-900">{app.id}</span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="dashboard-table-applicant">{app.applicant}</span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="dashboard-table-amount">
-                        ৳{app.amount.toLocaleString()}
-                      </span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span
-                        className={`dashboard-table-stage-badge ${getStageColor(
-                          app.stage
-                        )}`}
-                      >
-                        {app.stage}
-                      </span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="text-sm text-gray-900">{app.assignee}</span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="text-sm text-gray-600">{app.initiatedBy}</span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <div className="dashboard-table-sla-container">
-                        {getStatusIcon(app.slaStatus)}
-                        <span
-                          className={`text-sm ${getSlaColor(app.slaStatus)}`}
-                        >
-                          {app.sla}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="dashboard-table-docs-badge">
-                        {app.docs || 0}
-                      </span>
-                    </td>
-                    <td className="dashboard-table-cell">
-                      <span className="text-sm text-gray-600">{app.lastUpdate}</span>
-                    </td>
-                    <td className="dashboard-table-cell text-center">
-                      <button
-                        onClick={() => {
-                          // Find the original raw workflow object by id and pass
-                          // it to the parent. ApplicationDetails expects the raw
-                          // workflow data (workflowData) rather than the
-                          // transformed `app` object.
-                          const workflow = workflows.find(
-                            (w) => w.workflow.id === app.id
-                          );
-                          if (workflow && onApplicationClick) {
-                            onApplicationClick(workflow);
-                          }
-                        }}
-                        className="dashboard-table-action-button"
-                      >
-                        <Eye className="dashboard-table-action-icon" />
-                        View
-                      </button>
-                    </td>
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Application ID
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Applicant
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Amount
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Current Stage
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Assignee
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Initiated By
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      SLA Status
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Docs
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row">
+                      Last Update
+                    </th>
+                    <th className="dashboard-table-header-cell dashboard-table-header-row text-center">
+                      Action
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="dashboard-table-body">
+                  {filteredApplications.map((app: TransformedApp) => (
+                    <tr
+                      key={app.id}
+                      className="dashboard-table-row"
+                    >
+                      <td className="dashboard-table-cell">
+                        <input
+                          type="checkbox"
+                          className="dashboard-table-checkbox"
+                          checked={selectedRows.includes(app.id)}
+                          onChange={() => handleToggleRow(app.id)}
+                        />
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="text-sm font-medium text-gray-900">{app.id}</span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="dashboard-table-applicant">{app.applicant}</span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="dashboard-table-amount">
+                          ৳{app.amount.toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span
+                          className={`dashboard-table-stage-badge ${getStageColor(
+                            app.stage
+                          )}`}
+                        >
+                          {app.stage}
+                        </span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="text-sm text-gray-900">{app.assignee}</span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="text-sm text-gray-600">{app.initiatedBy}</span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <div className="dashboard-table-sla-container">
+                          {getStatusIcon(app.slaStatus)}
+                          <span
+                            className={`text-sm ${getSlaColor(app.slaStatus)}`}
+                          >
+                            {app.sla}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="dashboard-table-docs-badge">
+                          {app.docs || 0}
+                        </span>
+                      </td>
+                      <td className="dashboard-table-cell">
+                        <span className="text-sm text-gray-600">{app.lastUpdate}</span>
+                      </td>
+                      <td className="dashboard-table-cell text-center">
+                        <button
+                          onClick={() => {
+                            // Find the original raw workflow object by id and pass
+                            // it to the parent. ApplicationDetails expects the raw
+                            // workflow data (workflowData) rather than the
+                            // transformed `app` object.
+                            const workflow = workflows.find(
+                              (w) => w.workflow.id === app.id
+                            );
+                            if (workflow && onApplicationClick) {
+                              onApplicationClick(workflow);
+                            }
+                          }}
+                          className="dashboard-table-action-button"
+                        >
+                          <Eye className="dashboard-table-action-icon" />
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
