@@ -52,7 +52,7 @@ const MainLayout = ({
   return (
     <div
       className="app-shell"
-      style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}
+      style={{ display: "flex", minHeight: "100vh", background: "var(--bg)" }}
     >
       <Sidebar
         collapsed={sidebarCollapsed}

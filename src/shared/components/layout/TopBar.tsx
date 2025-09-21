@@ -1,6 +1,7 @@
 // src/shared/components/layout/TopBar.tsx
 import type { ReactNode } from "react";
 import { Menu, Bell, User, Search, Home } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./TopBar.css";
 
 type TopBarProps = {
@@ -89,17 +90,19 @@ const TopBar: React.FC<TopBarProps> = ({
         </div>
       )}
       
-      <div 
+      <div
         className="header-controls"
       >
         {right}
-        
+
+        <ThemeToggle />
+
         <button
           className="icon-button"
         >
           <Bell size={20} />
         </button>
-        
+
         <button
           className="icon-button"
         >

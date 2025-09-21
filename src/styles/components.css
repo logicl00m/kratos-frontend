@@ -4,11 +4,16 @@
   align-items: center;
   gap: 14px;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--panel);
   border-bottom: 1px solid var(--stroke);
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
   border-radius: 18px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .topbar {
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
 }
 
 .topbar input,
@@ -19,7 +24,7 @@
 }
 
 .textfield {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--panel);
   border: 1px solid var(--stroke);
   color: var(--text);
   padding: 10px 14px;
@@ -27,7 +32,11 @@
   outline: none;
   width: 280px;
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.3s ease;
+}
+
+.dark .textfield {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .textfield:focus {
@@ -36,20 +45,24 @@
 }
 
 .btn {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--panel);
   border: 1px solid var(--stroke);
   color: var(--text);
   padding: 10px 16px;
   border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.3s ease;
 }
 
 .btn:hover {
   transform: translateY(-1px);
-  border-color: rgba(99, 102, 241, 0.45);
+  border-color: var(--accent);
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+}
+
+.dark .btn:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 .btn.primary {
@@ -67,24 +80,4 @@
   color: var(--muted);
 }
 
-body.light .topbar {
-  background: rgba(255, 255, 255, 0.94);
-  border-bottom: 1px solid var(--stroke);
-}
-
-body.light .btn,
-body.light .topbar .btn,
-body.light .topbar .toolbar .btn,
-body.light .topbar .segment button,
-body.light .topbar button.segment,
-body.light .topbar .segment button:not(.active) {
-  background: rgba(255, 255, 255, 0.96) !important;
-  color: var(--text) !important;
-  border-color: var(--stroke) !important;
-}
-
-body.light .textfield {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--stroke);
-  color: var(--text);
-}
+/* Remove old body.light specific overrides as they're now handled by CSS variables */

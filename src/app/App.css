@@ -26,12 +26,16 @@
   min-width: 300px;
   max-width: 600px;
   height: 100%;
-  background: #ffffff;
-  border-right: 2px solid #e5e7eb;
+  background: var(--panel);
+  border-right: 2px solid var(--stroke);
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .json-editor-panel {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
 }
 
 .editor-header {
@@ -39,22 +43,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--panel);
+  border-bottom: 1px solid var(--stroke);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .editor-header h3 {
   margin: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--text);
+  transition: color 0.3s ease;
 }
 
 .editor-toggle-btn {
   background: none;
   border: none;
   font-size: 24px;
-  color: #6b7280;
+  color: var(--muted);
   cursor: pointer;
   padding: 0;
   width: 28px;
@@ -67,8 +73,8 @@
 }
 
 .editor-toggle-btn:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent);
 }
 
 /* Graph Main Panel */
@@ -77,7 +83,8 @@
   position: relative;
   height: 100%;
   overflow: hidden;
-  background: #fafafa;
+  background: var(--bg);
+  transition: background-color 0.3s ease;
 }
 
 /* Show Editor Button */
