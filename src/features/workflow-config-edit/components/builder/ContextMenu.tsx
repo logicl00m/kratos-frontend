@@ -52,7 +52,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     <div
       ref={menuRef}
       className="context-menu"
-      style={{ left: x, top: y }}
+      // set CSS custom properties for positioning
+      style={(() => {
+        const cssVars = {
+          ["--ctx-left"]: `${x}px`,
+          ["--ctx-top"]: `${y}px`,
+        } as unknown as React.CSSProperties;
+        return cssVars;
+      })()}
       role="menu"
       aria-label={isNode ? "Node context menu" : "Edge context menu"}
     >
@@ -109,4 +116,3 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
 };
 
 export default ContextMenu;
-

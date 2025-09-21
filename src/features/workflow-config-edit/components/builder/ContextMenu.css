@@ -1,6 +1,9 @@
 /* src/features/workflow-config-edit/components/builder/ContextMenu.css */
 .context-menu {
   position: absolute;
+  /* position set via CSS custom properties --ctx-left and --ctx-top */
+  left: var(--ctx-left, 0px);
+  top: var(--ctx-top, 0px);
   min-width: 200px;
   padding: 6px 0;
   border-radius: 16px;

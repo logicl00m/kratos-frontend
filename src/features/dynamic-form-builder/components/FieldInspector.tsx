@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -11,7 +11,13 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Plus, Minus } from "lucide-react";
 import type { Field } from "../types/form-builder.types";
 
 interface FieldInspectorProps {
@@ -20,7 +26,103 @@ interface FieldInspectorProps {
   onPreview: () => void;
 }
 
-const FIELD_ACTIONS = ["save", "validate", "upload", "replace"];
+interface FieldActionOption {
+  value: string;
+  label: string;
+  types: Field["type"][];
+}
+
+const FIELD_ACTION_OPTIONS: FieldActionOption[] = [
+  {
+    value: "save",
+    label: "Save",
+    types: ["text", "number", "textarea", "select", "radio", "checkbox", "date"],
+  },
+  {
+    value: "validate",
+    label: "Validate",
+    types: [
+      "text",
+      "number",
+      "textarea",
+      "select",
+      "radio",
+      "checkbox",
+      "date",
+      "file",
+    ],
+  },
+  {
+    value: "upload",
+    label: "Upload",
+    types: ["file"],
+  },
+  {
+    value: "replace",
+    label: "Replace",
+    types: ["file"],
+  },
+];
+
+const FIELD_TYPES_WITH_OPTIONS: Field["type"][] = ["select", "radio", "checkbox"];
+
+function getAllowedActions(fieldType: Field["type"]) {
+  return FIELD_ACTION_OPTIONS.filter((option) =>
+    option.types.includes(fieldType)
+  );
+}
+
+interface FieldActionsSelectorProps {
+  value: string[];
+  onChange: (next: string[]) => void;
+  disabled?: boolean;
+  options: FieldActionOption[];
+}
+
+function FieldActionsSelector({ value, onChange, disabled, options }: FieldActionsSelectorProps) {
+  const toggleAction = (action: string, checked: boolean) => {
+    if (checked) {
+      onChange(Array.from(new Set([...value, action])));
+    } else {
+      onChange(value.filter((item) => item !== action));
+    }
+  };
+
+  const summary = value.length
+    ? `${value.length} action${value.length > 1 ? "s" : ""} selected`
+    : "Select actions";
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="dfb-inspector__actions-trigger"
+          disabled={disabled || !options.length}
+        >
+          <span>{summary}</span>
+          <ChevronDown size={14} aria-hidden />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="dfb-inspector__actions-menu" align="start">
+        {options.map((option) => (
+          <DropdownMenuCheckboxItem
+            key={option.value}
+            checked={value.includes(option.value)}
+            onCheckedChange={(checked) => toggleAction(option.value, checked)}
+          >
+            {option.label}
+          </DropdownMenuCheckboxItem>
+        ))}
+        {!options.length && (
+          <div className="dfb-inspector__actions-empty">No actions available</div>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export default function FieldInspector({
   selectedField,
@@ -30,7 +132,7 @@ export default function FieldInspector({
   if (!selectedField) {
     return (
       <aside className="dfb-inspector__empty">
-        <h3 className="dfb-inspector__title">Inspector — Field Properties</h3>
+        <h3 className="dfb-inspector__title">Inspector - Field properties</h3>
         <p className="dfb-inspector__subtitle">
           Select a field on the canvas to configure its settings.
         </p>
@@ -39,11 +141,14 @@ export default function FieldInspector({
   }
 
   const withValidation = selectedField.validation ?? {};
+  const isStructuralField = selectedField.type === "section" || selectedField.type === "divider";
+  const allowedActions = getAllowedActions(selectedField.type);
+  const fieldActions = selectedField.fieldActions ?? [];
 
   const addOption = () => {
     const newOptions = [
       ...(selectedField.options || []),
-      { value: `value_${Date.now()}`, label: "New Option" },
+      { value: `value_${Date.now()}`, label: "New option" },
     ];
     onUpdateField({ options: newOptions });
   };
@@ -65,21 +170,16 @@ export default function FieldInspector({
     onUpdateField({ options: newOptions });
   };
 
-  const toggleFieldAction = (action: string) => {
-    const currentActions = selectedField.fieldActions || [];
-    const newActions = currentActions.includes(action)
-      ? currentActions.filter((a) => a !== action)
-      : [...currentActions, action];
-    onUpdateField({ fieldActions: newActions });
+  const handleActionsChange = (actions: string[]) => {
+    onUpdateField({ fieldActions: actions });
   };
 
   return (
     <aside className="dfb-inspector">
       <div>
-        <h3 className="dfb-inspector__title">Inspector — Field Properties</h3>
+        <h3 className="dfb-inspector__title">Inspector - Field properties</h3>
         <p className="dfb-inspector__subtitle">
-          Configure the selected field. Status affects runtime behaviour;
-          actions are constrained by type.
+          Configure the selected field. Status affects runtime behaviour; actions are constrained by type.
         </p>
       </div>
 
@@ -91,18 +191,15 @@ export default function FieldInspector({
             <Input
               id="field-label"
               value={selectedField.name}
-              onChange={(e) => onUpdateField({ name: e.target.value })}
+              onChange={(event) => onUpdateField({ name: event.target.value })}
             />
             <p className="dfb-inspector__hint">Human-readable field label.</p>
           </div>
 
           <div>
-            <Label htmlFor="field-id">ID</Label>
-            <Input
-              id="field-id"
-              value={selectedField.id}
-              onChange={(e) => onUpdateField({ id: e.target.value })}
-            />
+            <Label htmlFor="field-id">Field ID</Label>
+            <Input id="field-id" value={selectedField.id} disabled />
+            <p className="dfb-inspector__hint">Managed by backend. IDs are read-only here.</p>
           </div>
 
           <div>
@@ -143,27 +240,56 @@ export default function FieldInspector({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="default">default</SelectItem>
-                <SelectItem value="readonly">readonly</SelectItem>
-                <SelectItem value="disabled">disabled</SelectItem>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="readonly">Read only</SelectItem>
+                <SelectItem value="disabled">Disabled</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label>Field actions</Label>
+            <FieldActionsSelector
+              value={fieldActions}
+              onChange={handleActionsChange}
+              disabled={isStructuralField}
+              options={allowedActions}
+            />
+            <div className="dfb-inspector__action-tags">
+              {fieldActions.length ? (
+                fieldActions.map((action) => (
+                  <span key={action} className="dfb-inspector__action-tag">
+                    {action}
+                  </span>
+                ))
+              ) : (
+                <p className="dfb-inspector__hint">
+                  {isStructuralField
+                    ? "Structural elements do not support actions."
+                    : "Select one or more behaviours applied to this field."}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       <section className="dfb-inspector__section">
-        <h4>Data Binding</h4>
+        <h4>Data binding</h4>
         <div className="dfb-inspector__options">
           <div>
             <Label htmlFor="field-path">Path</Label>
             <Input
               id="field-path"
               value={selectedField.data}
-              onChange={(e) => onUpdateField({ data: e.target.value })}
+              placeholder={isStructuralField ? "" : "{{ data.borrower.property }}"}
+              onChange={(event) => onUpdateField({ data: event.target.value })}
+              disabled={isStructuralField}
             />
             <p className="dfb-inspector__hint">
-              Mustache path. Example: {"{{ data.borrower.legalName }}"}
+              {isStructuralField
+                ? "Structural elements do not bind to data."
+                : "Mustache path. Example: {{ data.borrower.legalName }}"}
             </p>
           </div>
         </div>
@@ -182,35 +308,23 @@ export default function FieldInspector({
                   validation: { ...withValidation, required: checked },
                 })
               }
+              disabled={isStructuralField}
             />
           </div>
 
           {selectedField.type === "number" && (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                gap: 12,
-              }}
-            >
+            <div className="dfb-inspector__grid">
               <div>
                 <Label htmlFor="field-min">Min</Label>
                 <Input
                   id="field-min"
                   type="number"
-                  value={
-                    withValidation.min !== undefined
-                      ? String(withValidation.min)
-                      : ""
-                  }
-                  onChange={(e) =>
+                  value={withValidation.min ?? ""}
+                  onChange={(event) =>
                     onUpdateField({
                       validation: {
                         ...withValidation,
-                        min:
-                          e.target.value === ""
-                            ? undefined
-                            : Number(e.target.value),
+                        min: event.target.value === "" ? undefined : Number(event.target.value),
                       },
                     })
                   }
@@ -221,19 +335,12 @@ export default function FieldInspector({
                 <Input
                   id="field-max"
                   type="number"
-                  value={
-                    withValidation.max !== undefined
-                      ? String(withValidation.max)
-                      : ""
-                  }
-                  onChange={(e) =>
+                  value={withValidation.max ?? ""}
+                  onChange={(event) =>
                     onUpdateField({
                       validation: {
                         ...withValidation,
-                        max:
-                          e.target.value === ""
-                            ? undefined
-                            : Number(e.target.value),
+                        max: event.target.value === "" ? undefined : Number(event.target.value),
                       },
                     })
                   }
@@ -242,100 +349,92 @@ export default function FieldInspector({
             </div>
           )}
 
-          {selectedField.type === "text" && (
+          {!isStructuralField && (
             <div>
-              <Label htmlFor="field-regex">Regex</Label>
+              <Label htmlFor="field-regex">Pattern (regex)</Label>
               <Input
                 id="field-regex"
-                value={withValidation.regex || ""}
-                onChange={(e) =>
+                value={withValidation.regex ?? ""}
+                onChange={(event) =>
                   onUpdateField({
-                    validation: { ...withValidation, regex: e.target.value },
+                    validation: {
+                      ...withValidation,
+                      regex: event.target.value || undefined,
+                    },
                   })
                 }
-                placeholder="^[A-Za-z]+$"
+                placeholder="^\\w+$"
               />
               <p className="dfb-inspector__hint">
-                Optional. Applied after trimming.
+                Optional. Leave blank to remove a pattern constraint.
               </p>
             </div>
           )}
         </div>
       </section>
 
-      <section className="dfb-inspector__section">
-        <h4>Help Text</h4>
-        <Textarea
-          id="field-help"
-          value={selectedField.helpText || ""}
-          onChange={(e) => onUpdateField({ helpText: e.target.value })}
-          placeholder="Enter your full legal name as it appears on official documents."
-          rows={3}
-        />
-      </section>
-
-      {(selectedField.type === "select" || selectedField.type === "radio") && (
+      {FIELD_TYPES_WITH_OPTIONS.includes(selectedField.type) && (
         <section className="dfb-inspector__section">
           <h4>Options</h4>
-          <p className="dfb-inspector__hint">
-            Stored in formMeta.optionsByFieldId[id]. Not included in the primary
-            export.
-          </p>
           <div className="dfb-inspector__options">
-            {selectedField.options?.map((option, index) => (
+            {(selectedField.options || []).map((option, index) => (
               <div key={option.value} className="dfb-inspector__option">
-                <Input
-                  value={option.value}
-                  onChange={(e) => updateOption(index, "value", e.target.value)}
-                  placeholder="value"
-                />
-                <Input
-                  value={option.label}
-                  onChange={(e) => updateOption(index, "label", e.target.value)}
-                  placeholder="Label"
-                />
+                <div className="dfb-inspector__grid">
+                  <div>
+                    <Label htmlFor={`option-label-${index}`}>Label</Label>
+                    <Input
+                      id={`option-label-${index}`}
+                      value={option.label}
+                      onChange={(event) =>
+                        updateOption(index, "label", event.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`option-value-${index}`}>Value</Label>
+                    <Input
+                      id={`option-value-${index}`}
+                      value={option.value}
+                      onChange={(event) =>
+                        updateOption(index, "value", event.target.value)
+                      }
+                    />
+                  </div>
+                </div>
                 <Button
-                  size="sm"
+                  type="button"
                   variant="ghost"
-                  aria-label={`Remove option ${index + 1}`}
+                  size="sm"
+                  className="dfb-inspector__option-remove"
                   onClick={() => removeOption(index)}
                 >
-                  <Minus size={16} />
+                  <Minus size={14} aria-hidden />
+                  Remove option
                 </Button>
               </div>
             ))}
-            <Button size="sm" variant="outline" onClick={addOption}>
-              <Plus size={16} style={{ marginRight: 6 }} />
-              Add Option
+
+            <Button
+              type="button"
+              onClick={addOption}
+              variant="outline"
+              size="sm"
+              className="dfb-inspector__option-add"
+            >
+              <Plus size={14} aria-hidden />
+              Add option
             </Button>
           </div>
         </section>
       )}
 
-      <section className="dfb-inspector__section">
-        <h4>Field Actions</h4>
-        <p className="dfb-inspector__hint">
-          Allowed by type: text / number / textarea / select / radio / checkbox
-          / date (save, validate). file (upload, replace, validate).
-        </p>
-        <div className="dfb-inspector__options">
-          {FIELD_ACTIONS.map((action) => (
-            <div key={action} className="dfb-inspector__row">
-              <Label style={{ textTransform: "capitalize" }}>{action}</Label>
-              <Switch
-                aria-label={`Toggle ${action}`}
-                checked={selectedField.fieldActions.includes(action)}
-                onCheckedChange={() => toggleFieldAction(action)}
-              />
-            </div>
-          ))}
+      <footer className="dfb-inspector__footer">
+        <div className="dfb-inspector__actions">
+          <Button variant="outline" size="sm" onClick={onPreview}>
+            Preview changes
+          </Button>
         </div>
-      </section>
-
-      <div className="dfb-inspector__footer">
-        <Button>Save</Button>
-        <Button variant="outline">Preview</Button>
-      </div>
+      </footer>
     </aside>
   );
 }
