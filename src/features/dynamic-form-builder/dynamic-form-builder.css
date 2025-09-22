@@ -222,15 +222,15 @@
 }
 
 .dfb-inspector {
-  width: 360px;
+  width: 340px;
   background: var(--panel);
-  border-left: 1px solid var(--stroke);
-  padding: 28px;
+  border-left: 1px solid color-mix(in oklab, var(--stroke) 80%, transparent);
+  padding: 20px 20px 88px; /* extra bottom padding for sticky footer */
   overflow-y: auto;
-  box-shadow: inset 1px 0 0 color-mix(in oklab, var(--stroke) 40%, transparent);
+  box-shadow: inset 1px 0 0 color-mix(in oklab, var(--stroke) 35%, transparent);
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .dfb-inspector__empty {
@@ -245,21 +245,22 @@
 }
 
 .dfb-inspector__title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .dfb-inspector__subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
 }
 
 .dfb-inspector__section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--stroke);
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed color-mix(in oklab, var(--stroke) 70%, transparent);
 }
 
 .dfb-inspector__section:last-of-type {
@@ -268,8 +269,8 @@
 }
 
 .dfb-inspector__section h4 {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--text);
 }
@@ -283,12 +284,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 }
 
 .dfb-inspector__options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .dfb-inspector__option {
@@ -299,10 +301,14 @@
 }
 
 .dfb-inspector__footer {
+  position: sticky;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   margin-top: auto;
+  padding-top: 10px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, var(--panel) 30%);
 }
 
 .dfb-inspector__actions .button-outline {
@@ -596,12 +602,14 @@
   width: 100%;
   justify-content: space-between;
   border-radius: 10px;
-  border-color: rgba(148, 163, 184, 0.6);
+  border-color: rgba(148, 163, 184, 0.5);
+  min-height: 36px;
 }
 
 .dfb-inspector__actions-menu {
-  max-height: 260px;
-  min-width: 200px;
+  max-height: 300px;
+  min-width: 220px;
+  z-index: 90; /* ensure above the scrolling inspector */
 }
 
 .dfb-inspector__actions-empty {
@@ -619,20 +627,19 @@
 .dfb-inspector__action-tag {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(59, 130, 246, 0.12);
-  color: #1d4ed8;
+  background: hsl(var(--accent-bg));
+  color: hsl(var(--accent-foreground));
   font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 
 .dfb-inspector__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .dfb-inspector__option-add,
@@ -709,6 +716,82 @@
   }
 }
 
+/* ---------- Form Builder Skin (scoped) ---------- */
+
+/* Inputs */
+.dfb-skin .dfb-input {
+  height: 38px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: hsl(var(--muted-bg));
+  color: var(--text);
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.dfb-skin .dfb-input::placeholder {
+  color: var(--muted);
+}
+
+.dfb-skin .dfb-input:focus-visible {
+  outline: none;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+  background: color-mix(in oklab, hsl(var(--accent-bg)) 20%, white 80%);
+}
+
+/* Select (Radix) */
+.dfb-skin .dfb-select__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 12px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: hsl(var(--muted-bg));
+  color: var(--text);
+  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.dfb-skin .dfb-select__trigger[data-state="open"] {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+.dfb-skin .dfb-select__content {
+  width: var(--radix-select-trigger-width);
+  max-height: min(320px, 60vh);
+  overflow: auto;
+  margin-top: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.32);
+  z-index: 60;
+}
+
+.dfb-skin .dfb-select__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: default;
+}
+
+.dfb-skin .dfb-select__item[data-highlighted] {
+  background: hsl(var(--accent-bg));
+  color: hsl(var(--accent-foreground));
+}
+
+.dfb-skin .dfb-select__item[data-state="checked"] {
+  background: color-mix(in oklab, hsl(var(--accent-bg)) 65%, white 35%);
+  color: hsl(var(--accent-foreground));
+}
+
 @media (max-width: 768px) {
   .dfb__workspace {
     padding: 20px;
@@ -718,4 +801,138 @@
     padding: 24px;
     gap: 18px;
   }
+}
+
+/* Input base stays the same; only change focus */
+.dfb-skin .dfb-input:focus,
+.dfb-skin .dfb-input:focus-visible {
+  outline: none;
+  border-color: hsl(var(--ring));
+  /* softer ring; no background color shift */
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.55);
+  background: hsl(var(--muted-bg));
+}
+
+/* -----------------------------------------------------------
+   0) Local token bridge (inside the builder only)
+   Give shadcn tokens (HSL tuples) sensible fallbacks so
+   bg-popover / border, etc. never resolve to transparent.
+   ----------------------------------------------------------- */
+.dfb-skin {
+  /* HSL tuples:  h s l  (no color() function) */
+  /* Fallbacks roughly match your panel/text/stroke look */
+  --popover: 222 14% 12%;                 /* dark slate panel */
+  --popover-foreground: 210 20% 95%;      /* near-white text */
+  --border: 215 16% 47%;                  /* soft gray border */
+  --ring: 230 90% 66%;
+}
+
+/* If you have a light theme wrapper, override here */
+:root:not(.dark) .dfb-skin {
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 14% 12%;
+  --border: 215 16% 82%;
+}
+
+/* -----------------------------------------------------------
+   1) Inputs — keep background steady on focus
+   ----------------------------------------------------------- */
+.dfb-skin .dfb-input {
+  height: 38px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: hsl(var(--muted-bg));
+  color: var(--text);
+  transition: border .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+/* Kill any previous "brighten on focus" rule */
+.dfb-skin .dfb-input:focus,
+.dfb-skin .dfb-input:focus-visible {
+  outline: none;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.55);
+  background: hsl(var(--muted-bg));
+}
+
+/* -----------------------------------------------------------
+   2) Select — fully opaque panel, crisp states, correct stacking
+   Radix provides size vars for popper; we keep those.
+   ----------------------------------------------------------- */
+.dfb-skin .dfb-select__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 12px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  background: hsl(var(--muted-bg));
+  color: var(--text);
+  transition: border .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.dfb-skin .dfb-select__trigger:focus,
+.dfb-skin .dfb-select__trigger[data-state="open"] {
+  outline: none;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.55);
+  background: hsl(var(--muted-bg));
+}
+
+/* Content shell */
+.dfb-skin .dfb-select__content {
+  position: relative;                     /* for ::before layer */
+  width: var(--radix-select-trigger-width);
+  max-height: min(320px, var(--radix-select-content-available-height));
+  overflow: auto;
+  margin-top: 6px;
+  border-radius: 14px;
+  border: 1px solid hsl(var(--border));
+  /* Use shadcn tokens (now bridged) for a solid panel */
+  background: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.32);
+  z-index: 1000;                          /* sit above inspector */
+  isolation: isolate;                     /* creates a new stacking ctx */
+}
+
+/* Defensive background layer in case something overrides background */
+.dfb-skin .dfb-select__content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: hsl(var(--popover));
+  z-index: -1;
+}
+
+/* The inner viewport can be transparent; make it inherit the panel bg */
+.dfb-skin .dfb-select__content > div {
+  background: hsl(var(--popover));
+}
+
+/* Items */
+.dfb-skin .dfb-select__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+}
+
+/* Hover/focus (Radix sets data-highlighted) */
+.dfb-skin .dfb-select__item[data-highlighted] {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+/* Selected row */
+.dfb-skin .dfb-select__item[data-state="checked"] {
+  background: color-mix(in oklab, hsl(var(--accent)) 55%, hsl(var(--popover)) 45%);
+  color: hsl(var(--accent-foreground));
 }

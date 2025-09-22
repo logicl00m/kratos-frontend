@@ -215,13 +215,19 @@ export default function FieldInspector({
               id="field-label"
               value={selectedField.name}
               onChange={(event) => onUpdateField({ name: event.target.value })}
+              className="dfb-input"
             />
             <p className="dfb-inspector__hint">Human-readable field label.</p>
           </div>
 
           <div>
             <Label htmlFor="field-id">Field ID</Label>
-            <Input id="field-id" value={selectedField.id} disabled />
+            <Input
+              id="field-id"
+              value={selectedField.id}
+              disabled
+              className="dfb-input"
+            />
             <p className="dfb-inspector__hint">
               Managed by backend. IDs are read-only here.
             </p>
@@ -235,20 +241,44 @@ export default function FieldInspector({
                 onUpdateField({ type: value as Field["type"] })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="dfb-select__trigger">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="text">Text</SelectItem>
-                <SelectItem value="number">Number</SelectItem>
-                <SelectItem value="textarea">Textarea</SelectItem>
-                <SelectItem value="file">File</SelectItem>
-                <SelectItem value="select">Select</SelectItem>
-                <SelectItem value="radio">Radio</SelectItem>
-                <SelectItem value="checkbox">Checkbox</SelectItem>
-                <SelectItem value="date">Date</SelectItem>
-                <SelectItem value="section">Section</SelectItem>
-                <SelectItem value="divider">Divider</SelectItem>
+              <SelectContent
+                className="dfb-select__content"
+                position="popper"
+                sideOffset={6}
+              >
+                <SelectItem value="text" className="dfb-select__item">
+                  Text
+                </SelectItem>
+                <SelectItem value="number" className="dfb-select__item">
+                  Number
+                </SelectItem>
+                <SelectItem value="textarea" className="dfb-select__item">
+                  Textarea
+                </SelectItem>
+                <SelectItem value="file" className="dfb-select__item">
+                  File
+                </SelectItem>
+                <SelectItem value="select" className="dfb-select__item">
+                  Select
+                </SelectItem>
+                <SelectItem value="radio" className="dfb-select__item">
+                  Radio
+                </SelectItem>
+                <SelectItem value="checkbox" className="dfb-select__item">
+                  Checkbox
+                </SelectItem>
+                <SelectItem value="date" className="dfb-select__item">
+                  Date
+                </SelectItem>
+                <SelectItem value="section" className="dfb-select__item">
+                  Section
+                </SelectItem>
+                <SelectItem value="divider" className="dfb-select__item">
+                  Divider
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -261,13 +291,23 @@ export default function FieldInspector({
                 onUpdateField({ status: value as Field["status"] })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="dfb-select__trigger">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="readonly">Read only</SelectItem>
-                <SelectItem value="disabled">Disabled</SelectItem>
+              <SelectContent
+                className="dfb-select__content"
+                position="popper"
+                sideOffset={6}
+              >
+                <SelectItem value="default" className="dfb-select__item">
+                  Default
+                </SelectItem>
+                <SelectItem value="readonly" className="dfb-select__item">
+                  Read only
+                </SelectItem>
+                <SelectItem value="disabled" className="dfb-select__item">
+                  Disabled
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -336,6 +376,7 @@ export default function FieldInspector({
               }
               onChange={(event) => onUpdateField({ data: event.target.value })}
               disabled={isStructuralField}
+              className="dfb-input"
             />
             <p className="dfb-inspector__hint">
               {isStructuralField
@@ -381,6 +422,7 @@ export default function FieldInspector({
                       },
                     })
                   }
+                  className="dfb-input"
                 />
               </div>
               <div>
@@ -400,6 +442,7 @@ export default function FieldInspector({
                       },
                     })
                   }
+                  className="dfb-input"
                 />
               </div>
             </div>
@@ -420,6 +463,7 @@ export default function FieldInspector({
                   })
                 }
                 placeholder="^\\w+$"
+                className="dfb-input"
               />
               <p className="dfb-inspector__hint">
                 Optional. Leave blank to remove a pattern constraint.

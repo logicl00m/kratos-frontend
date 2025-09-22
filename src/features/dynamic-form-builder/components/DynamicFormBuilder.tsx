@@ -448,7 +448,7 @@ export function DynamicFormBuilder({
   };
 
   return (
-    <div className="dfb" role="application" onDragEnd={handleDragEnd}>
+    <div className="dfb dfb-skin" role="application" onDragEnd={handleDragEnd}>
       <FieldPalette onFieldDragStart={handleFieldDragStart} />
 
       <div className="dfb__workspace">
