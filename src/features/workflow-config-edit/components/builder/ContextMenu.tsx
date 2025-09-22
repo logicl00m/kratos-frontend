@@ -1,3 +1,10 @@
+/*
+PROMPT (Copilot/GPT-5): Context menu item for forms
+
+- Add menu item “Attach / Edit form” when the target is a process node.
+- Calls onOpenFormConfig(nodeId).
+- Keyboard support: Enter/Space to trigger; aria-haspopup="dialog".
+*/
 // src/features/workflow/components/builder/ContextMenu.tsx
 import React, { useEffect, useRef } from "react";
 import { Copy, Trash2, Edit3, Users } from "lucide-react";
@@ -11,6 +18,8 @@ interface ContextMenuProps {
   onDelete?: () => void;
   onRename?: () => void;
   onAssignPeople?: () => void;
+  onOpenFormConfig?: (nodeId: string) => void; // Added for form config
+  nodeId?: string; // Added to identify the node
   isNode?: boolean;
 }
 
@@ -22,6 +31,8 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   onDelete,
   onRename,
   onAssignPeople,
+  onOpenFormConfig, // Destructure form config prop
+  nodeId, // Receive nodeId
   isNode = true,
 }) => {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -97,6 +108,19 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           >
             <Copy size={14} />
             Duplicate
+          </button>
+          <button
+            className="context-menu-item"
+            onClick={() => {
+              if (nodeId && onOpenFormConfig) {
+                onOpenFormConfig(nodeId);
+              }
+              onClose();
+            }}
+            role="menuitem"
+            aria-haspopup="dialog"
+          >
+            Attach / Edit form
           </button>
         </>
       )}

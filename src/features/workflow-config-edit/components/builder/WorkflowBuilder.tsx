@@ -1,3 +1,18 @@
+/*
+PROMPT (Copilot/GPT-5): Validation incl. Forms coverage
+
+- Extend Validate to include Forms coverage:
+  - Compute withForms / totalProcessNodes.
+  - If any process node lacks data.form, push error: "{stateName} has no form attached".
+  - If any node uses binding=latest, push warning: "{stateName} tracks latest; builds may be non-deterministic" with a “Pin all” quick fix.
+- In the Validate modal/panel, show:
+  - Coverage bar and list of items with “Go to state” links.
+- Export should block when errors exist, allow with warnings.
+
+Notes: “Binding type” and “formRef” patterns mirror Camunda form linking; keep parity so backend can evolve to an engine later.
+Docs: https://docs.camunda.io/docs/components/modeler/web-modeler/advanced-modeling/form-linking/
+*/
+
 // src/features/workflow-config-edit/components/builder/WorkflowBuilder.tsx
 import React, { useState, useCallback, useRef } from "react";
 import ReactFlow, {
@@ -19,10 +34,7 @@ import ProcessNode from "./ProcessNode";
 import DecisionNode from "./DecisionNode";
 import BuilderDetailsPanel from "./BuilderDetailsPanel";
 import ContextMenu from "./ContextMenu";
-import {
-  validateWorkflow,
-  exportToWorkflowJson,
-} from "@features/workflow-config-edit/utils/builderUtils";
+import { validateWorkflowWithForms, exportToWorkflowJson } from "@features/workflow-config-edit/utils/builderUtils";
 import { mockPeople } from "@features/workflow-config-edit/data/mockPeople";
 import type {
   BuilderNodeData,
@@ -126,6 +138,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
     edgeId?: string;
   } | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
+  const [formsCoverage, setFormsCoverage] = useState<{ withForms: number; totalProcessNodes: number }>({ withForms: 0, totalProcessNodes: 0 });
   const [showValidation, setShowValidation] = useState(false);
 
   const onConnect = useCallback(
@@ -215,6 +229,11 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
           center: { label: "Submit" },
           right: { label: "Approve" },
         },
+        onOpenFormConfig: (nodeId: string) => {
+          const node = nodes.find((n) => n.id === nodeId) ?? null;
+          setSelectedNode(node);
+          setSelectedEdge(null);
+        },
       } as ProcessNodeData,
     };
 
@@ -246,12 +265,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
 
   const handleEdgeUpdate = (
     edgeId: string,
-    data: { label: string; operation?: string }
+    data: { label?: string; operation?: string }
   ) => {
     setEdges((current) =>
       current.map((edge) =>
         edge.id === edgeId
-          ? { ...edge, label: data.label, data: { operation: data.operation } }
+          ? { ...edge, label: data.label ?? edge.label, data: { operation: data.operation } }
           : edge
       )
     );
@@ -298,16 +317,20 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
   };
 
   const handleValidate = () => {
-    const errors = validateWorkflow(nodes, edges);
+    const { errors, warnings, coverage } = validateWorkflowWithForms(nodes, edges);
     setValidationErrors(errors);
+    setValidationWarnings(warnings);
+    setFormsCoverage(coverage);
     setShowValidation(true);
   };
 
   const handleExport = () => {
-    const validation = validateWorkflow(nodes, edges);
-    setValidationErrors(validation);
+    const { errors, warnings, coverage } = validateWorkflowWithForms(nodes, edges);
+    setValidationErrors(errors);
+    setValidationWarnings(warnings);
+    setFormsCoverage(coverage);
 
-    if (validation.length > 0) {
+    if (errors.length > 0) {
       setShowValidation(true);
       return;
     }
@@ -427,6 +450,11 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
             onDelete={handleContextDelete}
             onRename={contextMenu.nodeId ? handleContextRename : undefined}
             onAssignPeople={contextMenu.nodeId ? handleContextAssign : undefined}
+            onOpenFormConfig={(nodeId) => {
+              const node = nodes.find((n) => n.id === nodeId) ?? null;
+              setSelectedNode(node);
+              setSelectedEdge(null);
+            }}
             isNode={!!contextMenu.nodeId}
           />
         )}
@@ -444,23 +472,34 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
         />
 
         {showValidation && (
-          <div className="validation-panel" role="status">
+          <div className="validation-panel">
             <div className="validation-header">
               <AlertCircle size={16} />
               Validation {validationErrors.length > 0 ? "Failed" : "Passed"}
               <button onClick={() => setShowValidation(false)}>Close</button>
             </div>
-            {validationErrors.length > 0 ? (
-              <ul className="validation-errors">
-                {validationErrors.map((error) => (
-                  <li key={error}>{error}</li>
-                ))}
-              </ul>
-            ) : (
-              <div className="validation-success">
-                Workflow is valid and ready for export.
+            <div className="validation-body">
+              <div className="coverage-row" aria-live="polite">
+                Forms coverage: {formsCoverage.withForms}/{formsCoverage.totalProcessNodes}
               </div>
-            )}
+              {validationErrors.length > 0 && (
+                <ul className="validation-errors">
+                  {validationErrors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
+                </ul>
+              )}
+              {validationWarnings.length > 0 && (
+                <ul className="validation-warnings">
+                  {validationWarnings.map((w) => (
+                    <li key={w}>{w}</li>
+                  ))}
+                </ul>
+              )}
+              {validationErrors.length === 0 && validationWarnings.length === 0 && (
+                <div className="validation-success">Workflow is valid and ready for export.</div>
+              )}
+            </div>
           </div>
         )}
       </div>

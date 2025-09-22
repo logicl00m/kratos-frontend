@@ -1,6 +1,25 @@
+/*
+PROMPT (Copilot/GPT-5): BuilderDetailsPanel → Form section
+
+Create a new Form section with these controls:
+
+- Attach existing: searchable combobox for forms (name + @vX).
+  - Data source: GET /api/forms?query= (to be stubbed now).
+  - Selection updates node.data.form (id, name, version).
+- Binding: radio Pinned (vX) / Track latest. Default Pinned.
+- Create new: button opens DynamicFormBuilder in a drawer/modal.
+  - On save, return { id, name, version, json }; attach to node; close drawer.
+- Require to transition: toggle bound to node.data.requireFormToTransition.
+- Preview: read-only preview using existing form builder preview component.
+- Form JSON viewer: collapsible panel showing the saved JSON (for debugging).
+- Validation hints: when no form attached, show inline error and a “Quick attach” CTA.
+
+A11y: labels tied to inputs; helper text via aria-describedby. Follow WAI forms labelling guidance.
+Docs: https://www.w3.org/WAI/tutorials/forms/labels/
+*/
 // src/features/workflow/components/builder/BuilderDetailsPanel.tsx
-import React, { useState } from "react";
-import { X, Users, Plus, Trash2, Eye, Edit3 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { X, Users, Plus, Trash2, Eye, Edit3, FileText } from "lucide-react";
 import type { Node, Edge } from "reactflow";
 import type {
   ProcessNodeData,
@@ -8,13 +27,15 @@ import type {
   Person,
 } from "@features/workflow-config-edit/types/builder.types";
 import "./BuilderDetailsPanel.css";
+import { searchForms } from "@features/workflow-config-edit/services/formsApi";
+import { DynamicFormBuilder } from "@features/dynamic-form-builder/components/DynamicFormBuilder";
 
 interface BuilderDetailsPanelProps {
   selectedNode: Node | null;
   selectedEdge: Edge | null;
   onClose: () => void;
-  onNodeUpdate: (nodeId: string, data: any) => void;
-  onEdgeUpdate: (edgeId: string, data: any) => void;
+  onNodeUpdate: (nodeId: string, data: ProcessNodeData | DecisionNodeData) => void;
+  onEdgeUpdate: (edgeId: string, data: { label?: string; operation?: string }) => void;
   onViewForm?: (nodeId: string) => void;
   availablePeople: Person[];
 }
@@ -30,8 +51,11 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAssigneeDropdown, setShowAssigneeDropdown] = useState(false);
+  const [formQuery, setFormQuery] = useState("");
+  const [formResults, setFormResults] = useState<Array<{ id: string; name: string; version: number }>>([]);
+  const [showFormDrawer, setShowFormDrawer] = useState(false);
 
-  if (!selectedNode && !selectedEdge) return null;
+  type ActionSide = "left" | "center" | "right";
 
   const nodeData = selectedNode?.data;
   const isProcessNode = selectedNode?.type === "process";
@@ -47,7 +71,7 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
   const handleAddAssignee = (person: Person) => {
     if (selectedNode && nodeData) {
       const currentAssignees = nodeData.assignees || [];
-      if (!currentAssignees.find((a) => a.id === person.id)) {
+      if (!currentAssignees.find((a: Person) => a.id === person.id)) {
         onNodeUpdate(selectedNode.id, {
           ...nodeData,
           assignees: [...currentAssignees, person],
@@ -62,13 +86,13 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
     if (selectedNode && nodeData) {
       onNodeUpdate(selectedNode.id, {
         ...nodeData,
-        assignees: nodeData.assignees.filter((a) => a.id !== personId),
+        assignees: nodeData.assignees.filter((a: Person) => a.id !== personId),
       });
     }
   };
 
   const handleActionUpdate = (
-    side: "left" | "center" | "right",
+    side: ActionSide,
     field: "label" | "operation",
     value: string
   ) => {
@@ -129,7 +153,29 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return (
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        if (!formQuery) {
+          setFormResults([]);
+          return;
+        }
+        const res = await searchForms(formQuery);
+        if (!cancelled) setFormResults(res);
+      } catch {
+        if (!cancelled) setFormResults([]);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [formQuery]);
+
+  const nothingSelected = !selectedNode && !selectedEdge;
+
+  return nothingSelected ? null : (
     <div className="builder-detail-panel">
       <div className="panel-header">
         <h3 className="panel-title">
@@ -151,8 +197,9 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                 </button>
               </div>
               <div className="field-group">
-                <label>State Name</label>
+                <label htmlFor="state-name-input">State Name</label>
                 <input
+                  id="state-name-input"
                   type="text"
                   value={nodeData?.label || ""}
                   onChange={(e) =>
@@ -165,10 +212,11 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                 />
               </div>
               <div className="field-group">
-                <label>Internal ID (optional)</label>
+                <label htmlFor="state-internal-id">Internal ID (optional)</label>
                 <input
+                  id="state-internal-id"
                   type="text"
-                  value={(nodeData as any)?.internalId || ""}
+                  value={(nodeData as ProcessNodeData | DecisionNodeData)?.internalId || ""}
                   onChange={(e) =>
                     onNodeUpdate(selectedNode.id, {
                       ...nodeData,
@@ -204,23 +252,21 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                     className="search-input"
                     autoFocus
                   />
-                  <div className="assignee-list">
-                    {filteredPeople.map((person) => (
-                      <div
-                        key={person.id}
-                        onClick={() => handleAddAssignee(person)}
-                        className="assignee-item"
-                      >
-                        <span>{person.name}</span>
-                        <span className="assignee-type">{person.type}</span>
-                      </div>
+                  <ul className="assignee-list">
+                    {filteredPeople.map((person: Person) => (
+                      <li key={person.id} className="assignee-item">
+                        <button type="button" onClick={() => handleAddAssignee(person)}>
+                          <span>{person.name}</span>
+                          <span className="assignee-type">{person.type}</span>
+                        </button>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               )}
 
               <div className="assignee-chips">
-                {nodeData?.assignees?.map((person) => (
+                {nodeData?.assignees?.map((person: Person) => (
                   <div key={person.id} className="assignee-chip">
                     <span>{person.name}</span>
                     <button onClick={() => handleRemoveAssignee(person.id)}>
@@ -265,11 +311,7 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                           placeholder="Action label"
                           value={action?.label || ""}
                           onChange={(e) =>
-                            handleActionUpdate(
-                              side as any,
-                              "label",
-                              e.target.value
-                            )
+                            handleActionUpdate(side as "left" | "center" | "right", "label", e.target.value)
                           }
                           className="input-field"
                         />
@@ -277,11 +319,7 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                           placeholder="Operation/description"
                           value={action?.operation || ""}
                           onChange={(e) =>
-                            handleActionUpdate(
-                              side as any,
-                              "operation",
-                              e.target.value
-                            )
+                            handleActionUpdate(side as "left" | "center" | "right", "operation", e.target.value)
                           }
                           className="textarea-field"
                           rows={2}
@@ -294,6 +332,116 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {isProcessNode && (
+              <div className="section">
+                <div className="section-header">
+                  <span className="section-title"><FileText size={14} /> Form</span>
+                </div>
+                <div className="field-group">
+                  <label htmlFor="builder-form-search">Attach existing</label>
+                  <input
+                    id="builder-form-search"
+                    type="text"
+                    value={formQuery}
+                    onChange={(e) => setFormQuery(e.target.value)}
+                    placeholder="Search forms (name)"
+                    className="input-field"
+                    aria-describedby="builder-form-help"
+                  />
+                  <div id="builder-form-help" className="help-text">Search by name; latest first.</div>
+                  {formResults.length > 0 && (
+                    <ul className="combobox-list">
+                      {formResults.map((f) => (
+                        <li key={`${f.id}@${f.version}`}>
+                          <button
+                            type="button"
+                            className="combobox-item"
+                            onClick={() => {
+                              if (!selectedNode) return;
+                              const data = nodeData as ProcessNodeData;
+                              onNodeUpdate(selectedNode.id, {
+                                ...data,
+                                form: { id: f.id, name: f.name, version: f.version, binding: 'pinned' },
+                              });
+                              setFormQuery("");
+                              setFormResults([]);
+                            }}
+                          >
+                            {f.name}@v{f.version}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                <div className="field-group">
+                  <span className="label">Binding</span>
+                  <div className="radio-row" role="radiogroup" aria-label="Form binding">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name="form-binding"
+                        checked={(nodeData as ProcessNodeData).form?.binding !== 'latest'}
+                        onChange={() => {
+                          const data = nodeData as ProcessNodeData;
+                          if (!data.form || !selectedNode) return;
+                          onNodeUpdate(selectedNode.id, { ...data, form: { ...data.form, binding: 'pinned' } });
+                        }}
+                      />
+                      <span>
+                        Pinned {(nodeData as ProcessNodeData).form ? `(v${(nodeData as ProcessNodeData).form!.version})` : ''}
+                      </span>
+                    </label>
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name="form-binding"
+                        checked={(nodeData as ProcessNodeData).form?.binding === 'latest'}
+                        onChange={() => {
+                          const data = nodeData as ProcessNodeData;
+                          if (!data.form || !selectedNode) return;
+                          onNodeUpdate(selectedNode.id, { ...data, form: { ...data.form, binding: 'latest' } });
+                        }}
+                      />
+                      <span>Track latest</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="builder-require-form">Require to transition</label>
+                  <input
+                    id="builder-require-form"
+                    type="checkbox"
+                    checked={Boolean((nodeData as ProcessNodeData).requireFormToTransition)}
+                    onChange={(e) => {
+                      const data = nodeData as ProcessNodeData;
+                      if (!selectedNode) return;
+                      onNodeUpdate(selectedNode.id, { ...data, requireFormToTransition: e.target.checked });
+                    }}
+                  />
+                </div>
+
+                <div className="field-group">
+                  <button type="button" className="action-btn" onClick={() => setShowFormDrawer(true)}>
+                    <Plus size={14} /> Create new
+                  </button>
+                </div>
+
+                {(nodeData as ProcessNodeData).form && (
+                  <div className="field-group">
+                    <div className="json-viewer">
+                      <details>
+                        <summary>Form JSON</summary>
+                        <pre aria-label="Form JSON preview">{JSON.stringify((nodeData as ProcessNodeData).form, null, 2)}</pre>
+                      </details>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -363,11 +511,12 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
         )}
 
         {selectedEdge && (
-          <div className="section">
+            <div className="section">
             <div className="section-title">Edge Configuration</div>
             <div className="field-group">
-              <label>Action Label</label>
+              <label htmlFor="edge-action-label">Action Label</label>
               <input
+                id="edge-action-label"
                 type="text"
                 value={(selectedEdge.label as string) || ""}
                 onChange={(e) =>
@@ -377,8 +526,9 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
               />
             </div>
             <div className="field-group">
-              <label>Operation</label>
+              <label htmlFor="edge-operation">Operation</label>
               <textarea
+                id="edge-operation"
                 value={selectedEdge.data?.operation || ""}
                 onChange={(e) =>
                   onEdgeUpdate(selectedEdge.id, { operation: e.target.value })
@@ -390,6 +540,34 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
           </div>
         )}
       </div>
+
+      {showFormDrawer && (
+        <div className="drawer-overlay" aria-label="Create form">
+          <div className="drawer-panel">
+            <div className="drawer-header">
+              <h4>Create form</h4>
+              <button onClick={() => setShowFormDrawer(false)} aria-label="Close form drawer">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="drawer-body">
+              <DynamicFormBuilder
+                onSave={(form) => {
+                  if (selectedNode && isProcessNode) {
+                    const data = nodeData as ProcessNodeData;
+                    onNodeUpdate(selectedNode.id, {
+                      ...data,
+                      form: { id: form.id!, name: form.name, version: form.version!, binding: 'pinned' },
+                    });
+                  }
+                  setShowFormDrawer(false);
+                }}
+                onCancel={() => setShowFormDrawer(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

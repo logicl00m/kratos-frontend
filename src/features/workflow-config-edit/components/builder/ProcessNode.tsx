@@ -2,14 +2,32 @@
 import React from "react";
 import { Handle, Position } from "reactflow";
 import type { NodeProps } from "reactflow";
-import { Users, User } from "lucide-react";
+import { Users, User, FileText } from "lucide-react";
 import type { ProcessNodeData } from "@features/workflow-config-edit/types/builder.types";
 import "./ProcessNode.css";
 
-const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
-  data,
-  selected,
-}) => {
+/*
+PROMPT (Copilot/GPT-5): Form chip + actions
+
+- Add a compact Form chip in the node body.
+  - If data.form exists, show: Form: ${name}@v${version} with a tooltip “binding: pinned|latest”.
+  - If absent, show a gray “Form: Not connected”.
+- Clicking the chip opens the BuilderDetailsPanel scrolled to the Form section for this node.
+- Right-click context menu: add “Attach / Edit form” → same behavior.
+- Props/Events needed:
+  - onOpenFormConfig(nodeId: string): void
+- Accessibility:
+  - Chip is a <button> with aria-label="Attach or edit form for {stateName}".
+- Tests (Jest):
+  - renders with form
+  - renders without
+  - click opens panel
+
+A11y: Avoid color-only meaning; include icon + text per WCAG 1.4.1.
+Docs: https://www.w3.org/TR/WCAG22/
+*/
+
+const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({ data, selected, id }) => {
   const getAssigneeIcon = () => {
     if (data.assignees.length === 0) return null;
     if (data.assignees.length === 1) {
@@ -99,6 +117,22 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
           )}
         </div>
       )}
+
+      {/* Form chip */}
+      <div className="node-form-chip-wrap">
+        <button
+          type="button"
+          className={`form-chip ${data.form ? 'connected' : 'disconnected'}`}
+          aria-label={`Attach or edit form for ${data.label}`}
+          title={data.form ? `binding: ${data.form.binding}` : 'Form: Not connected'}
+          onClick={() => data.onOpenFormConfig?.(id)}
+        >
+          <FileText size={14} aria-hidden="true" />
+          <span className="form-chip-text">
+            {data.form ? `Form: ${data.form.name}@v${data.form.version}` : 'Form: Not connected'}
+          </span>
+        </button>
+      </div>
     </div>
   );
 };

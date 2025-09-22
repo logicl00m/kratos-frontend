@@ -4,7 +4,9 @@ import type {
   ProcessNodeData,
   DecisionNodeData,
   WorkflowBuilderConfig,
+  WorkflowValidationResult,
 } from "@features/workflow-config-edit/types/builder.types";
+import { selectFormsCoverage } from "@features/workflow-config-edit/state/workflowSelectors";
 
 /**
  * Basic validation helpers for the visual builder.
@@ -56,6 +58,36 @@ export function validateWorkflow(
   });
 
   return errors;
+}
+
+export function validateWorkflowWithForms(
+  nodes: Node<BuilderNodeData>[],
+  edges: Edge<unknown>[]
+): WorkflowValidationResult {
+  const baseErrors = validateWorkflow(nodes, edges);
+  const { withForms, total } = selectFormsCoverage(nodes);
+
+  const errors = [...baseErrors];
+  const warnings: string[] = [];
+
+  // Each process node must have a form
+  nodes.forEach((node) => {
+    if (node.type === 'process') {
+      const data = node.data as ProcessNodeData;
+      if (!data.form) {
+        errors.push(`${data.label ?? node.id} has no form attached`);
+      } else if (data.form.binding === 'latest') {
+        warnings.push(`${data.label ?? node.id} tracks latest; builds may be non-deterministic`);
+      }
+    }
+  });
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    warnings,
+    coverage: { withForms, totalProcessNodes: total },
+  };
 }
 
 /**

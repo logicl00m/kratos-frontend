@@ -1,3 +1,15 @@
+/*
+PROMPT (Copilot/GPT-5): Headless drawer API + Preview
+
+- Expose a headless API for the builder when shown in a drawer:
+  - Props: initialForm?: FormDTO, onSave(form: FormDTO), onCancel().
+  - FormDTO: { id?: string; name: string; version?: number; json: object }.
+- On Save: POST to /api/forms (mock), receive {id, version}; call onSave({id, name, version, json}).
+- Provide a Preview tab (read-only) that the BuilderDetailsPanel can reuse.
+- Respect labels/aria for all fields (tie to FieldInspector config).
+Docs: https://www.w3.org/WAI/tutorials/forms/labels/
+*/
+
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +19,7 @@ import FieldList from "./FieldList";
 import FieldInspector from "./FieldInspector";
 import type { Field, FormConfig } from "../types/form-builder.types";
 import "../dynamic-form-builder.css";
+import { createForm, type FormDTO } from "@features/workflow-config-edit/services/formsApi";
 
 type ContextMenuState = {
   field: Field;
@@ -120,8 +133,14 @@ const adjustContextMenuPosition = (x: number, y: number) => {
   };
 };
 
-export function DynamicFormBuilder() {
-  const [formName, setFormName] = useState("applicationCore");
+export interface DynamicFormBuilderProps {
+  initialForm?: FormDTO;
+  onSave?: (form: FormDTO) => void;
+  onCancel?: () => void;
+}
+
+export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFormBuilderProps) {
+  const [formName, setFormName] = useState(initialForm?.name ?? "applicationCore");
   const [fields, setFields] = useState<Field[]>(INITIAL_FIELDS);
   const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [draggedFieldType, setDraggedFieldType] = useState<Field["type"] | null>(null);
@@ -327,23 +346,32 @@ export function DynamicFormBuilder() {
     input.click();
   };
 
-  const saveConfiguration = () => {
-    const payload: FormConfig = {
-      [formName]: {
-        fields,
+  const saveConfiguration = async () => {
+    // Translate internal state to FormDTO
+    const dto: FormDTO = {
+      id: initialForm?.id,
+      name: formName,
+      version: initialForm?.version,
+      json: {
+        [formName]: {
+          fields,
+        },
       },
     };
 
-    console.log("Form configuration ready to save", payload);
-    setSaveFeedback("Configuration prepared. Submit to your backend from here.");
+    try {
+      const saved = await createForm(dto);
+      onSave?.({ id: saved.id, name: saved.name, version: saved.version, json: saved.json as Record<string, unknown> });
+      setSaveFeedback(`Saved ${saved.name}@v${saved.version}`);
+    } catch (e) {
+      console.error(e);
+      setSaveFeedback('Failed to save form');
+    }
 
     if (saveFeedbackTimeout.current) {
       window.clearTimeout(saveFeedbackTimeout.current);
     }
-
-    saveFeedbackTimeout.current = window.setTimeout(() => {
-      setSaveFeedback(null);
-    }, 3000);
+    saveFeedbackTimeout.current = window.setTimeout(() => setSaveFeedback(null), 2500);
   };
 
   const handleFieldContextMenu = (field: Field, index: number, position: { x: number; y: number }) => {
@@ -405,6 +433,16 @@ export function DynamicFormBuilder() {
                 <Save size={16} />
                 Save
               </Button>
+              {onCancel && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onCancel}
+                  className="dfb__actions-button dfb__actions-button--ghost"
+                >
+                  Cancel
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
