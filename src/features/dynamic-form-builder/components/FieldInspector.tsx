@@ -280,6 +280,31 @@ export default function FieldInspector({
               disabled={isStructuralField}
               options={allowedActions}
             />
+            {/* Also render quick toggles for accessibility and faster edits */}
+            <div className="dfb-inspector__grid" style={{ marginTop: 8 }}>
+              {allowedActions.map((option) => {
+                const checked = fieldActions.includes(option.value);
+                return (
+                  <div key={option.value} className="dfb-inspector__row">
+                    <span className="dfb-inspector__hint">{option.label}</span>
+                    <Switch
+                      aria-label={`Toggle ${option.value}`}
+                      checked={checked}
+                      onCheckedChange={(next) => {
+                        if (next && !checked) {
+                          handleActionsChange([...fieldActions, option.value]);
+                        } else if (!next && checked) {
+                          handleActionsChange(
+                            fieldActions.filter((a) => a !== option.value)
+                          );
+                        }
+                      }}
+                      disabled={isStructuralField}
+                    />
+                  </div>
+                );
+              })}
+            </div>
             <div className="dfb-inspector__action-tags">
               {fieldActions.length ? (
                 fieldActions.map((action) => (
@@ -463,6 +488,7 @@ export default function FieldInspector({
               variant="outline"
               size="sm"
               className="dfb-inspector__option-add"
+              aria-label="Add Option"
             >
               <Plus size={14} aria-hidden />
               Add option
@@ -472,7 +498,12 @@ export default function FieldInspector({
       )}
       <footer className="dfb-inspector__footer">
         <div className="dfb-inspector__actions">
-          <Button variant="outline" size="sm" onClick={onPreview}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onPreview}
+            aria-label="Preview"
+          >
             Preview changes
           </Button>
         </div>

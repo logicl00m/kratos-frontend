@@ -14,7 +14,11 @@ interface FieldListProps {
   onDrop: (event: React.DragEvent, index: number) => void;
   onDeleteField: (index: number) => void;
   onDuplicateField: (index: number) => void;
-  onFieldContextMenu: (field: Field, index: number, position: { x: number; y: number }) => void;
+  onFieldContextMenu: (
+    field: Field,
+    index: number,
+    position: { x: number; y: number }
+  ) => void;
   dragOverIndex: number | null;
 }
 
@@ -29,7 +33,7 @@ export default function FieldList({
   onDuplicateField,
   onFieldContextMenu,
   dragOverIndex,
-}: FieldListProps) {
+}: Readonly<FieldListProps>) {
   return (
     <Card className="dfb-field-list">
       <div className="dfb-field-list__header">
@@ -40,18 +44,23 @@ export default function FieldList({
         <span className="dfb-field-list__hint">{fields.length} fields</span>
       </div>
 
-      <div>
+      <ul
+        aria-label="Fields list"
+        style={{ listStyle: "none", margin: 0, padding: 0 }}
+      >
         {fields.map((field, index) => (
-          <div
+          <li
             key={field.id}
             draggable
             onDragStart={() => onFieldReorderStart(index)}
             onDragOver={(event) => onDragOver(event, index)}
             onDrop={(event) => onDrop(event, index)}
-            onClick={() => onFieldSelect(field)}
             onContextMenu={(event) => {
               event.preventDefault();
-              onFieldContextMenu(field, index, { x: event.clientX, y: event.clientY });
+              onFieldContextMenu(field, index, {
+                x: event.clientX,
+                y: event.clientY,
+              });
             }}
             className={cn(
               "dfb-field-item",
@@ -60,12 +69,19 @@ export default function FieldList({
             )}
           >
             <GripVertical className="dfb-field-item__handle" size={16} />
-            <div className="dfb-field-item__name">
+            <button
+              type="button"
+              className="dfb-field-item__name"
+              onClick={() => onFieldSelect(field)}
+              aria-label={`Select ${field.name} field`}
+            >
               <span>{field.name}</span>
               <span className="dfb-field-item__badge">{field.type}</span>
-            </div>
+            </button>
             <div className="dfb-field-item__meta-group">id: {field.id}</div>
-            <div className="dfb-field-item__meta-group">data: {field.data || "(unbound)"}</div>
+            <div className="dfb-field-item__meta-group">
+              data: {field.data || "(unbound)"}
+            </div>
             <div className="dfb-field-item__tags">
               {field.fieldActions.map((action) => (
                 <span key={action} className="dfb-field-item__tag">
@@ -78,6 +94,7 @@ export default function FieldList({
                 size="sm"
                 variant="ghost"
                 aria-label={`Duplicate ${field.name}`}
+                title={`Duplicate ${field.name}`}
                 onClick={(event) => {
                   event.stopPropagation();
                   onDuplicateField(index);
@@ -89,6 +106,7 @@ export default function FieldList({
                 size="sm"
                 variant="ghost"
                 aria-label={`Delete ${field.name}`}
+                title={`Delete ${field.name}`}
                 onClick={(event) => {
                   event.stopPropagation();
                   onDeleteField(index);
@@ -97,9 +115,9 @@ export default function FieldList({
                 <Trash2 size={16} aria-hidden />
               </Button>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </Card>
   );
 }

@@ -108,12 +108,25 @@ function FieldContextMenu({
   onEdit,
   onDuplicate,
   onDelete,
-}: FieldContextMenuProps) {
+}: Readonly<FieldContextMenuProps>) {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Escape") {
+      // Close is handled by outside listener in parent via window click; no-op here
+      (event.currentTarget as HTMLDivElement).blur();
+    }
+    if (event.key === "Enter") {
+      // Activate first item by default
+      onEdit();
+    }
+  };
   return (
     <div
       className="dfb-context-menu"
       style={{ top: position.y, left: position.x }}
       role="menu"
+      tabIndex={0}
+      aria-label="Field actions"
+      onKeyDown={handleKeyDown}
       onClick={(event) => event.stopPropagation()}
       onContextMenu={(event) => event.preventDefault()}
     >
@@ -168,7 +181,7 @@ export function DynamicFormBuilder({
   initialForm,
   onSave,
   onCancel,
-}: DynamicFormBuilderProps) {
+}: Readonly<DynamicFormBuilderProps>) {
   const [formName, setFormName] = useState(
     initialForm?.name ?? "applicationCore"
   );
@@ -274,7 +287,7 @@ export function DynamicFormBuilder({
   };
 
   const addField = () => {
-    const newField = createField("text");
+    const newField = { ...createField("text"), name: "New Field" };
     setFields((current) => [...current, newField]);
     setSelectedField(newField);
   };
@@ -435,7 +448,7 @@ export function DynamicFormBuilder({
   };
 
   return (
-    <div className="dfb" onDragEnd={handleDragEnd}>
+    <div className="dfb" role="application" onDragEnd={handleDragEnd}>
       <FieldPalette onFieldDragStart={handleFieldDragStart} />
 
       <div className="dfb__workspace">
@@ -509,13 +522,9 @@ export function DynamicFormBuilder({
             </div>
 
             {saveFeedback && (
-              <div
-                className="dfb__save-feedback"
-                role="status"
-                aria-live="polite"
-              >
+              <output className="dfb__save-feedback" aria-live="polite">
                 {saveFeedback}
-              </div>
+              </output>
             )}
           </div>
 
@@ -538,7 +547,7 @@ export function DynamicFormBuilder({
             className="dfb__add-button"
           >
             <Plus size={16} />
-            Add field
+            Add Field
           </Button>
         </div>
       </div>
@@ -550,27 +559,16 @@ export function DynamicFormBuilder({
       />
 
       {isPreviewOpen && (
-        <div
-          className="dfb-preview"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Form preview"
-        >
-          <div
+        <dialog className="dfb-preview" open aria-label="Form preview">
+          <button
+            type="button"
             className="dfb-preview__backdrop"
+            aria-label="Close preview"
             onClick={() => setIsPreviewOpen(false)}
           />
           <div className="dfb-preview__panel">
             <div className="dfb-preview__heading">
               <h3 className="dfb-preview__title">{formName} preview</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsPreviewOpen(false)}
-                className="dfb__actions-button dfb__actions-button--ghost"
-              >
-                Close
-              </Button>
             </div>
             <p className="dfb-inspector__subtitle">
               Review how this configuration will export and appear to end users.
@@ -629,7 +627,7 @@ export function DynamicFormBuilder({
               </Button>
             </div>
           </div>
-        </div>
+        </dialog>
       )}
 
       {contextMenu && (
