@@ -9,7 +9,7 @@ type ApplicationRowProps = {
   onSelect: (id: string) => void;
   onClick: (app: LoanApplication) => void;
   getStageColor: (stage: string) => string;
-  getStatusIcon: (status: string) => React.ReactNode;
+  getStatusIcon?: (status: string) => React.ReactNode;
 };
 
 const ApplicationRow: React.FC<ApplicationRowProps> = ({
@@ -20,11 +20,10 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
   getStageColor,
   getStatusIcon,
 }) => {
+  const renderStatusIcon = (status: string) =>
+    typeof getStatusIcon === "function" ? getStatusIcon(status) : null;
   return (
-    <tr
-      key={app.id}
-      className="dashboard-table-row"
-    >
+    <tr key={app.id} className="dashboard-table-row">
       <td className="dashboard-table-cell">
         <input
           type="checkbox"
@@ -41,27 +40,30 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
       </td>
       <td className="dashboard-table-cell">
         <span className="dashboard-table-amount">
-          ৳{app.amount.toLocaleString()}
+          ${app.amount.toLocaleString()}
         </span>
       </td>
       <td className="dashboard-table-cell">
         <span
-          className={`dashboard-table-stage-badge ${getStageColor(
-            app.stage
-          )}`}
+          className={`dashboard-table-stage-badge ${getStageColor(app.stage)}`}
         >
           {app.stage}
         </span>
       </td>
       <td className="dashboard-table-cell">
+        <span className="text-sm dashboard-table-product">{app.product}</span>
+      </td>
+      <td className="dashboard-table-cell">
         <span className="text-sm dashboard-table-assignee">{app.assignee}</span>
       </td>
       <td className="dashboard-table-cell">
-        <span className="text-sm dashboard-table-initiated-by">{app.initiatedBy}</span>
+        <span className="text-sm dashboard-table-initiated-by">
+          {app.initiatedBy}
+        </span>
       </td>
       <td className="dashboard-table-cell">
         <div className="dashboard-table-sla-container">
-          {getStatusIcon(app.slaStatus)}
+          {renderStatusIcon(app.slaStatus)}
           <span
             className={`text-sm dashboard-table-sla-text dashboard-table-sla-${app.slaStatus}`}
           >
@@ -70,12 +72,12 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
         </div>
       </td>
       <td className="dashboard-table-cell">
-        <span className="dashboard-table-docs-badge">
-          {app.docs || 0}
-        </span>
+        <span className="dashboard-table-docs-badge">{app.docs || 0}</span>
       </td>
       <td className="dashboard-table-cell">
-        <span className="text-sm dashboard-table-last-update">{app.lastUpdate}</span>
+        <span className="text-sm dashboard-table-last-update">
+          {app.lastUpdate}
+        </span>
       </td>
       <td className="dashboard-table-cell text-center">
         <button

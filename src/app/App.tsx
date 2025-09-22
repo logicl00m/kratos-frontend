@@ -72,14 +72,16 @@ function App() {
   );
 
   const CreateWorkflowPage = (
-    <CreateWorkflow
-      onBack={() => navigate("/dashboard")}
-      onComplete={(wfConfig) => {
-        setWorkflow(wfConfig as unknown as WorkflowConfig);
-        setJsonText(JSON.stringify(wfConfig, null, 2));
-        navigate("/viewer");
-      }}
-    />
+    <MainLayout title="Create Workflow" onNavigate={handleNavigation}>
+      <CreateWorkflow
+        onBack={() => navigate("/dashboard")}
+        onComplete={(wfConfig) => {
+          setWorkflow(wfConfig as unknown as WorkflowConfig);
+          setJsonText(JSON.stringify(wfConfig, null, 2));
+          navigate("/viewer");
+        }}
+      />
+    </MainLayout>
   );
 
   const FormBuilderRoute = (
