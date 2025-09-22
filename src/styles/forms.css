@@ -1,77 +1,159 @@
 /* Form surfaces and workflow editor tooling styled for the unified aesthetic */
 .form-page {
-  padding: 32px;
+  padding: var(--space-xl);
   display: flex;
   justify-content: center;
+  min-height: 100vh;
+  animation: fadeIn var(--transition-slow) ease-out;
 }
 
 .form-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-md);
   color: var(--text);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--stroke-light);
+  animation: slideDown var(--transition-base) ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .icon-btn {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--panel);
   border: 1px solid var(--stroke);
-  border-radius: 12px;
-  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-md);
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all var(--transition-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .icon-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.icon-btn:hover::before {
+  opacity: 0.1;
+}
+
+.icon-btn:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .form {
   width: 100%;
   max-width: 760px;
   display: grid;
-  gap: 18px;
+  gap: var(--space-lg);
   position: relative;
-  padding-bottom: 80px;
+  padding-bottom: calc(var(--space-3xl) + var(--space-md));
+  animation: fadeInUp var(--transition-slow) ease-out;
+  animation-delay: 0.1s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .form-field {
   display: grid;
-  gap: 8px;
+  gap: var(--space-sm);
+  animation: fadeIn var(--transition-base) ease-out;
+  animation-fill-mode: both;
 }
+
+.form-field:nth-child(1) { animation-delay: 0.05s; }
+.form-field:nth-child(2) { animation-delay: 0.1s; }
+.form-field:nth-child(3) { animation-delay: 0.15s; }
+.form-field:nth-child(4) { animation-delay: 0.2s; }
+.form-field:nth-child(5) { animation-delay: 0.25s; }
 
 .form-field input,
 .form-field select,
 .form-field textarea {
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--panel);
   border: 1px solid var(--stroke);
-  border-radius: 12px;
-  padding: 12px 14px;
-  font-size: 14px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.875rem;
   color: var(--text);
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-inner);
+  transition: all var(--transition-base);
+}
+
+.form-field input::placeholder,
+.form-field select::placeholder,
+.form-field textarea::placeholder {
+  color: var(--muted);
+  transition: opacity var(--transition-fast);
+}
+
+.form-field input:hover,
+.form-field select:hover,
+.form-field textarea:hover {
+  border-color: var(--accent);
+  background: var(--panel-hover);
 }
 
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.form-field input:focus::placeholder,
+.form-field select:focus::placeholder,
+.form-field textarea:focus::placeholder {
+  opacity: 0.5;
 }
 
 .form-field input[aria-invalid="true"],
 .form-field select[aria-invalid="true"],
 .form-field textarea[aria-invalid="true"] {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.16);
+  border-color: var(--danger);
+  box-shadow: 0 0 0 4px var(--danger-bg);
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 .error {
-  color: #b91c1c;
+  color: var(--danger);
   font-weight: 600;
+  font-size: 0.75rem;
+  animation: errorFadeIn var(--transition-fast) ease-out;
+}
+
+@keyframes errorFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .sticky-bar {
@@ -79,34 +161,50 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
+  background: var(--panel);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--stroke);
-  border-radius: 16px;
-  padding: 12px 16px;
+  border-radius: var(--radius-xl);
+  padding: var(--space-md) var(--space-lg);
   display: flex;
-  gap: 10px;
+  gap: var(--space-md);
   justify-content: flex-end;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+  box-shadow: var(--shadow-xl);
+  z-index: 100;
+  animation: slideUp var(--transition-base) ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
 .sheet,
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.32);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
   display: grid;
   place-items: end center;
-  padding: 24px;
+  padding: var(--space-lg);
+  z-index: 1000;
+  animation: fadeIn var(--transition-fast) ease-out;
 }
 
 .sheet-card {
-  width: 560px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 24px 24px 14px 14px;
-  border: 1px solid rgba(208, 215, 230, 0.7);
-  padding: 24px;
-  box-shadow: 0 -24px 48px rgba(15, 23, 42, 0.24);
+  width: min(560px, 90vw);
+  background: var(--panel);
+  border-radius: var(--radius-2xl) var(--radius-2xl) var(--radius-lg) var(--radius-lg);
+  border: 1px solid var(--stroke);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-2xl);
+  animation: slideUpSheet var(--transition-spring) ease-out;
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .sheet-actions {
@@ -121,12 +219,18 @@
 }
 
 .modal-card {
-  width: 560px;
-  background: rgba(255, 255, 255, 0.98);
-  border-radius: 24px;
-  border: 1px solid rgba(208, 215, 230, 0.7);
-  padding: 28px;
-  box-shadow: 0 32px 64px rgba(15, 23, 42, 0.28);
+  width: min(560px, 90vw);
+  background: var(--panel);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--stroke);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-2xl);
+  animation: scaleIn var(--transition-spring) ease-out;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .modal-actions {
@@ -145,11 +249,17 @@
 }
 
 .toast-card {
-  background: #111827;
-  color: #fff;
-  border-radius: 14px;
-  padding: 12px 18px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+  background: var(--text);
+  color: var(--bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  box-shadow: var(--shadow-xl);
+  animation: toastSlideIn var(--transition-spring) ease-out;
+}
+
+@keyframes toastSlideIn {
+  from { transform: translateY(100%) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .palette {

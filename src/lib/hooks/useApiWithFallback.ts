@@ -11,7 +11,6 @@ import type {
 } from '@/lib/api';
 
 // Fallback imports
-import { mockWorkflowData as mockWorkflowRawData } from '@features/dashboard/data/mockWorkflowData';
 import { workflowTemplates } from '@features/workflow-templates/data/workflowTemplates';
 import { runningWorkflowsData, allWorkflows } from '@features/running-workflows/data/runningWorkflows.data';
 import { mockPeople } from '@features/workflow-config-edit/data/mockPeople';
@@ -75,16 +74,18 @@ export const useApiWithFallback = <T>(
  * Hook for dashboard statistics with fallback
  */
 export const useDashboardStats = (filters?: FilterOptions) => {
+  // Use running-workflows as canonical mock source
+  const workflowList = allWorkflows as unknown as WorkflowData[];
   const fallbackStats: DashboardStats = {
-    totalApplications: mockWorkflowRawData.length,
-    pendingApplications: mockWorkflowRawData.filter(w => w.workflow.currentState !== 'Completed').length,
-    approvedApplications: mockWorkflowRawData.filter(w => w.workflow.currentState === 'Completed').length,
+    totalApplications: workflowList.length,
+    pendingApplications: workflowList.filter(w => w.workflow.currentState !== 'Completed').length,
+    approvedApplications: workflowList.filter(w => w.workflow.currentState === 'Completed').length,
     rejectedApplications: 0,
     slaMetrics: {
-      onTime: Math.floor(mockWorkflowRawData.length * 0.6),
-      due: Math.floor(mockWorkflowRawData.length * 0.2),
-      overdue: Math.floor(mockWorkflowRawData.length * 0.1),
-      completed: Math.floor(mockWorkflowRawData.length * 0.1),
+      onTime: Math.floor(workflowList.length * 0.6),
+      due: Math.floor(workflowList.length * 0.2),
+      overdue: Math.floor(workflowList.length * 0.1),
+      completed: Math.floor(workflowList.length * 0.1),
     }
   };
 
@@ -99,22 +100,28 @@ export const useDashboardStats = (filters?: FilterOptions) => {
  * Hook for dashboard applications with fallback
  */
 export const useDashboardApplications = (params?: PaginatedRequest & FilterOptions) => {
-  // Convert mock data to ApplicationInstance format
-  const fallbackApplications: ApplicationInstance[] = mockWorkflowRawData.map((mockData: WorkflowData) => ({
-    id: mockData.workflow.id,
-    workflowId: mockData.workflow.id,
-    currentState: mockData.workflow.currentState,
-    status: mockData.workflow.currentState === 'Completed' ? 'completed' : 'pending',
-    assignee: getCurrentAssignee(mockData.workflow),
-    data: extractFormData(mockData.workflow.forms),
-    history: [],
-    metadata: {
-      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-      updatedAt: mockData.workflow.currentStateEnteredAt,
-      slaStatus: Math.random() > 0.7 ? 'overdue' : Math.random() > 0.5 ? 'due' : 'on-time',
-      priority: Math.random() > 0.7 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low'
-    }
-  }));
+  // Convert running-workflows mock data to ApplicationInstance format
+  const workflowList = allWorkflows as unknown as WorkflowData[];
+  const fallbackApplications: ApplicationInstance[] = workflowList.map((mockData: WorkflowData) => {
+    const status: ApplicationInstance['status'] = mockData.workflow.currentState === 'Completed' ? 'completed' : 'pending';
+    const slaStatus: ApplicationInstance['metadata']['slaStatus'] = status === 'completed' ? 'completed' : 'on-time';
+    const createdAt = new Date(new Date(mockData.workflow.currentStateEnteredAt).getTime() - 48 * 3600 * 1000).toISOString();
+    return {
+      id: mockData.workflow.id,
+      workflowId: mockData.workflow.id,
+      currentState: mockData.workflow.currentState,
+      status,
+      assignee: getCurrentAssignee(mockData.workflow),
+      data: extractFormData(mockData.workflow.forms),
+      history: [],
+      metadata: {
+        createdAt,
+        updatedAt: mockData.workflow.currentStateEnteredAt,
+        slaStatus,
+        priority: 'medium'
+      }
+    };
+  });
 
   const fallbackResponse = {
     data: fallbackApplications,
@@ -323,7 +330,7 @@ export const useForms = (params?: PaginatedRequest) => {
  * Hook for single workflow instance with fallback
  */
 export const useWorkflowInstance = (instanceId: string) => {
-  const mockData = mockWorkflowRawData.find(w => w.workflow.id === instanceId);
+  const mockData = (allWorkflows as unknown as WorkflowData[]).find(w => w.workflow.id === instanceId);
   
   const fallbackInstance: ApplicationInstance | null = mockData ? {
     id: mockData.workflow.id,
@@ -336,8 +343,8 @@ export const useWorkflowInstance = (instanceId: string) => {
     metadata: {
       createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
       updatedAt: mockData.workflow.currentStateEnteredAt,
-      slaStatus: Math.random() > 0.7 ? 'overdue' : Math.random() > 0.5 ? 'due' : 'on-time',
-      priority: Math.random() > 0.7 ? 'high' : Math.random() > 0.5 ? 'medium' : 'low'
+      slaStatus: (mockData.workflow.currentState === 'Completed' ? 'completed' : 'on-time'),
+      priority: 'medium'
     }
   } : null;
 
@@ -373,6 +380,31 @@ function extractFormData(forms: Record<string, { fields?: Array<{ id: string; da
         // Type guard to ensure we only store valid types
         if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || (typeof value === 'object' && value !== null)) {
           data[field.id] = value;
+
+          // Alias legacy ids from running-workflows mock to normalized keys expected by Dashboard
+          const idLower = field.id.toLowerCase();
+          if (idLower === 'applicantlegalname' && typeof value === 'string') {
+            data['applicantName'] = value;
+          }
+          if (
+            (
+              idLower === 'requestedamount' ||
+              idLower === 'amount' ||
+              idLower === 'principalamount' ||
+              idLower === 'fundingamount' ||
+              idLower === 'totalamountrequested' ||
+              idLower === 'requestamount'
+            )
+          ) {
+            if (typeof value === 'number') data['loanAmount'] = value;
+            else if (typeof value === 'string') {
+              const n = Number(value.replace(/[^0-9.]/g, ''));
+              if (!Number.isNaN(n)) data['loanAmount'] = n;
+            }
+          }
+          if (idLower === 'loanamount') {
+            data['loanAmount'] = value as number;
+          }
         }
       });
     }

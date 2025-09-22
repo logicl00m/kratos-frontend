@@ -8,7 +8,6 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
   ConnectionMode,
-  MarkerType,
   Panel,
 } from "reactflow";
 import type { Node, Edge, Connection } from "reactflow";
@@ -21,6 +20,7 @@ import OrthogonalEdge from "./OrthogonalEdge";
 import DetailPanel from "./DetailPanel";
 import { exportGraphToJson } from "@features/workflow/utils/graphExport";
 import { getLayoutedElements } from "@features/workflow/utils/autoLayout";
+import GraphToolbar from "./GraphToolbar";
 
 const nodeTypes = {
   stateNode: StateNode,
@@ -94,12 +94,9 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   const exportGraph = () => exportGraphToJson(exportData);
 
   const onLayout = useCallback(
-    (direction?: 'TB' | 'LR') => {
-      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-        nodes,
-        edges,
-        direction
-      );
+    (direction?: "TB" | "LR") => {
+      const { nodes: layoutedNodes, edges: layoutedEdges } =
+        getLayoutedElements(nodes, edges, direction);
 
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
@@ -108,7 +105,14 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   );
 
   return (
-    <div style={{ width: "100%", height: "calc(100vh - 120px)", position: "relative" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "calc(100vh - 120px)",
+        position: "relative",
+      }}
+    >
+      <GraphToolbar onExport={exportGraph} />
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -128,22 +132,20 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
         }}
         elevateEdgesOnSelect={true}
         defaultEdgeOptions={{
-          type: 'step',
-          pathfindingRadius: 2000,
+          type: "step",
           updatable: true,
-          selectable: true,
           focusable: true,
           style: {
             strokeWidth: 2,
-            cursor: 'pointer',
+            cursor: "pointer",
           },
           labelStyle: {
-            fill: '#1f2937',
+            fill: "#1f2937",
             fontWeight: 600,
             fontSize: 14,
           },
           labelBgStyle: {
-            fill: '#ffffff',
+            fill: "#ffffff",
             fillOpacity: 1,
           },
         }}
@@ -166,34 +168,43 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
         />
 
         <Panel position="top-right">
-          <div style={{ display: 'flex', gap: '8px', background: 'white', padding: '8px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              background: "white",
+              padding: "8px",
+              borderRadius: "4px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
             <button
-              onClick={() => onLayout('TB')}
+              onClick={() => onLayout("TB")}
               style={{
-                padding: '6px 12px',
-                background: '#6366f1',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: '500'
+                padding: "6px 12px",
+                background: "#6366f1",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "500",
               }}
               title="Auto Layout - Top to Bottom"
             >
               Auto Layout ↓
             </button>
             <button
-              onClick={() => onLayout('LR')}
+              onClick={() => onLayout("LR")}
               style={{
-                padding: '6px 12px',
-                background: '#6366f1',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: '500'
+                padding: "6px 12px",
+                background: "#6366f1",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "500",
               }}
               title="Auto Layout - Left to Right"
             >
@@ -202,14 +213,14 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
             <button
               onClick={exportGraph}
               style={{
-                padding: '6px 12px',
-                background: '#10b981',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px',
-                fontWeight: '500'
+                padding: "6px 12px",
+                background: "#10b981",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "500",
               }}
               title="Export Graph"
             >

@@ -1,4 +1,4 @@
-import type { Node, Edge } from "reactflow";
+ import type { Node, Edge } from "reactflow";
 import type {
   WorkflowData,
   WorkflowHistoryEntry,
@@ -184,6 +184,19 @@ export function getAllHistory(workflow: WorkflowData): WorkflowHistoryEntry[] {
   );
 }
 
+/**
+ * Returns history entries that are relevant to a specific state.
+ * Includes transitions either into or out of the given state.
+ */
+export function getHistoryForState(
+  workflow: WorkflowData,
+  stateId: string
+): WorkflowHistoryEntry[] {
+  return getAllHistory(workflow).filter(
+    (entry) => entry.stateFrom === stateId || entry.stateTo === stateId
+  );
+}
+
 export function getWorkflowFormData(workflow: WorkflowData): Record<string, unknown> {
   const currentState = workflow.workflow.currentState;
   const formData: Record<string, unknown> = {};
@@ -195,6 +208,35 @@ export function getWorkflowFormData(workflow: WorkflowData): Record<string, unkn
     : Object.keys(forms).map((name) => ({ formName: name }));
 
   formRefs.forEach((formRef) => {
+    const form = forms[formRef.formName];
+    if (!form?.fields) return;
+
+    form.fields.forEach((field) => {
+      formData[field.id] = field.data;
+    });
+  });
+
+  return formData;
+}
+
+/**
+ * Returns form data specific to a given state by aggregating the fields
+ * of the forms referenced by that state. If the state does not reference
+ * any forms, an empty object is returned (node-specific view).
+ */
+export function getFormDataForState(
+  workflow: WorkflowData,
+  stateId: string
+): Record<string, unknown> {
+  const formData: Record<string, unknown> = {};
+  const forms = workflow.workflow.forms || {};
+  const stateConfig = workflow.workflow.states[stateId];
+
+  if (!stateConfig?.forms?.length) {
+    return formData; // show nothing if state has no forms (node-specific)
+  }
+
+  stateConfig.forms.forEach((formRef) => {
     const form = forms[formRef.formName];
     if (!form?.fields) return;
 

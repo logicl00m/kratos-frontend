@@ -2,82 +2,271 @@
 .topbar {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 24px;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
   background: var(--panel);
   border-bottom: 1px solid var(--stroke);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-2xl);
+  transition: all var(--transition-base);
+  position: relative;
+  z-index: 10;
+}
+
+.topbar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.05));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+.topbar:hover::after {
+  opacity: 1;
 }
 
 .dark .topbar {
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-xl);
 }
 
 .topbar input,
 .topbar button,
 .topbar label {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text);
+  transition: color var(--transition-fast);
 }
 
 .textfield {
   background: var(--panel);
   border: 1px solid var(--stroke);
   color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
   outline: none;
   width: 280px;
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.3s ease;
+  box-shadow: var(--shadow-inner);
+  transition: all var(--transition-base);
+  position: relative;
 }
 
-.dark .textfield {
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+.textfield::placeholder {
+  color: var(--muted);
+  transition: opacity var(--transition-fast);
+}
+
+.textfield:hover {
+  border-color: var(--accent);
+  background: var(--panel-hover);
 }
 
 .textfield:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+
+.textfield:focus::placeholder {
+  opacity: 0.5;
+}
+
+.dark .textfield {
+  box-shadow: var(--shadow-inner);
 }
 
 .btn {
   background: var(--panel);
   border: 1px solid var(--stroke);
   color: var(--text);
-  padding: 10px 16px;
-  border-radius: 999px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.3s ease;
+  transition: all var(--transition-spring);
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--accent), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
 }
 
 .btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.02);
   border-color: var(--accent);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-lg);
+  background: var(--panel-hover);
+}
+
+.btn:hover::before {
+  opacity: 0.1;
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+  transition: transform var(--transition-fast);
 }
 
 .dark .btn:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-xl);
 }
 
 .btn.primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
   color: white;
   border-color: transparent;
-  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.28);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+  animation: buttonGlow 3s ease-in-out infinite;
+}
+
+@keyframes buttonGlow {
+  0%, 100% { box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25); }
+  50% { box-shadow: 0 12px 32px rgba(99, 102, 241, 0.35); }
+}
+
+.btn.primary:hover {
+  background: linear-gradient(135deg, var(--accent-hover) 0%, #2563eb 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 16px 40px rgba(99, 102, 241, 0.35);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:disabled:hover {
+  box-shadow: none;
+  border-color: var(--stroke);
 }
 
 .switch {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   cursor: pointer;
   color: var(--muted);
+  transition: color var(--transition-fast);
+}
+
+.switch:hover {
+  color: var(--text);
+}
+
+/* Card Component */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--info));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-spring);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent);
+}
+
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+/* Badge Component */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+/* Status Badge Variants */
+.badge.success {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success);
+}
+
+.badge.warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning);
+}
+
+.badge.danger {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.badge.info {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info);
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: var(--text);
+  color: var(--bg);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-fast);
+  z-index: 1000;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-12px);
 }
 
 /* Remove old body.light specific overrides as they're now handled by CSS variables */
