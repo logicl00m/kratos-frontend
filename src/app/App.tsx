@@ -8,6 +8,7 @@ import ApplicationDetails from "@features/application-details/components/Applica
 import RunningWorkflowsPage from "@features/running-workflows/components/RunningWorkflowsPage";
 import WorkflowBuilder from "@features/workflow-config-edit/components/builder/WorkflowBuilder";
 import { DynamicFormBuilder } from "@features/dynamic-form-builder";
+import CreateWorkflow from "@features/workflow-templates/components/CreateWorkflow";
 import {
   parseWorkflowToGraph,
   getDefaultWorkflow,
@@ -34,6 +35,7 @@ function App() {
     | "running"
     | "builder"
     | "form-builder"
+    | "create-workflow"
   >("dashboard");
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(
     null
@@ -41,7 +43,7 @@ function App() {
   const stateKeys = Object.keys(workflow.workflow?.states || {});
   const [currentStateIndex, setCurrentStateIndex] = useState<number>(0);
   const currentState = stateKeys[currentStateIndex] || stateKeys[0] || "";
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+  // Layout handles sidebar state internally
 
   const handleNodeFormView = (nodeId: string) => {
     const index = stateKeys.indexOf(nodeId);
@@ -110,6 +112,9 @@ function App() {
       case "dashboard":
         setViewMode("dashboard");
         break;
+      case "create-workflow":
+        setViewMode("create-workflow");
+        break;
       case "running":
         setViewMode("running");
         break;
@@ -132,30 +137,31 @@ function App() {
   // Dashboard view with integrated layout
   if (viewMode === "dashboard") {
     return (
-      <MainLayout 
-        title="Dashboard" 
-        showMenuButton={true}
-        onNavigate={handleNavigation}
-        sidebarCollapsed={sidebarCollapsed}
-        onSidebarCollapseChange={setSidebarCollapsed}
-      >
-        <Dashboard 
-          onApplicationClick={handleApplicationClick}
-        />
+      <MainLayout title="Dashboard" onNavigate={handleNavigation}>
+        <Dashboard onApplicationClick={handleApplicationClick} />
       </MainLayout>
+    );
+  }
+
+  // Create workflow view
+  if (viewMode === "create-workflow") {
+    return (
+      <CreateWorkflow
+        onBack={() => setViewMode("dashboard")}
+        onComplete={(workflowConfig) => {
+          // Set the workflow and navigate to viewer
+          setWorkflow(workflowConfig as unknown as WorkflowConfig);
+          setJsonText(JSON.stringify(workflowConfig, null, 2));
+          setViewMode("graph");
+        }}
+      />
     );
   }
 
   // Form builder view
   if (viewMode === "form-builder") {
     return (
-      <MainLayout 
-        title="Form Builder" 
-        showMenuButton={true}
-        onNavigate={handleNavigation}
-        sidebarCollapsed={sidebarCollapsed}
-        onSidebarCollapseChange={setSidebarCollapsed}
-      >
+      <MainLayout title="Form Builder" onNavigate={handleNavigation}>
         <DynamicFormBuilder />
       </MainLayout>
     );
@@ -164,13 +170,7 @@ function App() {
   // Workflow Builder view
   if (viewMode === "builder") {
     return (
-      <MainLayout 
-        title="Workflow Builder" 
-        showMenuButton={false}
-        onNavigate={handleNavigation}
-        sidebarCollapsed={sidebarCollapsed}
-        onSidebarCollapseChange={setSidebarCollapsed}
-      >
+      <MainLayout title="Workflow Builder" onNavigate={handleNavigation}>
         <div className="app-container">
           <WorkflowBuilder
             onExport={handleWorkflowExport}
@@ -184,13 +184,7 @@ function App() {
   // Running workflows view
   if (viewMode === "running") {
     return (
-      <MainLayout 
-        title="Running Workflows" 
-        showMenuButton={true}
-        onNavigate={handleNavigation}
-        sidebarCollapsed={sidebarCollapsed}
-        onSidebarCollapseChange={setSidebarCollapsed}
-      >
+      <MainLayout title="Running Workflows" onNavigate={handleNavigation}>
         <RunningWorkflowsPage onBack={() => setViewMode("dashboard")} />
       </MainLayout>
     );
@@ -199,13 +193,7 @@ function App() {
   // Application Details view
   if (viewMode === "details" && selectedWorkflow) {
     return (
-      <MainLayout 
-        title="Application Details" 
-        showMenuButton={true}
-        onNavigate={handleNavigation}
-        sidebarCollapsed={sidebarCollapsed}
-        onSidebarCollapseChange={setSidebarCollapsed}
-      >
+      <MainLayout title="Application Details" onNavigate={handleNavigation}>
         <ApplicationDetails
           workflowData={selectedWorkflow}
           onBack={handleBackToDashboard}
@@ -216,13 +204,7 @@ function App() {
 
   // Graph/Form view
   return (
-    <MainLayout
-      title="Workflow Visualizer"
-      showMenuButton={true}
-      onNavigate={handleNavigation}
-      sidebarCollapsed={sidebarCollapsed}
-      onSidebarCollapseChange={setSidebarCollapsed}
-    >
+    <MainLayout title="Workflow Visualizer" onNavigate={handleNavigation}>
       <div className="workflow-viewer-container">
         {viewMode === "form" ? (
           <div className="form-container">
@@ -269,7 +251,7 @@ function App() {
                   onClick={() => setShowEditor(true)}
                   title="Show JSON Editor"
                 >
-                  {'</>'}
+                  {"</>"}
                 </button>
               )}
             </div>

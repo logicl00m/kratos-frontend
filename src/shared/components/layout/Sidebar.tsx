@@ -1,6 +1,17 @@
 // src/shared/components/layout/Sidebar.tsx
 import { useState, useEffect } from "react";
-import { Menu, X, Home, FileText, Settings, Users, BarChart3, Workflow, PlayCircle, PlusCircle } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  FileText,
+  Settings,
+  Users,
+  BarChart3,
+  Workflow,
+  PlayCircle,
+  PlusCircle,
+} from "lucide-react";
 import "./Sidebar.css";
 
 type SidebarItem = {
@@ -17,13 +28,18 @@ type SidebarProps = {
   onNavigate?: (id: string) => void;
 };
 
-const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNavigate }: SidebarProps) => {
+const Sidebar = ({
+  collapsed = false,
+  onCollapseChange,
+  mobile = false,
+  onNavigate,
+}: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
-  
+
   useEffect(() => {
     setIsCollapsed(collapsed);
   }, [collapsed]);
-  
+
   const toggleSidebar = () => {
     const newCollapsed = !isCollapsed;
     setIsCollapsed(newCollapsed);
@@ -32,9 +48,22 @@ const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNaviga
 
   const sidebarItems: SidebarItem[] = [
     { id: "dashboard", label: "Dashboard", icon: <Home size={20} /> },
+    {
+      id: "create-workflow",
+      label: "Create Workflow",
+      icon: <PlusCircle size={20} />,
+    },
     { id: "applications", label: "Applications", icon: <FileText size={20} /> },
-    { id: "running", label: "Running Workflows", icon: <PlayCircle size={20} /> },
-    { id: "builder", label: "Workflow Builder", icon: <PlusCircle size={20} /> },
+    {
+      id: "running",
+      label: "Running Workflows",
+      icon: <PlayCircle size={20} />,
+    },
+    {
+      id: "builder",
+      label: "Workflow Builder",
+      icon: <PlusCircle size={20} />,
+    },
     { id: "form-builder", label: "Form Builder", icon: <FileText size={20} /> },
     { id: "viewer", label: "Workflow Viewer", icon: <Workflow size={20} /> },
     { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} /> },
@@ -49,51 +78,41 @@ const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNaviga
     }
   };
 
-  const sidebarStyle = mobile ? {
-    left: isCollapsed ? "-240px" : "0",
-  } : {
-    transition: "width 0.3s ease",
-    height: "100vh",
-    position: "fixed" as const,
-    left: 0,
-    top: 0,
-    zIndex: 100,
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column" as const,
-  };
+  const sidebarStyle = mobile
+    ? {
+        left: isCollapsed ? "-240px" : "0",
+      }
+    : {
+        transition: "width 0.3s ease",
+        height: "100vh",
+        position: "fixed" as const,
+        left: 0,
+        top: 0,
+        zIndex: 100,
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column" as const,
+      };
 
   return (
     <>
       {mobile && !isCollapsed && (
-        <div 
-          className="sidebar-backdrop"
-          onClick={toggleSidebar}
-        />
+        <div className="sidebar-backdrop" onClick={toggleSidebar} />
       )}
-      <aside 
-        className={`sidebar ${isCollapsed ? "collapsed" : ""} ${mobile ? "mobile" : ""}`}
+      <aside
+        className={`sidebar ${isCollapsed ? "collapsed" : ""} ${
+          mobile ? "mobile" : ""
+        }`}
         style={sidebarStyle}
       >
-        <div 
-          className="sidebar-header"
-        >
-          {!isCollapsed && (
-            <div className="logo">
-              Kratos Workflow
-            </div>
-          )}
-          <button
-            className="toggle-btn"
-            onClick={toggleSidebar}
-          >
+        <div className="sidebar-header">
+          {!isCollapsed && <div className="logo">Kratos Workflow</div>}
+          <button className="toggle-btn" onClick={toggleSidebar}>
             {isCollapsed && !mobile ? <Menu size={20} /> : <X size={20} />}
           </button>
         </div>
 
-        <nav 
-          className="sidebar-nav"
-        >
+        <nav className="sidebar-nav">
           <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {sidebarItems.map((item) => (
               <li key={item.id}>
@@ -101,17 +120,9 @@ const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNaviga
                   onClick={() => handleItemClick(item.id)}
                   className={`nav-item ${isCollapsed ? "collapsed" : ""}`}
                 >
-                  <span 
-                    className="nav-icon"
-                  >
-                    {item.icon}
-                  </span>
+                  <span className="nav-icon">{item.icon}</span>
                   {!isCollapsed && (
-                    <span 
-                      className="nav-label"
-                    >
-                      {item.label}
-                    </span>
+                    <span className="nav-label">{item.label}</span>
                   )}
                 </button>
               </li>
@@ -119,9 +130,7 @@ const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNaviga
           </ul>
         </nav>
 
-        <div 
-          className="sidebar-footer"
-        >
+        <div className="sidebar-footer">
           {!isCollapsed && (
             <div className="footer-content">
               <div>Workflow Manager</div>
