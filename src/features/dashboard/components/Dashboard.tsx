@@ -8,7 +8,6 @@ import type {
 import { transformWorkflowsToApplications } from "@features/dashboard/utils/workflowTransformer";
 import {
   getStageColor,
-  getSlaColor,
   getStatusIcon,
 } from "@features/dashboard/utils/styleHelpers";
 import DashboardFilters from "./DashboardFilters";
@@ -115,7 +114,7 @@ const Dashboard: React.FC<{
   );
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50 p-6 rounded-xl">
+    <div className="flex flex-col h-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl">
       <DashboardMain
         stats={stats}
         filteredApplications={filteredApplications}
@@ -124,9 +123,6 @@ const Dashboard: React.FC<{
         handleToggleRow={handleToggleRow}
         handleApplicationClick={handleApplicationClick}
         getStageColor={getStageColor}
-        getSlaColor={(s: string) =>
-          getSlaColor(s as unknown as LoanApplication["slaStatus"])
-        }
         getStatusIcon={(s: string) =>
           getStatusIcon(s as unknown as LoanApplication["slaStatus"])
         }

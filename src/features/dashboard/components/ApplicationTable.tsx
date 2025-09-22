@@ -10,7 +10,6 @@ interface ApplicationTableProps {
   onSelectRow: (id: string) => void;
   onRowClick: (app: LoanApplication) => void;
   getStageColor: (stage: string) => string;
-  getSlaColor: (status: string) => string;
   getStatusIcon: (status: string) => React.ReactNode;
 }
 
@@ -21,7 +20,6 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
   onSelectRow,
   onRowClick,
   getStageColor,
-  getSlaColor,
   getStatusIcon,
 }) => {
   return (
@@ -80,7 +78,6 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
             onSelect={onSelectRow}
             onClick={onRowClick}
             getStageColor={getStageColor}
-            getSlaColor={getSlaColor}
             getStatusIcon={getStatusIcon}
           />
         ))}

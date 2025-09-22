@@ -19,7 +19,6 @@ interface DashboardMainProps {
   handleToggleRow: (id: string) => void;
   handleApplicationClick: (app: LoanApplication) => void;
   getStageColor: (stage: string) => string;
-  getSlaColor: (status: string) => string;
   getStatusIcon: (status: string) => React.ReactNode;
 }
 
@@ -31,7 +30,6 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
   handleToggleRow,
   handleApplicationClick,
   getStageColor,
-  getSlaColor,
   getStatusIcon,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,7 +71,6 @@ const DashboardMain: React.FC<DashboardMainProps> = ({
             onSelectRow={handleToggleRow}
             onRowClick={handleApplicationClick}
             getStageColor={getStageColor}
-            getSlaColor={getSlaColor}
             getStatusIcon={getStatusIcon}
           />
         </div>

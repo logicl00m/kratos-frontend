@@ -22,16 +22,6 @@ export const getStageColor = (stage: string) => {
   return colors[stage] || "bg-gray-600";
 };
 
-export const getSlaColor = (status: SLAStatus) => {
-  const colors: { [key in SLAStatus]: string } = {
-    overdue: "text-red-600 font-semibold",
-    due: "text-amber-600 font-medium",
-    ontime: "text-gray-600",
-    completed: "text-emerald-600 font-medium",
-  };
-  return colors[status] || "text-gray-600";
-};
-
 export const getStatusIcon = (status: SLAStatus) => {
   if (status === "overdue")
     return <XCircle className="w-4 h-4 text-red-500" />;

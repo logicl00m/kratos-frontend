@@ -9,7 +9,6 @@ type ApplicationRowProps = {
   onSelect: (id: string) => void;
   onClick: (app: LoanApplication) => void;
   getStageColor: (stage: string) => string;
-  getSlaColor: (status: string) => string;
   getStatusIcon: (status: string) => React.ReactNode;
 };
 
@@ -19,7 +18,6 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
   onSelect,
   onClick,
   getStageColor,
-  getSlaColor,
   getStatusIcon,
 }) => {
   return (
@@ -36,7 +34,7 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
         />
       </td>
       <td className="dashboard-table-cell">
-        <span className="text-sm font-medium text-gray-900">{app.id}</span>
+        <span className="text-sm font-medium dashboard-table-id">{app.id}</span>
       </td>
       <td className="dashboard-table-cell">
         <span className="dashboard-table-applicant">{app.applicant}</span>
@@ -56,16 +54,16 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
         </span>
       </td>
       <td className="dashboard-table-cell">
-        <span className="text-sm text-gray-900">{app.assignee}</span>
+        <span className="text-sm dashboard-table-assignee">{app.assignee}</span>
       </td>
       <td className="dashboard-table-cell">
-        <span className="text-sm text-gray-600">{app.initiatedBy}</span>
+        <span className="text-sm dashboard-table-initiated-by">{app.initiatedBy}</span>
       </td>
       <td className="dashboard-table-cell">
         <div className="dashboard-table-sla-container">
           {getStatusIcon(app.slaStatus)}
           <span
-            className={`text-sm ${getSlaColor(app.slaStatus)}`}
+            className={`text-sm dashboard-table-sla-text dashboard-table-sla-${app.slaStatus}`}
           >
             {app.sla}
           </span>
@@ -77,7 +75,7 @@ const ApplicationRow: React.FC<ApplicationRowProps> = ({
         </span>
       </td>
       <td className="dashboard-table-cell">
-        <span className="text-sm text-gray-600">{app.lastUpdate}</span>
+        <span className="text-sm dashboard-table-last-update">{app.lastUpdate}</span>
       </td>
       <td className="dashboard-table-cell text-center">
         <button
