@@ -1,8 +1,104 @@
 // src/shared/components/layout/TopBar.tsx
+import { useState, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
-import { Menu, Bell, User, Search, Home } from "lucide-react";
+import {
+  Menu,
+  Bell,
+  User,
+  Search,
+  Home,
+  Plus,
+  FileText,
+  Workflow,
+  FormInput,
+  ChevronRight,
+} from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import "./TopBar.css";
+
+// Create New Dropdown Component
+const CreateNewDropdown: React.FC<{ onNavigate: (itemId: string) => void }> = ({
+  onNavigate,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const menuItems = [
+    {
+      id: "create-workflow",
+      label: "Create New Workflow",
+      icon: <Workflow className="w-4 h-4" />,
+      description: "Start from a template",
+    },
+    {
+      id: "builder",
+      label: "Create Workflow Template",
+      icon: <FileText className="w-4 h-4" />,
+      description: "Build a custom template",
+    },
+    {
+      id: "form-builder",
+      label: "Create New Form",
+      icon: <FormInput className="w-4 h-4" />,
+      description: "Design a dynamic form",
+    },
+  ];
+
+  const handleItemClick = (itemId: string) => {
+    onNavigate(itemId);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="create-new-button"
+        aria-label="Create new"
+      >
+        <Plus size={20} />
+        <span className="create-new-text">Create New</span>
+      </button>
+
+      {isOpen && (
+        <div className="create-new-dropdown">
+          <div className="dropdown-content">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleItemClick(item.id)}
+                className="dropdown-item"
+              >
+                <div className="dropdown-item-icon">{item.icon}</div>
+                <div className="dropdown-item-text">
+                  <div className="dropdown-item-label">{item.label}</div>
+                  <div className="dropdown-item-description">
+                    {item.description}
+                  </div>
+                </div>
+                <ChevronRight className="dropdown-item-chevron" />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 type TopBarProps = {
   title: string;
@@ -23,20 +119,13 @@ const TopBar: React.FC<TopBarProps> = ({
   searchValue,
   onSearchChange,
   showSearch = false,
-  onNavigate
+  onNavigate,
 }) => {
   return (
-    <header 
-      className="app-header topbar"
-    >
-      <div
-        className="header-left"
-      >
+    <header className="app-header topbar">
+      <div className="header-left">
         {showMenuButton && (
-          <button
-            className="menu-toggle"
-            onClick={onMenuToggle}
-          >
+          <button className="menu-toggle" onClick={onMenuToggle}>
             <Menu size={20} />
           </button>
         )}
@@ -58,23 +147,23 @@ const TopBar: React.FC<TopBarProps> = ({
             fontWeight: "600",
             cursor: "pointer",
             boxShadow: "0 4px 12px rgba(102, 126, 234, 0.4)",
-            transition: "all 0.3s ease"
+            transition: "all 0.3s ease",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "translateY(-2px)";
-            e.currentTarget.style.boxShadow = "0 6px 20px rgba(102, 126, 234, 0.6)";
+            e.currentTarget.style.boxShadow =
+              "0 6px 20px rgba(102, 126, 234, 0.6)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 4px 12px rgba(102, 126, 234, 0.4)";
+            e.currentTarget.style.boxShadow =
+              "0 4px 12px rgba(102, 126, 234, 0.4)";
           }}
         >
           <Home size={20} />
           <span>Home</span>
         </button>
-        <h1 className="header-title">
-          {title}
-        </h1>
+        <h1 className="header-title">{title}</h1>
       </div>
 
       {showSearch && (
@@ -89,23 +178,20 @@ const TopBar: React.FC<TopBarProps> = ({
           />
         </div>
       )}
-      
-      <div
-        className="header-controls"
-      >
+
+      <div className="header-controls">
         {right}
+
+        {/* Add Create New Dropdown */}
+        {onNavigate && <CreateNewDropdown onNavigate={onNavigate} />}
 
         <ThemeToggle />
 
-        <button
-          className="icon-button"
-        >
+        <button className="icon-button">
           <Bell size={20} />
         </button>
 
-        <button
-          className="icon-button"
-        >
+        <button className="icon-button">
           <User size={20} />
         </button>
       </div>
