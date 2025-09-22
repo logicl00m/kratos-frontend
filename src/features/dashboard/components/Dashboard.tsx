@@ -1,11 +1,13 @@
 // src/features/dashboard/components/Dashboard.tsx
 import React, { useState, useMemo } from "react";
-import { mockWorkflowData as mockWorkflowRawData } from "../data/mockWorkflowData";
+import {
+  useDashboardApplications,
+  useDashboardStats,
+} from "../../../lib/hooks/useApiWithFallback";
 import type {
   WorkflowData,
   LoanApplication,
 } from "@features/dashboard/types/dashboard.types";
-import { transformWorkflowsToApplications } from "@features/dashboard/utils/workflowTransformer";
 import {
   getStageColor,
   getStatusIcon,
@@ -27,16 +29,46 @@ const Dashboard: React.FC<{
     useState<string>("All Products");
   const [selectedOwner, setSelectedOwner] = useState<string>("All Owners");
 
-  const workflows = mockWorkflowRawData;
-  const applications = useMemo(
-    () => transformWorkflowsToApplications(workflows),
-    [workflows]
-  );
+  // Use real API data instead of mock data
+  const {
+    data: applicationsResponse,
+    loading: applicationsLoading,
+    isUsingFallback: applicationsUsingFallback,
+  } = useDashboardApplications();
+  const {
+    data: statsData,
+    loading: statsLoading,
+    isUsingFallback: statsUsingFallback,
+  } = useDashboardStats();
+
+  // Get applications from API data
+  const rawApplications = applicationsResponse?.data || [];
+
+  // Transform API ApplicationInstance data to LoanApplication format
+  const applications: LoanApplication[] = rawApplications.map((app: any) => ({
+    id: app.id,
+    applicant:
+      app.data?.firstName && app.data?.lastName
+        ? `${app.data.firstName} ${app.data.lastName}`
+        : app.data?.applicantName || "Unknown Applicant",
+    amount: parseFloat(
+      app.data?.loanAmount?.toString()?.replace(/[^0-9.]/g, "") || "50000"
+    ),
+    product: app.data?.productType || "Personal Loan",
+    stage: app.currentState || "Application",
+    assignee: app.assignee || "Unassigned",
+    initiatedBy: app.data?.submittedBy || "System",
+    sla: "5 days",
+    slaStatus: (app.metadata?.slaStatus ||
+      "ontime") as LoanApplication["slaStatus"],
+    lastUpdate: app.metadata?.updatedAt || new Date().toISOString(),
+    flags: [],
+  }));
 
   const ownerOptions = useMemo(() => {
     const set = new Set<string>();
-    applications.forEach((a) => {
-      if (a.assignee && a.assignee !== "Unassigned") set.add(a.assignee);
+    applications.forEach((app) => {
+      if (app.assignee) set.add(app.assignee);
     });
     return [
       "All Owners",
@@ -84,17 +116,24 @@ const Dashboard: React.FC<{
   };
 
   const handleApplicationClick = (app: LoanApplication) => {
-    const workflow = workflows.find((w) => w.workflow.id === app.id);
-    if (workflow && onApplicationClick) {
-      onApplicationClick(workflow);
-    }
+    // TODO: Implement with real workflow data from API
+    console.log("Application clicked:", app.id);
   };
 
-  const stats = {
-    total: applications.length,
-    completed: applications.filter((a) => a.stage === "Completed").length,
-    pending: applications.filter((a) => a.stage !== "Completed").length,
-    overdue: applications.filter((a) => a.slaStatus === "overdue").length,
+  // Use real stats data when available
+  const stats = statsData || {
+    totalApplications: applications.length,
+    pendingApplications: applications.filter((a) => a.stage !== "Completed")
+      .length,
+    approvedApplications: applications.filter((a) => a.stage === "Completed")
+      .length,
+    rejectedApplications: 0,
+    slaMetrics: {
+      onTime: applications.filter((a) => a.slaStatus === "ontime").length,
+      due: applications.filter((a) => a.slaStatus === "due").length,
+      overdue: applications.filter((a) => a.slaStatus === "overdue").length,
+      completed: applications.filter((a) => a.slaStatus === "completed").length,
+    },
   };
 
   const filterControls = (

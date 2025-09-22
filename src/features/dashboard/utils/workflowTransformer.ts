@@ -175,3 +175,57 @@ function transformWorkflowToApplication(workflow: WorkflowData): LoanApplication
 export function transformWorkflowsToApplications(workflows: WorkflowData[]): LoanApplication[] {
   return workflows.map(transformWorkflowToApplication);
 }
+
+/**
+ * Transform API ApplicationInstance data to LoanApplication format
+ */
+export function transformApiApplicationsToLoanApplications(apiApplications: import('@/lib/api').ApplicationInstance[]): LoanApplication[] {
+  return apiApplications.map((app): LoanApplication => {
+    // Extract amount from data
+    const amount = Object.values(app.data).find(value => 
+      typeof value === 'number' && value > 1000
+    ) as number || 0;
+
+    // Extract applicant name from data
+    const applicant = Object.values(app.data).find(value => 
+      typeof value === 'string' && value.includes('Ltd') || value.includes('Co')
+    ) as string || 'Unknown Applicant';
+
+    // Calculate SLA based on metadata
+    const createdAt = new Date(app.metadata.createdAt);
+    const now = new Date();
+    const hoursElapsed = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    
+    let sla: string;
+    let slaStatus: LoanApplication['slaStatus'];
+    
+    if (app.metadata.slaStatus === 'overdue') {
+      sla = 'Overdue';
+      slaStatus = 'overdue';
+    } else if (app.metadata.slaStatus === 'due') {
+      sla = 'Due Soon';
+      slaStatus = 'due';
+    } else if (app.metadata.slaStatus === 'completed') {
+      sla = 'Completed';
+      slaStatus = 'completed';
+    } else {
+      sla = 'On Time';
+      slaStatus = 'ontime';
+    }
+
+    return {
+      id: app.id,
+      applicant,
+      product: 'Business Loan', // Default product type
+      amount,
+      stage: app.currentState,
+      assignee: app.assignee || 'Unassigned',
+      initiatedBy: 'System', // Default initiator
+      sla,
+      slaStatus,
+      lastUpdate: new Date(app.metadata.updatedAt).toLocaleDateString('en-GB'),
+      flags: [], // No flags from API yet
+      docs: 0 // No document count from API yet
+    };
+  });
+}
