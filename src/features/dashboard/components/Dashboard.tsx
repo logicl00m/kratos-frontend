@@ -117,22 +117,17 @@ const Dashboard: React.FC<{
   };
 
   const handleApplicationClick = (app: LoanApplication) => {
-    // Find the full workflow data for this application
-    const workflowApplication = rawApplications.find((rawApp: any) => rawApp.id === app.id);
-    
-    if (workflowApplication && onApplicationClick) {
-      // Transform the raw application data to WorkflowData format
-      // This is a simplified version - in a real implementation, you would fetch the full workflow data
+    if (onApplicationClick) {
+      // Create a WorkflowData object from the available data
       const workflow: WorkflowData = {
         workflow: {
-          id: workflowApplication.id,
-          currentState: workflowApplication.currentState,
-          currentStateEnteredAt: workflowApplication.metadata?.updatedAt || new Date().toISOString(),
-          forms: {}, // In a real implementation, this would be populated with actual form data
-          states: {} // In a real implementation, this would be populated with actual state data
+          id: app.id,
+          currentState: app.stage,
+          currentStateEnteredAt: app.lastUpdate,
+          forms: {},
+          states: {}
         }
       };
-      
       onApplicationClick(workflow);
     }
   };

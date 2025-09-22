@@ -11,14 +11,14 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "ABC Textiles Ltd.",
             },
             {
-              id: "requestedAmount",
-              name: "Requested Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 50000000,
             }
@@ -70,8 +70,8 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "XYZ Manufacturing Ltd.",
             },
@@ -127,14 +127,14 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "Quick Mart Stores",
             },
             {
-              id: "requestedAmount",
-              name: "Requested Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 10000000,
             }
@@ -180,14 +180,14 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "Green Agriculture Co.",
             },
             {
-              id: "totalAmountRequested",
-              name: "Total Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 75000000,
             }
@@ -223,14 +223,14 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "Tech Solutions Ltd.",
             },
             {
-              id: "principalAmount",
-              name: "Principal Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 35000000,
             }
@@ -276,19 +276,19 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "Fashion House BD",
             },
             {
-              id: "amount",
-              name: "Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 15000000,
             }
           ]
-        }
+        },
       },
       states: {
         ARMDraft: {
@@ -311,14 +311,14 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "Steel Works Industries",
             },
             {
-              id: "requestAmount",
-              name: "Request Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 90000000,
             }
@@ -370,19 +370,19 @@ export const mockWorkflowData: WorkflowData[] = [
         coreDetails: {
           fields: [
             {
-              id: "applicantLegalName",
-              name: "Applicant Legal Name",
+              id: "applicantName",
+              name: "Applicant Name",
               type: "text",
               data: "Pharma Solutions Ltd.",
             },
             {
-              id: "fundingAmount",
-              name: "Funding Amount",
+              id: "loanAmount",
+              name: "Loan Amount",
               type: "number",
               data: 120000000,
             }
           ]
-        }
+        },
       },
       states: {
         ARMDraft: {

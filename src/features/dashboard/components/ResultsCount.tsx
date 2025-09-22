@@ -10,15 +10,10 @@ const ResultsCount: React.FC<ResultsCountProps> = ({
   filteredCount,
   totalCount,
 }) => (
-  <div className="dashboard-results-count">
+  <div className="dashboard-results-count" data-testid="results-count">
     Showing{" "}
-    <span className="dashboard-results-count-highlight">
-      {filteredCount}
-    </span>{" "}
-    of{" "}
-    <span className="dashboard-results-count-highlight">
-      {totalCount}
-    </span>{" "}
+    <span className="dashboard-results-count-highlight">{filteredCount}</span>{" "}
+    of <span className="dashboard-results-count-highlight">{totalCount}</span>{" "}
     applications
   </div>
 );

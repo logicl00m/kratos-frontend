@@ -10,7 +10,7 @@ interface ApplicationTableProps {
   onSelectRow: (id: string) => void;
   onRowClick: (app: LoanApplication) => void;
   getStageColor: (stage: string) => string;
-  getStatusIcon: (status: string) => React.ReactNode;
+  getStatusIcon?: (status: string) => React.ReactNode;
 }
 
 const ApplicationTable: React.FC<ApplicationTableProps> = ({
@@ -22,8 +22,27 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
   getStageColor,
   getStatusIcon,
 }) => {
+  const colWidths: Array<number | string> = [
+    40, // Checkbox
+    "10%", // Application ID
+    "14%", // Applicant
+    "9%", // Amount
+    "11%", // Current Stage
+    "11%", // Product
+    "11%", // Assignee
+    "9%", // Initiated By
+    "7%", // SLA Status
+    "5%", // Docs
+    "8%", // Last Update
+    "5%", // Action
+  ];
   return (
     <table className="dashboard-table">
+      <colgroup>
+        {colWidths.map((w, i) => (
+          <col key={`col-${i}-${String(w)}`} style={{ width: w }} />
+        ))}
+      </colgroup>
       <thead className="dashboard-table-header">
         <tr>
           <th className="dashboard-table-header-cell">
@@ -48,6 +67,9 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
           </th>
           <th className="dashboard-table-header-cell dashboard-table-header-row">
             Current Stage
+          </th>
+          <th className="dashboard-table-header-cell dashboard-table-header-row">
+            Product
           </th>
           <th className="dashboard-table-header-cell dashboard-table-header-row">
             Assignee
