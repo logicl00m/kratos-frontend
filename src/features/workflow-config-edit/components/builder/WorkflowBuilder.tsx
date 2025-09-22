@@ -15,6 +15,7 @@ Docs: https://docs.camunda.io/docs/components/modeler/web-modeler/advanced-model
 
 // src/features/workflow-config-edit/components/builder/WorkflowBuilder.tsx
 import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import ReactFlow, {
   Controls,
   Background,
@@ -35,7 +36,10 @@ import DecisionNode from "./DecisionNode";
 import BuilderDetailsPanel from "./BuilderDetailsPanel";
 import ContextMenu from "./ContextMenu";
 import { FormPickerDialog } from "./FormPickerDialog";
-import { validateWorkflowWithForms, exportToWorkflowJson } from "@features/workflow-config-edit/utils/builderUtils";
+import {
+  validateWorkflowWithForms,
+  exportToWorkflowJson,
+} from "@features/workflow-config-edit/utils/builderUtils";
 import { mockPeople } from "@features/workflow-config-edit/data/mockPeople";
 import type {
   BuilderNodeData,
@@ -118,21 +122,22 @@ interface WorkflowBuilderProps {
   onBack?: () => void;
 }
 
-const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) => {
+const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
+  onExport,
+  onBack,
+}) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const nodesRef = useRef<Node<BuilderNodeData>[]>(INITIAL_NODES);
-  const [nodes, setNodes, onNodesChange] = useNodesState<BuilderNodeData>(
-    INITIAL_NODES
-  );
-  const [edges, setEdges, onEdgesChange] = useEdgesState<{ operation?: string }>(
-    INITIAL_EDGES
-  );
-  const [selectedNode, setSelectedNode] = useState<
-    Node<BuilderNodeData> | null
-  >(null);
-  const [selectedEdge, setSelectedEdge] = useState<
-    Edge<{ operation?: string }> | null
-  >(null);
+  const [nodes, setNodes, onNodesChange] =
+    useNodesState<BuilderNodeData>(INITIAL_NODES);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<{
+    operation?: string;
+  }>(INITIAL_EDGES);
+  const [selectedNode, setSelectedNode] =
+    useState<Node<BuilderNodeData> | null>(null);
+  const [selectedEdge, setSelectedEdge] = useState<Edge<{
+    operation?: string;
+  }> | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -141,7 +146,10 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
   } | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
-  const [formsCoverage, setFormsCoverage] = useState<{ withForms: number; totalProcessNodes: number }>({ withForms: 0, totalProcessNodes: 0 });
+  const [formsCoverage, setFormsCoverage] = useState<{
+    withForms: number;
+    totalProcessNodes: number;
+  }>({ withForms: 0, totalProcessNodes: 0 });
   const [showValidation, setShowValidation] = useState(false);
   const [formPickerOpen, setFormPickerOpen] = useState(false);
   const [formPickerNodeId, setFormPickerNodeId] = useState<string | null>(null);
@@ -151,38 +159,63 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
     nodesRef.current = nodes;
   }, [nodes]);
 
-  const attachFormToNode = useCallback((currentNodes: Node<BuilderNodeData>[], nodeId: string, form: { id?: string; name: string; version?: number }) => {
-    return currentNodes.map((n) => {
-      if (n.id !== nodeId || n.type !== "process") return n;
-      const data = n.data as ProcessNodeData;
-      return {
-        ...n,
-        data: {
-          ...data,
-          form: { id: form.id ?? "", name: form.name, version: form.version ?? 1, binding: "pinned" },
-        },
-      } as Node<BuilderNodeData>;
-    });
-  }, []);
+  const attachFormToNode = useCallback(
+    (
+      currentNodes: Node<BuilderNodeData>[],
+      nodeId: string,
+      form: { id?: string; name: string; version?: number }
+    ) => {
+      return currentNodes.map((n) => {
+        if (n.id !== nodeId || n.type !== "process") return n;
+        const data = n.data as ProcessNodeData;
+        return {
+          ...n,
+          data: {
+            ...data,
+            form: {
+              id: form.id ?? "",
+              name: form.name,
+              version: form.version ?? 1,
+              binding: "pinned",
+            },
+          },
+        } as Node<BuilderNodeData>;
+      });
+    },
+    []
+  );
 
-  // Attach newly created form when navigating back from form builder
+  // Router state: attach form on return from FormBuilderPage
+  const location = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
-    function handler(event: Event) {
-      const { nodeId, form } = (event as CustomEvent<{ nodeId: string; form: { id?: string; name: string; version?: number } }>).detail || {};
-      if (!nodeId || !form) return;
-      const next = attachFormToNode(nodesRef.current, nodeId, form);
+    const state = location.state as
+      | {
+          attachForm?: { id?: string; name: string; version?: number };
+          nodeId?: string;
+        }
+      | null
+      | undefined;
+    if (state?.attachForm && state?.nodeId) {
+      const next = attachFormToNode(
+        nodesRef.current,
+        state.nodeId,
+        state.attachForm
+      );
       setNodes(next);
+      // Clear the state to avoid re-attaching on refresh
+      navigate("/builder", { replace: true, state: null });
     }
-    window.addEventListener("kratos:form-created", handler as EventListener);
-    return () => window.removeEventListener("kratos:form-created", handler as EventListener);
-  }, [attachFormToNode, setNodes]);
+  }, [location.state, navigate, attachFormToNode, setNodes]);
 
   const onConnect = useCallback(
     (params: Connection) => {
       if (!params.source || !params.target) return;
 
       const newEdge: Edge<{ operation?: string }> = {
-        id: `${params.source}-${params.sourceHandle ?? "action"}-${params.target}`,
+        id: `${params.source}-${params.sourceHandle ?? "action"}-${
+          params.target
+        }`,
         source: params.source,
         target: params.target,
         sourceHandle: params.sourceHandle,
@@ -305,7 +338,11 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
     setEdges((current) =>
       current.map((edge) =>
         edge.id === edgeId
-          ? { ...edge, label: data.label ?? edge.label, data: { operation: data.operation } }
+          ? {
+              ...edge,
+              label: data.label ?? edge.label,
+              data: { operation: data.operation },
+            }
           : edge
       )
     );
@@ -345,14 +382,20 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
     const node = nodes.find((n) => n.id === nodeId);
     if (!node) return;
 
-    const newLabel = window.prompt("Enter a new state name", node.data.label ?? "");
+    const newLabel = window.prompt(
+      "Enter a new state name",
+      node.data.label ?? ""
+    );
     if (!newLabel) return;
 
     handleNodeUpdate(nodeId, { ...node.data, label: newLabel });
   };
 
   const handleValidate = () => {
-    const { errors, warnings, coverage } = validateWorkflowWithForms(nodes, edges);
+    const { errors, warnings, coverage } = validateWorkflowWithForms(
+      nodes,
+      edges
+    );
     setValidationErrors(errors);
     setValidationWarnings(warnings);
     setFormsCoverage(coverage);
@@ -360,7 +403,10 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
   };
 
   const handleExport = () => {
-    const { errors, warnings, coverage } = validateWorkflowWithForms(nodes, edges);
+    const { errors, warnings, coverage } = validateWorkflowWithForms(
+      nodes,
+      edges
+    );
     setValidationErrors(errors);
     setValidationWarnings(warnings);
     setFormsCoverage(coverage);
@@ -481,10 +527,14 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
             x={contextMenu.x}
             y={contextMenu.y}
             onClose={closeContextMenu}
-            onDuplicate={contextMenu.nodeId ? handleContextDuplicate : undefined}
+            onDuplicate={
+              contextMenu.nodeId ? handleContextDuplicate : undefined
+            }
             onDelete={handleContextDelete}
             onRename={contextMenu.nodeId ? handleContextRename : undefined}
-            onAssignPeople={contextMenu.nodeId ? handleContextAssign : undefined}
+            onAssignPeople={
+              contextMenu.nodeId ? handleContextAssign : undefined
+            }
             onOpenFormConfig={(nodeId) => {
               const node = nodes.find((n) => n.id === nodeId) ?? null;
               setSelectedNode(node);
@@ -517,13 +567,18 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
             if (!formPickerNodeId) return;
             setNodes((curr) =>
               curr.map((n) => {
-                if (n.id !== formPickerNodeId || n.type !== 'process') return n;
+                if (n.id !== formPickerNodeId || n.type !== "process") return n;
                 const data = n.data as ProcessNodeData;
                 return {
                   ...n,
                   data: {
                     ...data,
-                    form: { id: form.id, name: form.name, version: form.version, binding: 'pinned' },
+                    form: {
+                      id: form.id,
+                      name: form.name,
+                      version: form.version,
+                      binding: "pinned",
+                    },
                   },
                 } as Node<BuilderNodeData>;
               })
@@ -542,7 +597,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
             </div>
             <div className="validation-body">
               <div className="coverage-row" aria-live="polite">
-                Forms coverage: {formsCoverage.withForms}/{formsCoverage.totalProcessNodes}
+                Forms coverage: {formsCoverage.withForms}/
+                {formsCoverage.totalProcessNodes}
               </div>
               {validationErrors.length > 0 && (
                 <ul className="validation-errors">
@@ -558,9 +614,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
                   ))}
                 </ul>
               )}
-              {validationErrors.length === 0 && validationWarnings.length === 0 && (
-                <div className="validation-success">Workflow is valid and ready for export.</div>
-              )}
+              {validationErrors.length === 0 &&
+                validationWarnings.length === 0 && (
+                  <div className="validation-success">
+                    Workflow is valid and ready for export.
+                  </div>
+                )}
             </div>
           </div>
         )}

@@ -1,14 +1,14 @@
 ﻿// src/app/App.tsx
 import { useState } from "react";
-import WorkflowGraph from "@features/workflow/components/WorkflowGraph";
-import FormViewer from "@features/form/components/FormViewer";
-import JsonEditor from "@features/workflow/components/JsonEditor";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Dashboard from "@features/dashboard/components/Dashboard";
 import ApplicationDetails from "@features/application-details/components/ApplicationDetails";
 import RunningWorkflowsPage from "@features/running-workflows/components/RunningWorkflowsPage";
 import WorkflowBuilder from "@features/workflow-config-edit/components/builder/WorkflowBuilder";
-import { DynamicFormBuilder } from "@features/dynamic-form-builder";
+import FormBuilderPage from "@features/dynamic-form-builder/FormBuilderPage";
 import CreateWorkflow from "@features/workflow-templates/components/CreateWorkflow";
+import WorkflowGraph from "@features/workflow/components/WorkflowGraph";
+import JsonEditor from "@features/workflow/components/JsonEditor";
 import {
   parseWorkflowToGraph,
   getDefaultWorkflow,
@@ -19,6 +19,7 @@ import "./App.css";
 import MainLayout from "@shared/components/layout/MainLayout";
 
 function App() {
+  const navigate = useNavigate();
   const [workflow, setWorkflow] = useState<WorkflowConfig>(
     getDefaultWorkflow()
   );
@@ -27,44 +28,24 @@ function App() {
   );
   const [error, setError] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState<boolean>(true);
-  const [viewMode, setViewMode] = useState<
-    | "dashboard"
-    | "graph"
-    | "form"
-    | "details"
-    | "running"
-    | "builder"
-    | "form-builder"
-    | "create-workflow"
-  >("dashboard");
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(
     null
   );
-  const stateKeys = Object.keys(workflow.workflow?.states || {});
-  const [currentStateIndex, setCurrentStateIndex] = useState<number>(0);
-  const currentState = stateKeys[currentStateIndex] || stateKeys[0] || "";
-  // Layout handles sidebar state internally
 
-  const handleNodeFormView = (nodeId: string) => {
-    const index = stateKeys.indexOf(nodeId);
-    if (index !== -1) {
-      setCurrentStateIndex(index);
-      setViewMode("form");
-    }
-  };
-
-  const handleBackToGraph = () => {
-    setViewMode("graph");
-  };
-
-  const handleApplicationClick = (workflowData: WorkflowData) => {
-    setSelectedWorkflow(workflowData);
-    setViewMode("details");
-  };
-
-  const handleBackToDashboard = () => {
-    setViewMode("dashboard");
-    setSelectedWorkflow(null);
+  const handleNavigation = (itemId: string) => {
+    const map: Record<string, string> = {
+      dashboard: "/dashboard",
+      "create-workflow": "/create-workflow",
+      running: "/running",
+      builder: "/builder",
+      "form-builder": "/form-builder/new",
+      viewer: "/viewer",
+      applications: "/applications",
+      analytics: "/analytics",
+      users: "/users",
+      settings: "/settings",
+    };
+    navigate(map[itemId] || "/dashboard");
   };
 
   const handleApplyJson = () => {
@@ -77,189 +58,150 @@ function App() {
     }
   };
 
-  const handleWorkflowExport = (workflowJson: unknown) => {
-    let parsed: unknown = workflowJson;
-    try {
-      if (typeof workflowJson === "string") {
-        parsed = JSON.parse(workflowJson);
-      }
-
-      if (
-        !parsed ||
-        typeof parsed !== "object" ||
-        (parsed as Record<string, unknown>) === null ||
-        !("workflow" in (parsed as Record<string, unknown>))
-      ) {
-        throw new Error("Invalid workflow format: missing 'workflow' property");
-      }
-
-      setWorkflow(parsed as WorkflowConfig);
-      setJsonText(JSON.stringify(parsed, null, 2));
-      setError(null);
-      setCurrentStateIndex(0);
-      setViewMode("graph");
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error("Failed to import workflow:", message);
-      setError(
-        message || "Failed to import workflow. Provide valid JSON or object."
-      );
-    }
-  };
-
-  const handleNavigation = (itemId: string) => {
-    switch (itemId) {
-      case "dashboard":
-        setViewMode("dashboard");
-        break;
-      case "create-workflow":
-        setViewMode("create-workflow");
-        break;
-      case "running":
-        setViewMode("running");
-        break;
-      case "builder":
-        setViewMode("builder");
-        break;
-      case "form-builder":
-        setViewMode("form-builder");
-        break;
-      case "viewer":
-        setViewMode("graph");
-        break;
-      default:
-        break;
-    }
-  };
-
   const { nodes, edges } = parseWorkflowToGraph(workflow);
 
-  // Dashboard view with integrated layout
-  if (viewMode === "dashboard") {
-    return (
-      <MainLayout title="Dashboard" onNavigate={handleNavigation}>
-        <Dashboard onApplicationClick={handleApplicationClick} />
-      </MainLayout>
-    );
-  }
-
-  // Create workflow view
-  if (viewMode === "create-workflow") {
-    return (
-      <CreateWorkflow
-        onBack={() => setViewMode("dashboard")}
-        onComplete={(workflowConfig) => {
-          // Set the workflow and navigate to viewer
-          setWorkflow(workflowConfig as unknown as WorkflowConfig);
-          setJsonText(JSON.stringify(workflowConfig, null, 2));
-          setViewMode("graph");
+  const DashboardPage = (
+    <MainLayout title="Dashboard" onNavigate={handleNavigation}>
+      <Dashboard
+        onApplicationClick={(wf) => {
+          setSelectedWorkflow(wf);
+          navigate("/applications/details");
         }}
       />
-    );
-  }
+    </MainLayout>
+  );
 
-  // Form builder view
-  if (viewMode === "form-builder") {
-    return (
-      <MainLayout title="Form Builder" onNavigate={handleNavigation}>
-        <DynamicFormBuilder />
-      </MainLayout>
-    );
-  }
+  const CreateWorkflowPage = (
+    <CreateWorkflow
+      onBack={() => navigate("/dashboard")}
+      onComplete={(wfConfig) => {
+        setWorkflow(wfConfig as unknown as WorkflowConfig);
+        setJsonText(JSON.stringify(wfConfig, null, 2));
+        navigate("/viewer");
+      }}
+    />
+  );
 
-  // Workflow Builder view
-  if (viewMode === "builder") {
-    return (
-      <MainLayout title="Workflow Builder" onNavigate={handleNavigation}>
-        <div className="app-container">
-          <WorkflowBuilder
-            onExport={handleWorkflowExport}
-            onBack={() => setViewMode("dashboard")}
-          />
-        </div>
-      </MainLayout>
-    );
-  }
+  const FormBuilderRoute = (
+    <MainLayout title="Form Builder" onNavigate={handleNavigation}>
+      <FormBuilderPage />
+    </MainLayout>
+  );
 
-  // Running workflows view
-  if (viewMode === "running") {
-    return (
-      <MainLayout title="Running Workflows" onNavigate={handleNavigation}>
-        <RunningWorkflowsPage onBack={() => setViewMode("dashboard")} />
-      </MainLayout>
-    );
-  }
-
-  // Application Details view
-  if (viewMode === "details" && selectedWorkflow) {
-    return (
-      <MainLayout title="Application Details" onNavigate={handleNavigation}>
-        <ApplicationDetails
-          workflowData={selectedWorkflow}
-          onBack={handleBackToDashboard}
+  const WorkflowBuilderPage = (
+    <MainLayout title="Workflow Builder" onNavigate={handleNavigation}>
+      <div className="app-container">
+        <WorkflowBuilder
+          onExport={(json) => {
+            let parsed: unknown = json;
+            try {
+              if (typeof json === "string") parsed = JSON.parse(json);
+              if (
+                !parsed ||
+                typeof parsed !== "object" ||
+                !("workflow" in (parsed as Record<string, unknown>))
+              ) {
+                throw new Error(
+                  "Invalid workflow format: missing 'workflow' property"
+                );
+              }
+              setWorkflow(parsed as WorkflowConfig);
+              setJsonText(JSON.stringify(parsed, null, 2));
+              setError(null);
+            } catch (err: unknown) {
+              const message = err instanceof Error ? err.message : String(err);
+              console.error("Failed to import workflow:", message);
+              setError(
+                message ||
+                  "Failed to import workflow. Provide valid JSON or object."
+              );
+            }
+          }}
+          onBack={() => navigate("/dashboard")}
         />
-      </MainLayout>
-    );
-  }
-
-  // Graph/Form view
-  return (
-    <MainLayout title="Workflow Visualizer" onNavigate={handleNavigation}>
-      <div className="workflow-viewer-container">
-        {viewMode === "form" ? (
-          <div className="form-container">
-            <FormViewer
-              stateName={currentState}
-              workflow={workflow}
-              currentState={currentState}
-              onSubmit={(data) => console.log("Submit:", data)}
-              onReject={(data) => console.log("Reject:", data)}
-              onBack={handleBackToGraph}
-            />
-          </div>
-        ) : (
-          <div className="workflow-graph-container">
-            {showEditor && (
-              <div className="json-editor-panel">
-                <div className="editor-header">
-                  <h3>JSON Editor</h3>
-                  <button
-                    className="editor-toggle-btn"
-                    onClick={() => setShowEditor(false)}
-                    aria-label="Close editor"
-                  >
-                    ×
-                  </button>
-                </div>
-                <JsonEditor
-                  value={jsonText}
-                  onChange={setJsonText}
-                  onApply={handleApplyJson}
-                  error={error}
-                />
-              </div>
-            )}
-            <div className="graph-main-panel">
-              <WorkflowGraph
-                nodes={nodes}
-                edges={edges}
-                onNodeFormView={handleNodeFormView}
-              />
-              {!showEditor && (
-                <button
-                  className="show-editor-btn"
-                  onClick={() => setShowEditor(true)}
-                  title="Show JSON Editor"
-                >
-                  {"</>"}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </MainLayout>
+  );
+
+  const RunningPage = (
+    <MainLayout title="Running Workflows" onNavigate={handleNavigation}>
+      <RunningWorkflowsPage onBack={() => navigate("/dashboard")} />
+    </MainLayout>
+  );
+
+  const ApplicationDetailsPage = selectedWorkflow ? (
+    <MainLayout title="Application Details" onNavigate={handleNavigation}>
+      <ApplicationDetails
+        workflowData={selectedWorkflow}
+        onBack={() => {
+          setSelectedWorkflow(null);
+          navigate("/dashboard");
+        }}
+      />
+    </MainLayout>
+  ) : (
+    <Navigate to="/dashboard" replace />
+  );
+
+  const ViewerPage = (
+    <MainLayout title="Workflow Visualizer" onNavigate={handleNavigation}>
+      <div className="workflow-viewer-container">
+        <div className="workflow-graph-container">
+          {showEditor && (
+            <div className="json-editor-panel">
+              <div className="editor-header">
+                <h3>JSON Editor</h3>
+                <button
+                  className="editor-toggle-btn"
+                  onClick={() => setShowEditor(false)}
+                  aria-label="Close editor"
+                >
+                  ×
+                </button>
+              </div>
+              <JsonEditor
+                value={jsonText}
+                onChange={setJsonText}
+                onApply={handleApplyJson}
+                error={error}
+              />
+            </div>
+          )}
+          <div className="graph-main-panel">
+            <WorkflowGraph
+              nodes={nodes}
+              edges={edges}
+              onNodeFormView={() => {}}
+            />
+            {!showEditor && (
+              <button
+                className="show-editor-btn"
+                onClick={() => setShowEditor(true)}
+                title="Show JSON Editor"
+              >
+                {"</>"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </MainLayout>
+  );
+
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={DashboardPage} />
+      <Route path="/create-workflow" element={CreateWorkflowPage} />
+      <Route path="/running" element={RunningPage} />
+      <Route path="/builder" element={WorkflowBuilderPage} />
+      <Route path="/form-builder/new" element={FormBuilderRoute} />
+      <Route path="/applications/details" element={ApplicationDetailsPage} />
+      <Route path="/viewer" element={ViewerPage} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
   );
 }
 
 export default App;
+// End of file

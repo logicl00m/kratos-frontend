@@ -108,9 +108,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ onBack, onComplete }) =
             <CheckCircle size={64} className="success-icon" />
             <h2>Workflow Created Successfully!</h2>
             <p>Your workflow has been downloaded and is ready to use.</p>
-            <button onClick={onBack} className="success-btn">
-              Back to Dashboard
-            </button>
           </div>
         </div>
       </div>
@@ -132,10 +129,6 @@ const CreateWorkflow: React.FC<CreateWorkflowProps> = ({ onBack, onComplete }) =
   return (
     <div className={`create-workflow-container ${isDark ? 'dark' : ''}`}>
       <div className="create-workflow-header">
-        <button onClick={onBack} className="back-button">
-          <ArrowLeft size={20} />
-          Back to Dashboard
-        </button>
         <div className="header-content">
           <h1>Create Workflow from Template</h1>
           <p>Choose a template and assign people to get started quickly</p>

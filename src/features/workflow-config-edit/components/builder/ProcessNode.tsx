@@ -27,7 +27,11 @@ A11y: Avoid color-only meaning; include icon + text per WCAG 1.4.1.
 Docs: https://www.w3.org/TR/WCAG22/
 */
 
-const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({ data, selected, id }) => {
+const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({
+  data,
+  selected,
+  id,
+}) => {
   const getAssigneeIcon = () => {
     if (data.assignees.length === 0) return null;
     if (data.assignees.length === 1) {
@@ -78,25 +82,19 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({ data, selected, id 
 
       <div className="node-actions">
         <div className="action-label left">
-          <span className="action-indicator">
-            L
-          </span>
+          <span className="action-indicator">L</span>
           <span className="action-text">
             {data.actions.left.label || "Reject"}
           </span>
         </div>
         <div className="action-label center">
-          <span className="action-indicator">
-            C
-          </span>
+          <span className="action-indicator">C</span>
           <span className="action-text">
             {data.actions.center.label || "Submit"}
           </span>
         </div>
         <div className="action-label right">
-          <span className="action-indicator">
-            R
-          </span>
+          <span className="action-indicator">R</span>
           <span className="action-text">
             {data.actions.right.label || "Approve"}
           </span>
@@ -122,14 +120,18 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({ data, selected, id 
       <div className="node-form-chip-wrap">
         <button
           type="button"
-          className={`form-chip ${data.form ? 'connected' : 'disconnected'}`}
+          className={`form-chip ${data.form ? "connected" : "disconnected"}`}
           aria-label={`Attach or edit form for ${data.label}`}
-          title={data.form ? `binding: ${data.form.binding}` : 'Form: Not connected'}
+          title={
+            data.form ? `binding: ${data.form.binding}` : "Form: Not connected"
+          }
           onClick={() => data.onOpenFormConfig?.(id)}
         >
           <FileText size={14} aria-hidden="true" />
           <span className="form-chip-text">
-            {data.form ? `Form: ${data.form.name}@v${data.form.version}` : 'Form: Not connected'}
+            {data.form
+              ? `Form: ${data.form.name}@v${data.form.version}`
+              : "Form: Not connected"}
           </span>
         </button>
       </div>
@@ -138,4 +140,3 @@ const ProcessNode: React.FC<NodeProps<ProcessNodeData>> = ({ data, selected, id 
 };
 
 export default ProcessNode;
-

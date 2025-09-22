@@ -13,13 +13,25 @@ Docs: https://www.w3.org/WAI/tutorials/forms/labels/
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Download, Upload, Plus, Eye, Save, Edit2, Copy, Trash2 } from "lucide-react";
+import {
+  Download,
+  Upload,
+  Plus,
+  Eye,
+  Save,
+  Edit2,
+  Copy,
+  Trash2,
+} from "lucide-react";
 import FieldPalette from "./FieldPalette";
 import FieldList from "./FieldList";
 import FieldInspector from "./FieldInspector";
 import type { Field, FormConfig } from "../types/form-builder.types";
 import "../dynamic-form-builder.css";
-import { createForm, type FormDTO } from "@features/workflow-config-edit/services/formsApi";
+import {
+  createForm,
+  type FormDTO,
+} from "@features/workflow-config-edit/services/formsApi";
 
 type ContextMenuState = {
   field: Field;
@@ -91,7 +103,12 @@ interface FieldContextMenuProps {
   onDelete: () => void;
 }
 
-function FieldContextMenu({ position, onEdit, onDuplicate, onDelete }: FieldContextMenuProps) {
+function FieldContextMenu({
+  position,
+  onEdit,
+  onDuplicate,
+  onDelete,
+}: FieldContextMenuProps) {
   return (
     <div
       className="dfb-context-menu"
@@ -104,11 +121,19 @@ function FieldContextMenu({ position, onEdit, onDuplicate, onDelete }: FieldCont
         <Edit2 size={14} aria-hidden />
         Edit properties
       </button>
-      <button type="button" className="dfb-context-menu__item" onClick={onDuplicate}>
+      <button
+        type="button"
+        className="dfb-context-menu__item"
+        onClick={onDuplicate}
+      >
         <Copy size={14} aria-hidden />
         Duplicate field
       </button>
-      <button type="button" className="dfb-context-menu__item dfb-context-menu__item--danger" onClick={onDelete}>
+      <button
+        type="button"
+        className="dfb-context-menu__item dfb-context-menu__item--danger"
+        onClick={onDelete}
+      >
         <Trash2 size={14} aria-hidden />
         Delete field
       </button>
@@ -139,12 +164,22 @@ export interface DynamicFormBuilderProps {
   onCancel?: () => void;
 }
 
-export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFormBuilderProps) {
-  const [formName, setFormName] = useState(initialForm?.name ?? "applicationCore");
+export function DynamicFormBuilder({
+  initialForm,
+  onSave,
+  onCancel,
+}: DynamicFormBuilderProps) {
+  const [formName, setFormName] = useState(
+    initialForm?.name ?? "applicationCore"
+  );
   const [fields, setFields] = useState<Field[]>(INITIAL_FIELDS);
   const [selectedField, setSelectedField] = useState<Field | null>(null);
-  const [draggedFieldType, setDraggedFieldType] = useState<Field["type"] | null>(null);
-  const [draggedFieldIndex, setDraggedFieldIndex] = useState<number | null>(null);
+  const [draggedFieldType, setDraggedFieldType] = useState<
+    Field["type"] | null
+  >(null);
+  const [draggedFieldIndex, setDraggedFieldIndex] = useState<number | null>(
+    null
+  );
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
@@ -229,7 +264,8 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
     } else if (draggedFieldIndex !== null && draggedFieldIndex !== dropIndex) {
       const updatedFields = [...fields];
       const [movedField] = updatedFields.splice(draggedFieldIndex, 1);
-      const targetIndex = draggedFieldIndex < dropIndex ? dropIndex - 1 : dropIndex;
+      const targetIndex =
+        draggedFieldIndex < dropIndex ? dropIndex - 1 : dropIndex;
       updatedFields.splice(targetIndex, 0, movedField);
       setFields(updatedFields);
     }
@@ -245,7 +281,9 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
 
   const deleteField = (index: number) => {
     const fieldToRemove = fields[index];
-    const updatedFields = fields.filter((_, fieldIndex) => fieldIndex !== index);
+    const updatedFields = fields.filter(
+      (_, fieldIndex) => fieldIndex !== index
+    );
     setFields(updatedFields);
 
     if (selectedField?.id === fieldToRemove.id) {
@@ -316,7 +354,9 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
       const reader = new FileReader();
       reader.onload = (loadEvent) => {
         try {
-          const json = JSON.parse(loadEvent.target?.result as string) as FormConfig;
+          const json = JSON.parse(
+            loadEvent.target?.result as string
+          ) as FormConfig;
           const firstKey = Object.keys(json)[0];
 
           if (!firstKey || !json[firstKey]) {
@@ -325,7 +365,9 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
 
           const importedFields = json[firstKey].fields?.map((field) => ({
             ...field,
-            fieldActions: field.fieldActions ?? [...(DEFAULT_FIELD_ACTIONS[field.type] ?? [])],
+            fieldActions: field.fieldActions ?? [
+              ...(DEFAULT_FIELD_ACTIONS[field.type] ?? []),
+            ],
           }));
 
           if (!importedFields) {
@@ -361,20 +403,32 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
 
     try {
       const saved = await createForm(dto);
-      onSave?.({ id: saved.id, name: saved.name, version: saved.version, json: saved.json as Record<string, unknown> });
+      onSave?.({
+        id: saved.id,
+        name: saved.name,
+        version: saved.version,
+        json: saved.json as Record<string, unknown>,
+      });
       setSaveFeedback(`Saved ${saved.name}@v${saved.version}`);
     } catch (e) {
       console.error(e);
-      setSaveFeedback('Failed to save form');
+      setSaveFeedback("Failed to save form");
     }
 
     if (saveFeedbackTimeout.current) {
       window.clearTimeout(saveFeedbackTimeout.current);
     }
-    saveFeedbackTimeout.current = window.setTimeout(() => setSaveFeedback(null), 2500);
+    saveFeedbackTimeout.current = window.setTimeout(
+      () => setSaveFeedback(null),
+      2500
+    );
   };
 
-  const handleFieldContextMenu = (field: Field, index: number, position: { x: number; y: number }) => {
+  const handleFieldContextMenu = (
+    field: Field,
+    index: number,
+    position: { x: number; y: number }
+  ) => {
     setSelectedField(field);
     const adjusted = adjustContextMenuPosition(position.x, position.y);
     setContextMenu({ field, index, position: adjusted });
@@ -455,7 +509,11 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
             </div>
 
             {saveFeedback && (
-              <div className="dfb__save-feedback" role="status" aria-live="polite">
+              <div
+                className="dfb__save-feedback"
+                role="status"
+                aria-live="polite"
+              >
                 {saveFeedback}
               </div>
             )}
@@ -474,7 +532,11 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
             dragOverIndex={dragOverIndex}
           />
 
-          <Button onClick={addField} variant="outline" className="dfb__add-button">
+          <Button
+            onClick={addField}
+            variant="outline"
+            className="dfb__add-button"
+          >
             <Plus size={16} />
             Add field
           </Button>
@@ -488,8 +550,16 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
       />
 
       {isPreviewOpen && (
-        <div className="dfb-preview" role="dialog" aria-modal="true" aria-label="Form preview">
-          <div className="dfb-preview__backdrop" onClick={() => setIsPreviewOpen(false)} />
+        <div
+          className="dfb-preview"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Form preview"
+        >
+          <div
+            className="dfb-preview__backdrop"
+            onClick={() => setIsPreviewOpen(false)}
+          />
           <div className="dfb-preview__panel">
             <div className="dfb-preview__heading">
               <h3 className="dfb-preview__title">{formName} preview</h3>
@@ -512,7 +582,9 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
                     <h5>{field.name}</h5>
                     <div>
                       {field.data && (
-                        <p className="dfb-inspector__hint">Path: {field.data}</p>
+                        <p className="dfb-inspector__hint">
+                          Path: {field.data}
+                        </p>
                       )}
                       <p className="dfb-inspector__hint">ID: {field.id}</p>
                       {!!field.fieldActions.length && (
@@ -521,12 +593,16 @@ export function DynamicFormBuilder({ initialForm, onSave, onCancel }: DynamicFor
                         </p>
                       )}
                     </div>
-                    <span className="dfb-preview__field-type">{field.type}</span>
+                    <span className="dfb-preview__field-type">
+                      {field.type}
+                    </span>
                   </div>
                 ))
               ) : (
                 <div style={{ padding: "32px", textAlign: "center" }}>
-                  <p className="dfb-inspector__hint">No fields yet. Add a field to preview the layout.</p>
+                  <p className="dfb-inspector__hint">
+                    No fields yet. Add a field to preview the layout.
+                  </p>
                 </div>
               )}
             </div>

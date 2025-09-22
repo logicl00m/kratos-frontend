@@ -19,6 +19,7 @@ Docs: https://www.w3.org/WAI/tutorials/forms/labels/
 */
 // src/features/workflow/components/builder/BuilderDetailsPanel.tsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { X, Users, Plus, Trash2, Eye, Edit3, FileText } from "lucide-react";
 import type { Node, Edge } from "reactflow";
 import type {
@@ -33,8 +34,14 @@ interface BuilderDetailsPanelProps {
   selectedNode: Node | null;
   selectedEdge: Edge | null;
   onClose: () => void;
-  onNodeUpdate: (nodeId: string, data: ProcessNodeData | DecisionNodeData) => void;
-  onEdgeUpdate: (edgeId: string, data: { label?: string; operation?: string }) => void;
+  onNodeUpdate: (
+    nodeId: string,
+    data: ProcessNodeData | DecisionNodeData
+  ) => void;
+  onEdgeUpdate: (
+    edgeId: string,
+    data: { label?: string; operation?: string }
+  ) => void;
   onViewForm?: (nodeId: string) => void;
   availablePeople: Person[];
 }
@@ -48,10 +55,13 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
   onViewForm,
   availablePeople,
 }) => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [showAssigneeDropdown, setShowAssigneeDropdown] = useState(false);
   const [formQuery, setFormQuery] = useState("");
-  const [formResults, setFormResults] = useState<Array<{ id: string; name: string; version: number }>>([]);
+  const [formResults, setFormResults] = useState<
+    Array<{ id: string; name: string; version: number }>
+  >([]);
 
   type ActionSide = "left" | "center" | "right";
 
@@ -210,11 +220,16 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                 />
               </div>
               <div className="field-group">
-                <label htmlFor="state-internal-id">Internal ID (optional)</label>
+                <label htmlFor="state-internal-id">
+                  Internal ID (optional)
+                </label>
                 <input
                   id="state-internal-id"
                   type="text"
-                  value={(nodeData as ProcessNodeData | DecisionNodeData)?.internalId || ""}
+                  value={
+                    (nodeData as ProcessNodeData | DecisionNodeData)
+                      ?.internalId || ""
+                  }
                   onChange={(e) =>
                     onNodeUpdate(selectedNode.id, {
                       ...nodeData,
@@ -253,7 +268,10 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                   <ul className="assignee-list">
                     {filteredPeople.map((person: Person) => (
                       <li key={person.id} className="assignee-item">
-                        <button type="button" onClick={() => handleAddAssignee(person)}>
+                        <button
+                          type="button"
+                          onClick={() => handleAddAssignee(person)}
+                        >
                           <span>{person.name}</span>
                           <span className="assignee-type">{person.type}</span>
                         </button>
@@ -309,7 +327,11 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                           placeholder="Action label"
                           value={action?.label || ""}
                           onChange={(e) =>
-                            handleActionUpdate(side as "left" | "center" | "right", "label", e.target.value)
+                            handleActionUpdate(
+                              side as "left" | "center" | "right",
+                              "label",
+                              e.target.value
+                            )
                           }
                           className="input-field"
                         />
@@ -317,7 +339,11 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                           placeholder="Operation/description"
                           value={action?.operation || ""}
                           onChange={(e) =>
-                            handleActionUpdate(side as "left" | "center" | "right", "operation", e.target.value)
+                            handleActionUpdate(
+                              side as "left" | "center" | "right",
+                              "operation",
+                              e.target.value
+                            )
                           }
                           className="textarea-field"
                           rows={2}
@@ -336,7 +362,9 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
             {isProcessNode && (
               <div className="section">
                 <div className="section-header">
-                  <span className="section-title"><FileText size={14} /> Form</span>
+                  <span className="section-title">
+                    <FileText size={14} /> Form
+                  </span>
                 </div>
                 <div className="field-group">
                   <label htmlFor="builder-form-search">Attach existing</label>
@@ -349,7 +377,9 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                     className="input-field"
                     aria-describedby="builder-form-help"
                   />
-                  <div id="builder-form-help" className="help-text">Search by name; latest first.</div>
+                  <div id="builder-form-help" className="help-text">
+                    Search by name; latest first.
+                  </div>
                   {formResults.length > 0 && (
                     <ul className="combobox-list">
                       {formResults.map((f) => (
@@ -362,7 +392,12 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                               const data = nodeData as ProcessNodeData;
                               onNodeUpdate(selectedNode.id, {
                                 ...data,
-                                form: { id: f.id, name: f.name, version: f.version, binding: 'pinned' },
+                                form: {
+                                  id: f.id,
+                                  name: f.name,
+                                  version: f.version,
+                                  binding: "pinned",
+                                },
                               });
                               setFormQuery("");
                               setFormResults([]);
@@ -378,31 +413,50 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
 
                 <div className="field-group">
                   <span className="label">Binding</span>
-                  <div className="radio-row" role="radiogroup" aria-label="Form binding">
+                  <div
+                    className="radio-row"
+                    role="radiogroup"
+                    aria-label="Form binding"
+                  >
                     <label className="radio-label">
                       <input
                         type="radio"
                         name="form-binding"
-                        checked={(nodeData as ProcessNodeData).form?.binding !== 'latest'}
+                        checked={
+                          (nodeData as ProcessNodeData).form?.binding !==
+                          "latest"
+                        }
                         onChange={() => {
                           const data = nodeData as ProcessNodeData;
                           if (!data.form || !selectedNode) return;
-                          onNodeUpdate(selectedNode.id, { ...data, form: { ...data.form, binding: 'pinned' } });
+                          onNodeUpdate(selectedNode.id, {
+                            ...data,
+                            form: { ...data.form, binding: "pinned" },
+                          });
                         }}
                       />
                       <span>
-                        Pinned {(nodeData as ProcessNodeData).form ? `(v${(nodeData as ProcessNodeData).form!.version})` : ''}
+                        Pinned{" "}
+                        {(nodeData as ProcessNodeData).form
+                          ? `(v${(nodeData as ProcessNodeData).form!.version})`
+                          : ""}
                       </span>
                     </label>
                     <label className="radio-label">
                       <input
                         type="radio"
                         name="form-binding"
-                        checked={(nodeData as ProcessNodeData).form?.binding === 'latest'}
+                        checked={
+                          (nodeData as ProcessNodeData).form?.binding ===
+                          "latest"
+                        }
                         onChange={() => {
                           const data = nodeData as ProcessNodeData;
                           if (!data.form || !selectedNode) return;
-                          onNodeUpdate(selectedNode.id, { ...data, form: { ...data.form, binding: 'latest' } });
+                          onNodeUpdate(selectedNode.id, {
+                            ...data,
+                            form: { ...data.form, binding: "latest" },
+                          });
                         }}
                       />
                       <span>Track latest</span>
@@ -411,15 +465,22 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                 </div>
 
                 <div className="field-group">
-                  <label htmlFor="builder-require-form">Require to transition</label>
+                  <label htmlFor="builder-require-form">
+                    Require to transition
+                  </label>
                   <input
                     id="builder-require-form"
                     type="checkbox"
-                    checked={Boolean((nodeData as ProcessNodeData).requireFormToTransition)}
+                    checked={Boolean(
+                      (nodeData as ProcessNodeData).requireFormToTransition
+                    )}
                     onChange={(e) => {
                       const data = nodeData as ProcessNodeData;
                       if (!selectedNode) return;
-                      onNodeUpdate(selectedNode.id, { ...data, requireFormToTransition: e.target.checked });
+                      onNodeUpdate(selectedNode.id, {
+                        ...data,
+                        requireFormToTransition: e.target.checked,
+                      });
                     }}
                   />
                 </div>
@@ -430,9 +491,10 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                     className="action-btn link"
                     onClick={() => {
                       if (!selectedNode) return;
-                      // Dispatch a custom event to request navigation to form builder
-                      const detail = { nodeId: selectedNode.id } as const;
-                      window.dispatchEvent(new CustomEvent('kratos:navigate-form-builder-new', { detail }));
+                      navigate("/form-builder/new", {
+                        state: { from: "/builder", nodeId: selectedNode.id },
+                        replace: false,
+                      });
                     }}
                   >
                     <Plus size={14} /> Create new
@@ -444,7 +506,13 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                     <div className="json-viewer">
                       <details>
                         <summary>Form JSON</summary>
-                        <pre aria-label="Form JSON preview">{JSON.stringify((nodeData as ProcessNodeData).form, null, 2)}</pre>
+                        <pre aria-label="Form JSON preview">
+                          {JSON.stringify(
+                            (nodeData as ProcessNodeData).form,
+                            null,
+                            2
+                          )}
+                        </pre>
                       </details>
                     </div>
                   </div>
@@ -518,7 +586,7 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
         )}
 
         {selectedEdge && (
-            <div className="section">
+          <div className="section">
             <div className="section-title">Edge Configuration</div>
             <div className="field-group">
               <label htmlFor="edge-action-label">Action Label</label>
@@ -554,4 +622,3 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
 };
 
 export default BuilderDetailsPanel;
-
