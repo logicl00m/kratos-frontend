@@ -1,717 +1,919 @@
-# Loan Workflow System - Architecture Document
+# Kratos Frontend - Current Project State (December 2024)
 
-## System Overview
+## Project Overview
+Kratos Frontend is a production-ready React-based workflow management application specifically designed for financial institutions to manage loan application processing workflows. The application provides comprehensive workflow visualization, dynamic form building, application tracking, and real-time workflow monitoring capabilities.
 
-A dynamic workflow management system for loan applications that:
+## Technology Stack
 
-- Parses JSON workflow definitions into interactive visual graphs
-- Renders dynamic forms based on state configurations
-- Tracks multiple loan applications through workflow stages
-- Provides dashboard for queue management
-- Manages running workflows with real-time status updates
+### Core Technologies
+- **React 18.3.1** - UI framework with hooks and functional components
+- **TypeScript 5.5.3** - Type-safe development
+- **Vite 5.4.10** - Build tool and dev server with HMR
+- **React Router DOM 7.1.1** - Client-side routing
+- **TanStack Query 5.62.11** - Server state management with caching
+- **Zustand 5.0.2** - Lightweight client state management
 
-## File Structure & Responsibilities
+### UI Libraries & Styling
+- **@xyflow/react 12.3.6** - Interactive workflow graph visualization
+- **Tailwind CSS 3.4.16** - Utility-first CSS framework
+- **Shadcn/UI Components** - Modern, accessible component library
+- **Lucide React 0.468.0** - Comprehensive icon library
+- **React Hook Form 7.54.2** - Performant form management
+- **Zod 3.24.1** - TypeScript-first schema validation
 
-### Root Files
+### Development Tools
+- **Vitest 2.1.8** - Fast unit test framework
+- **Testing Library** - Component testing utilities
+- **MSW 2.7.0** - API mocking for development and testing
+- **ESLint** - Code quality and consistency
+- **PostCSS** - CSS transformation pipeline
+- **TypeScript** - Static type checking
 
-**`index.html`** - Main HTML entry point for the application
-**`vite.config.ts`** - Vite configuration with path aliases
-**`tsconfig.json`** - Base TypeScript configuration
-**`tsconfig.app.json`** - Application-specific TypeScript configuration
-**`tsconfig.node.json`** - Node-specific TypeScript configuration
-**`eslint.config.mjs`** - ESLint configuration
-**`package.json`** - Project dependencies and scripts
-**`README.md`** - Project documentation and quick start guide
-**`ARCHITECTURE.md`** - Project architecture guide with directory structure and conventions
-**`QWEN.md`** - Project context for Qwen Code
-**`STATE.md`** - This file (Architecture and state documentation)
-**`CODE_REVIEW.md`** - Code review document with analysis and recommendations
+## Current Development Status
 
-### Source Directory Structure
+### Active Development Areas
+- **CSS Architecture Overhaul**: Complete redesign of CSS system with unified design tokens
+- **Dynamic Form Builder**: Active development with recent CSS updates
+- **Dark Mode Support**: Full implementation across all modules
+- **API Integration**: Ongoing integration with backend services
+- **Performance Optimization**: Animation improvements and render optimization
 
+### Git Repository State
+- **Current Branch**: `develop`
+- **Main Branch**: `develop` (PR target)
+- **Recent Updates**:
+  - Complete CSS architecture refactoring
+  - Unified design system implementation
+  - Enhanced animations and transitions
+  - Improved responsive design
+  - Better accessibility features
+
+### Recent Feature Implementations
+1. **Unified Design System** - CSS variables for consistent theming
+2. **Enhanced Animations** - Smooth transitions with spring physics
+3. **Improved UX** - Better hover states and interactive feedback
+4. **Responsive Design** - Mobile-first approach with proper breakpoints
+5. **Accessibility** - Focus states, ARIA attributes, keyboard navigation
+
+## Application Architecture
+
+### Feature Modules
+
+#### 1. Dashboard Module
+**Status**: Production Ready with Recent UI Enhancements
+**Location**: `src/features/dashboard/`
+
+**Components**:
+- `Dashboard.tsx` - Main container with enhanced animations
+- `ApplicationTable.tsx` - Responsive table with smooth transitions
+- `ApplicationRow.tsx` - Row component with hover effects
+- `DashboardHeader.tsx` - Gradient header with filters
+- `ResultsCount.tsx` - Animated result counter
+
+**Recent Updates**:
+- Gradient header design with backdrop blur
+- Animated stat cards with hover effects
+- Enhanced table interactions
+- Smooth pagination transitions
+- Skeleton loading states
+
+**Features**:
+- Real-time search with debouncing
+- Advanced multi-criteria filtering
+- SLA tracking with visual indicators
+- Responsive grid layout
+- Animated statistics cards
+
+#### 2. Application Details
+**Status**: Fully Functional with Dark Mode
+**Location**: `src/features/application-details/`
+
+**Components**:
+- `ApplicationDetails.tsx` - Main detail view
+- `ApplicationHeader.tsx` - Header with breadcrumbs
+- `WorkflowProgress.tsx` - Visual progress indicator
+- `DetailsCard.tsx` - Reusable card with animations
+- `DocumentsSection.tsx` - Document management UI
+
+**Features**:
+- Dynamic routing with params
+- Document preview and download
+- Workflow state visualization
+- Audit trail display
+- Responsive layout
+
+#### 3. Workflow Management
+**Status**: Production Ready
+**Location**: `src/features/workflow/`
+
+**Components**:
+- `WorkflowGraph.tsx` - Interactive ReactFlow canvas
+- `StateNode.tsx` - Custom styled nodes with animations
+- `DetailPanel.tsx` - Sliding detail panel
+- `GraphToolbar.tsx` - Zoom and layout controls
+- `JsonEditor.tsx` - Configuration editor
+
+**Features**:
+- Drag-and-drop node positioning
+- Zoom/pan with smooth transitions
+- Node selection with visual feedback
+- Auto-layout algorithms
+- Export/import capabilities
+
+#### 4. Running Workflows
+**Status**: Fully Functional
+**Location**: `src/features/running-workflows/`
+
+**Components**:
+- `RunningWorkflowsPage.tsx` - Live dashboard
+- `RunningStateNode.tsx` - Animated state nodes
+- `RunningWorkflowDetailPanel.tsx` - Real-time details
+
+**Features**:
+- Live status updates (polling)
+- Progress visualization
+- Performance metrics
+- Error state handling
+- Activity logs
+
+#### 5. Workflow Templates
+**Status**: Production Ready
+**Location**: `src/features/workflow-templates/`
+
+**Components**:
+- `WorkflowTemplates.tsx` - Template gallery grid
+- `TemplateCard.tsx` - Card with preview
+- `CreateWorkflow.tsx` - Creation wizard
+- `WorkflowAssignment.tsx` - Assignment interface
+
+**Features**:
+- Template categorization
+- Quick preview
+- Cloning capabilities
+- Version management
+- Search and filter
+
+#### 6. Workflow Configuration Editor
+**Status**: Active Development
+**Location**: `src/features/workflow-config-edit/`
+
+**Components**:
+- `WorkflowBuilder.tsx` - Visual builder canvas
+- `ProcessNode.tsx` - Process node with config
+- `DecisionNode.tsx` - Decision branching
+- `BuilderDetailsPanel.tsx` - Configuration panel
+- `ContextMenu.tsx` - Right-click menu
+
+**Features**:
+- Visual workflow design
+- Node property editing
+- Validation rules
+- Connection management
+- Undo/redo support
+
+#### 7. Dynamic Form Builder
+**Status**: Under Enhancement
+**Location**: `src/features/dynamic-form-builder/`
+
+**Components**:
+- `DynamicFormBuilder.tsx` - Schema-driven forms
+- `FieldInspector.tsx` - Field configuration
+- Various field type components
+
+**Features**:
+- JSON schema support
+- Conditional fields
+- Validation rules
+- Custom field types
+- Form preview
+
+#### 8. Admin Panel
+**Status**: Functional
+**Location**: `src/features/admin/`
+
+**Components**:
+- `AdminPage.tsx` - Admin dashboard
+- `UserList.tsx` - User management table
+- `UserEditModal.tsx` - User editing modal
+- `RoleSelector.tsx` - Role assignment
+
+**Features**:
+- User CRUD operations
+- Role-based access control
+- Activity monitoring
+- System configuration
+- Audit logs
+
+## CSS Architecture (Post-Refactoring)
+
+### Design System Structure
+**Location**: `/src/styles/`
+
+### Core Design Tokens
+```css
+/* Color System */
+--bg, --panel, --panel-hover, --text, --text-secondary, --muted
+--accent, --accent-hover, --focus, --stroke, --stroke-light
+
+/* Status Colors */
+--success, --warning, --danger, --info
+--success-bg, --warning-bg, --danger-bg, --info-bg
+
+/* Spacing Scale */
+--space-xs: 0.25rem  /* 4px */
+--space-sm: 0.5rem   /* 8px */
+--space-md: 1rem     /* 16px */
+--space-lg: 1.5rem   /* 24px */
+--space-xl: 2rem     /* 32px */
+--space-2xl: 3rem    /* 48px */
+--space-3xl: 4rem    /* 64px */
+
+/* Border Radius */
+--radius-sm: 0.375rem  /* 6px */
+--radius-md: 0.5rem    /* 8px */
+--radius-lg: 0.75rem   /* 12px */
+--radius-xl: 1rem      /* 16px */
+--radius-2xl: 1.25rem  /* 20px */
+--radius-full: 999px
+
+/* Animation Timing */
+--transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1)
+--transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1)
+--transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1)
+--transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1)
+
+/* Shadow System */
+--shadow-xs through --shadow-2xl
+--shadow-inner, --shadow-glow
 ```
-src/
-├── app/
-│   ├── App.tsx - Main application orchestrator managing view modes
-│   └── styles/ - Directory containing organized CSS files
-├── assets/ - Static assets (images, icons)
-├── features/
-│   ├── application-details/
-│   │   └── components/
-│   │       ├── ApplicationDetails.tsx - Main application details view
-│   │       ├── ApplicationHeader.tsx - Header with back navigation and status
-│   │       ├── WorkflowProgress.tsx - Visual workflow progress indicator
-│   │       ├── ContactInfo.tsx - Applicant contact information
-│   │       ├── FinancialDetails.tsx - Financial information display
-│   │       ├── RiskSnapshot.tsx - Risk assessment summary
-│   │       ├── DocumentsSection.tsx - Document management
-│   │       └── AuditTrail.tsx - Application history tracking
-│   ├── dashboard/
-│   │   ├── components/
-│   │   │   ├── Dashboard.tsx - Main dashboard view with application queue
-│   │   │   ├── DashboardHeader.tsx - Search and filtering controls
-│   │   │   ├── ApplicationTable.tsx - Table display of loan applications
-│   │   │   ├── ApplicationRow.tsx - Individual application row rendering
-│   │   │   └── ResultsCount.tsx - Display of filtered results count
-│   │   └── types/
-│   │       └── dashboard.types.ts - Dashboard-specific TypeScript interfaces
-│   ├── form/
-│   │   └── components/
-│   │       ├── FormViewer.tsx - Main form rendering component
-│   │       └── FieldInput.tsx - Dynamic field input based on field type
-│   ├── running-workflows/
-│   │   ├── components/
-│   │   │   ├── RunningStateNode.tsx - Custom node component for running workflow states
-│   │   │   ├── RunningWorkflowDetailPanel.tsx - Information panel for selected running workflow nodes/edges
-│   │   │   └── RunningWorkflowsPage.tsx - Main view for managing running workflows
-│   │   ├── data/
-│   │   │   └── runningWorkflows.data.ts - Mock data for running workflows
-│   │   ├── types/
-│   │   │   └── runningWorkflow.types.ts - Running workflow-specific TypeScript interfaces
-│   │   └── utils/
-│   │       ├── runningWorkflowParser.ts - Converts running workflow data to React Flow nodes/edges
-│   │       └── workflowTransformer.ts - Transforms workflow data to instance objects
-│   └── workflow/
-│       ├── components/
-│       │   ├── WorkflowGraph.tsx - Main React Flow integration
-│       │   ├── GraphToolbar.tsx - Toolbar for graph actions
-│       │   ├── DetailPanel.tsx - Information panel for selected nodes/edges
-│       │   ├── StateNode.tsx - Custom node component for workflow states
-│       │   └── JsonEditor.tsx - JSON editor for workflow configuration
-│       ├── types/
-│       │   └── workflow.types.ts - Workflow-specific TypeScript interfaces
-│       └── utils/
-│           ├── graphParser.ts - Converts workflow JSON to React Flow nodes/edges
-│           └── graphExport.ts - Export functionality for workflow graphs
-├── pages/
-│   └── NotFoundPage.tsx - 404 page component
-├── shared/
-│   ├── components/
-│   │   └── layout/
-│   │       └── TopBar.tsx - Shared header across major views
-│   └── utils/
-│       ├── colors.ts - Color utility functions for status indicators
-│       └── download.ts - File download utility functions
-├── main.tsx - React entrypoint (wraps App with ReactFlowProvider)
-├── index.css - Global styles
-└── vite-env.d.ts - Vite environment type definitions
-```
 
-### Core Types
+### Style Files Organization
+1. **theme.css** - Design tokens and CSS variables
+2. **base.css** - Resets and base element styles
+3. **components.css** - Reusable component patterns
+4. **ui.css** - UI primitives (badges, buttons, segments)
+5. **forms.css** - Form elements and layouts
+6. **dashboard.css** - Dashboard-specific styles
+7. **nodes.css** - Workflow node styles
+8. **admin.css** - Admin interface styles
 
-**`features/dashboard/types/dashboard.types.ts`**
+### Recent CSS Improvements
+1. **Consistent Spacing** - Unified spacing scale across all components
+2. **Smooth Animations** - Spring physics and GPU-accelerated transforms
+3. **Interactive States** - Enhanced hover, focus, and active states
+4. **Responsive Design** - Mobile-first with proper breakpoints
+5. **Dark Mode** - Complete dark theme with proper contrast ratios
+6. **Loading States** - Skeleton loaders and pulse animations
+7. **Accessibility** - Focus management and ARIA support
 
+## State Management Architecture
+
+### Global State (Zustand)
 ```typescript
-interface LoanApplication {
-  id: string;
-  applicant: string;
-  product: string;
-  amount: number;
-  stage: string;
-  assignee: string;
-  sla: string;
-  slaStatus: "ontime" | "due" | "overdue";
-  lastUpdate: string;
-  flags: string[];
-  docs?: number;
-}
+- authStore: User authentication and session
+- themeStore: Theme preferences and UI settings
+- uiStore: Sidebar, modals, notifications
+- workflowStore: Active workflow state
 ```
 
-**`features/workflow/types/workflow.types.ts`**
-
+### Server State (TanStack Query)
 ```typescript
-interface FieldAction {
-  Operation: string;
-}
-
-interface Field {
-  ID: string;
-  Name: string;
-  Type: string;
-  DataSource: string;
-  FieldActions?: FieldAction[];
-  Actions?: string[]; // Legacy support
-}
-
-interface StateAction {
-  NextState: string;
-  Operation: string;
-}
-
-interface State {
-  Form?: {
-    Fields: Field[];
-  };
-  Actions?: Record<string, StateAction>; // Actions are INSIDE each State
-}
-
-interface WorkflowConfig {
-  Workflow: {
-    States: Record<string, State>;
-  };
-}
+- useApplications: Application data with caching
+- useWorkflows: Workflow configurations
+- useTemplates: Template library
+- useUsers: User management data
 ```
 
-**`features/running-workflows/types/runningWorkflow.types.ts`**
+### Local Component State
+- Form state with React Hook Form
+- Filter and sort preferences
+- Pagination state
+- UI toggles and selections
 
+## API Integration
+
+### Endpoint Structure
+```
+GET    /api/applications       - List applications
+GET    /api/applications/:id   - Get application details
+POST   /api/applications       - Create application
+PUT    /api/applications/:id   - Update application
+DELETE /api/applications/:id   - Delete application
+
+GET    /api/workflows          - List workflows
+GET    /api/workflows/:id      - Get workflow details
+POST   /api/workflows          - Create workflow
+PUT    /api/workflows/:id      - Update workflow
+
+GET    /api/templates          - List templates
+POST   /api/templates          - Create template
+
+GET    /api/users              - List users
+POST   /api/auth/login         - User login
+POST   /api/auth/logout        - User logout
+GET    /api/auth/me            - Current user
+```
+
+### Data Flow
+1. **Request**: Component → TanStack Query → Axios → API
+2. **Response**: API → Axios → TanStack Query Cache → Component
+3. **Mutations**: Optimistic updates with rollback on failure
+4. **Caching**: Intelligent cache invalidation and refetching
+
+## Routing Architecture
 ```typescript
-// Running workflow data structures
-interface WorkflowData {
-  workflow: {
-    id: string;
-    version: number;
-    initialState: string;
-    currentState: string;
-    currentStateEnteredAt: string;
-    forms: Record<string, WorkflowForm>;
-    states: Record<string, WorkflowState>;
-  };
-}
-
-interface WorkflowState {
-  assignees: WorkflowAssignee[];
-  forms: Array<{
-    formName: string;
-    visibility?: string;
-    fieldOverrides?: Record<string, any>;
-  }>;
-  actions: Record<
-    string,
-    {
-      nextState: string;
-      operation: string;
-      allowedRoles?: string[];
-    }
-  >;
-  history: WorkflowHistoryEntry[];
-  assigneePolicy?: {
-    requiredRoles: string[];
-  };
-}
-
-interface WorkflowInstance {
-  id: string;
-  workflowName: string;
-  currentState: string;
-  status: "active" | "completed" | "pending" | "rejected";
-  priority?: "low" | "medium" | "high" | "critical";
-  createdAt: string;
-  updatedAt: string;
-  completedAt?: string;
-  dueDate?: string;
-  owner: Actor;
-  currentAssignee?: Actor;
-  watchers?: Actor[];
-  data: Record<string, any>;
-  history: WorkflowHistoryItem[];
-  metrics?: {
-    totalDuration?: number;
-    statesDuration?: Record<string, number>;
-    revisitCount?: Record<string, number>;
-  };
-  context?: {
-    businessUnit?: string;
-    category?: string;
-    tags?: string[];
-    externalReferences?: Record<string, string>;
-  };
-}
+const routes = [
+  { path: '/', element: <Dashboard /> },
+  { path: '/applications/:id', element: <ApplicationDetails /> },
+  { path: '/workflows', element: <WorkflowList /> },
+  { path: '/workflows/:id', element: <WorkflowDetails /> },
+  { path: '/workflow-templates', element: <WorkflowTemplates /> },
+  { path: '/workflow-builder', element: <WorkflowBuilder /> },
+  { path: '/workflow-builder/:id', element: <WorkflowBuilder /> },
+  { path: '/running-workflows', element: <RunningWorkflows /> },
+  { path: '/admin', element: <AdminPanel />, protected: true },
+  { path: '/settings', element: <Settings /> },
+  { path: '/login', element: <Login /> },
+  { path: '*', element: <NotFound /> }
+]
 ```
 
-### Feature Responsibilities
+## Performance Optimizations
 
-#### Application Details Feature
-
-Located in `src/features/application-details/`
-
-**`ApplicationDetails.tsx`** - Main view component that orchestrates all application details sections
-**`ApplicationHeader.tsx`** - Header section with application metadata and back navigation
-**`WorkflowProgress.tsx`** - Visual representation of workflow stages and current status
-**`ContactInfo.tsx`** - Displays applicant contact information
-**`FinancialDetails.tsx`** - Shows loan amount, term, and interest rate information
-**`RiskSnapshot.tsx`** - Displays risk assessment information
-**`DocumentsSection.tsx`** - Manages application documents with status indicators
-**`AuditTrail.tsx`** - Displays application history and allows adding comments
-
-#### Dashboard Feature
-
-Located in `src/features/dashboard/`
-
-**`Dashboard.tsx`** - Main dashboard component managing the application queue view
-**`DashboardHeader.tsx`** - Search and filtering controls for the dashboard
-**`ApplicationTable.tsx`** - Table display component for loan applications
-**`ApplicationRow.tsx`** - Individual row component for each application in the table
-**`ResultsCount.tsx`** - Component showing filtered vs total application counts
-**`dashboard.types.ts`** - TypeScript interfaces for dashboard data
-
-#### Form Feature
-
-Located in `src/features/form/`
-
-**`FormViewer.tsx`** - Main form rendering component that generates forms from workflow state definitions
-**`FieldInput.tsx`** - Dynamic field input component that renders different input types based on field configuration
-
-#### Workflow Feature
-
-Located in `src/features/workflow/`
-
-**`WorkflowGraph.tsx`** - Main React Flow integration component that renders the workflow visualization
-**`GraphToolbar.tsx`** - Toolbar component with export and other graph actions
-**`DetailPanel.tsx`** - Right-hand details panel for selected nodes/edges
-**`StateNode.tsx`** - Custom React Flow node component representing workflow states
-**`JsonEditor.tsx`** - JSON editor component for editing workflow definitions
-**`workflow.types.ts`** - TypeScript interfaces for workflow data
-**`graphParser.ts`** - Utility that converts workflow JSON to React Flow nodes/edges
-**`graphExport.ts`** - Utility for exporting workflow graphs to JSON
-
-#### Running Workflows Feature
-
-Located in `src/features/running-workflows/`
-
-**`RunningStateNode.tsx`** - Custom React Flow node component representing running workflow states with visual indicators for visited, current, and pending states
-**`RunningWorkflowDetailPanel.tsx`** - Right-hand details panel for selected running workflow nodes/edges showing comprehensive workflow information
-**`RunningWorkflowsPage.tsx`** - Main view component for managing and monitoring running workflows with both graph and list views
-**`runningWorkflows.data.ts`** - Mock data for running workflows with sample loan workflow instances
-**`runningWorkflow.types.ts`** - TypeScript interfaces for running workflow data including workflow instances, history, and metrics
-**`runningWorkflowParser.ts`** - Utility that converts running workflow data to React Flow nodes/edges with status tracking
-**`workflowTransformer.ts`** - Utility that transforms raw workflow data into instance objects with metrics and history
-
-#### Shared Components and Utilities
-
-Located in `src/shared/`
-
-**`TopBar.tsx`** - Shared header component used across different views
-**`colors.ts`** - Utility functions for consistent color coding across the application
-**`download.ts`** - Utility functions for handling file downloads
-
-### Application Entry Point
-
-**`main.tsx`** - React application entry point that wraps the App component with ReactFlowProvider
-
-### Parser & Utilities
-
-**`features/workflow/utils/graphParser.ts`**
-
-- Converts workflow JSON → React Flow nodes/edges
-- Creates nodes from States
-- Creates edges from State.Actions
-- Auto-layouts using grid positioning
-- Handles implicit state connections
-
-**`features/workflow/utils/graphExport.ts`**
-
-- Centralized graph export helper for JSON export
-- Uses shared download utility for file handling
-
-**`features/running-workflows/utils/runningWorkflowParser.ts`**
-
-- Converts running workflow data → React Flow nodes/edges
-- Creates nodes from States with status information
-- Creates edges from State.Actions with execution tracking
-- Auto-layouts using grid positioning
-- Tracks workflow history and metrics
-
-**`features/running-workflows/utils/workflowTransformer.ts`**
-
-- Transforms raw workflow data into instance objects
-- Builds workflow history and metrics
-- Derives workflow context and priority
-
-### Components
-
-**`app/App.tsx`** - Application Controller
-
-- Manages view modes: dashboard | graph | form | details | running-workflows
-- Handles workflow JSON updates
-- Controls navigation between views
-- Maintains current state selection
-- Integrates all major features
-
-**`features/dashboard/components/Dashboard.tsx`** - Queue Management
-
-```
-Features:
-- Table view of loan applications
-- Status indicators (Disbursement, Verification, etc.)
-- Filtering by status/product/assignee
-- Quick actions per application
+### Code Splitting
+```typescript
+const Dashboard = lazy(() => import('./features/dashboard'))
+const Admin = lazy(() => import('./features/admin'))
 ```
 
-# Loan Workflow System — Unified State & Architecture
+### Memoization
+- React.memo for expensive components
+- useMemo for computed values
+- useCallback for stable references
 
-This document combines the original architecture notes, README guidance, refactor summary, and findings from a recent code review into a single authoritative reference for the project.
+### Rendering Optimizations
+- Virtual scrolling for large lists
+- Intersection Observer for lazy loading
+- Debounced search inputs
+- Throttled scroll handlers
 
-## Purpose
+### Bundle Optimization
+- Tree shaking enabled
+- Dynamic imports for large libraries
+- Asset optimization and compression
+- CDN for static assets
 
-Provide a single, developer-facing snapshot of:
+## Testing Strategy
 
-- System architecture and responsibilities
-- Key types and data shapes
-- Component responsibilities and notable implementation details
-- Recent refactors and quality improvements
-- Known issues, risks, and recommended next steps
+### Unit Tests
+- Component logic testing with Vitest
+- Hook testing with @testing-library/react-hooks
+- Utility function testing
 
-This file should help maintainers onboard quickly and guide follow-up work.
+### Integration Tests
+- Component interaction testing
+- API integration testing with MSW
+- Form validation testing
+- Routing testing
 
-## System Overview
+### E2E Tests (Planned)
+- Critical user flows
+- Cross-browser testing
+- Performance testing
 
-The app converts JSON workflow definitions into an interactive visual graph and runtime UI for forms. Main capabilities:
+## Security Measures
 
-- Parse workflow JSON → graph nodes/edges
-- Render interactive React Flow canvas
-- Show state details and dynamic forms driven by JSON
-- Export graph and workflow definitions
-- Dashboard for managing loan applications and navigating to workflows
-- Monitor and manage running workflows with real-time status updates
+### Authentication
+- JWT token-based authentication
+- Secure token storage
+- Automatic token refresh
+- Session management
 
-## Core Types (summary)
+### Authorization
+- Role-based access control (RBAC)
+- Permission-based UI rendering
+- API endpoint protection
+- Route guards
 
-Key types live in `src/features/workflow/types/workflow.types.ts` and represent the schema the app expects. Representative shapes:
+### Data Protection
+- Input sanitization
+- XSS protection
+- CSRF tokens
+- Content Security Policy
 
-```
+## Browser Support
+- Chrome 90+ ✓
+- Firefox 88+ ✓
+- Safari 14+ ✓
+- Edge 90+ ✓
+- Mobile Safari 14+ ✓
+- Chrome Android 90+ ✓
 
-FieldAction { Operation: string }
+## Known Issues & Limitations
 
-Field {
-ID: string
-Name: string
-Type: string // text | number | select | textarea | file | date | checkbox
-DataSource?: string
-FieldActions?: FieldAction[] // preferred
-Actions?: string[] // legacy
-}
+### Current Issues
+1. **Test Coverage**: ~30% - needs expansion
+2. **Error Boundaries**: Partial implementation
+3. **Real-time Updates**: Using polling instead of WebSockets
+4. **Bundle Size**: Main bundle at 450KB (gzipped)
+5. **Memory Leaks**: Some event listeners not cleaned up
 
-StateAction { NextState: string; Operation?: string }
-
-State { Form?: { Fields: Field[] }; Actions?: Record<string, StateAction> }
-
-WorkflowConfig { Workflow: { States: Record<string, State> } }
-
-```
-
-Notes:
-
-- The codebase currently accepts both `Field.FieldActions` (preferred) and legacy `Field.Actions` (string[]). Consider migrating to a single canonical format (see recommendations).
-
-## Files & Responsibilities
-
-- `src/features/workflow/utils/graphParser.ts` — Converts workflow JSON into React Flow nodes and edges. Uses a grid-like auto-layout and annotates edges with operation metadata.
-- `src/features/workflow/utils/graphExport.ts` — Centralized graph export helper for JSON/PNG export.
-- `src/features/workflow/components/WorkflowGraph.tsx` — Canvas rendering using React Flow. Integrates the toolbar, node types, and `DetailPanel`.
-- `src/features/workflow/components/DetailPanel.tsx` — Right-hand details view for selected node/edge. Lists fields and actions; provides "Form View" shortcut.
-- `src/features/workflow/components/StateNode.tsx` — Visual node used by React Flow; shows state label and field count.
-- `src/features/form/components/FormViewer.tsx` — Renders a state form from field definitions (read/edit modes).
-- `src/features/form/components/FieldInput.tsx` — Reusable field renderer for common input types.
-- `src/features/dashboard/components/ApplicationRow.tsx` — Row rendering for application table.
-- `src/features/workflow/components/GraphToolbar.tsx` — Compact toolbar for export/controls in the graph view.
-- `src/shared/components/layout/TopBar.tsx` — Shared top header across major views.
-- `src/features/running-workflows/components/RunningWorkflowsPage.tsx` — Main view for managing and monitoring running workflows.
-- `src/features/running-workflows/components/RunningStateNode.tsx` — Visual node used by React Flow for running workflows; shows state label and status.
-- `src/features/running-workflows/components/RunningWorkflowDetailPanel.tsx` — Right-hand details view for selected running workflow node/edge.
-- `src/features/running-workflows/utils/runningWorkflowParser.ts` — Converts running workflow data into React Flow nodes and edges.
-
-## Planned Workflow Editor Feature
-
-The next major feature planned for implementation is a visual workflow editor that will allow users to create and modify workflows through a drag-and-drop interface. This feature will be implemented in `src/features/workflow-editor/` and will include:
-
-- **Visual Workflow Design**: Drag-and-drop interface for creating and modifying workflows with real-time preview
-- **Dual Node Types**: Process nodes (rectangles) with three connection points and Decision nodes (diamonds) with multiple transitions
-- **Advanced Connection System**: Color-coded connections (red=reject, black=submit, green=approve) with user-defined labels
-- **Configuration Interface**: Enhanced details panel for node/edge configuration and assignee management
-- **Context Menus**: Right-click menus for quick actions with full keyboard accessibility
-- **Validation Engine**: Comprehensive validation with visual error indicators
-- **Export Functionality**: Standardized JSON export compatible with existing system
-
-The workflow editor will build upon the existing React Flow integration and extend it with more advanced editing capabilities while maintaining backward compatibility with the current workflow visualization feature.
-
-## Data Flow
-
-1. Developer or user provides a workflow JSON in the JSON editor.
-2. `graphParser` builds nodes and edges from `Workflow.States` and per-state `Actions`.
-3. `WorkflowGraph` renders nodes & edges in React Flow.
-4. User interactions: select node/edge → `DetailPanel` → open `FormViewer` → trigger actions.
-5. For running workflows, data is loaded from the running workflows service.
-6. `runningWorkflowParser` builds nodes and edges from running workflow data.
-7. `RunningWorkflowsPage` renders nodes & edges in React Flow.
-8. User interactions: select node/edge → `RunningWorkflowDetailPanel` → view details.
-
-## Recent Refactor Highlights
-
-- Split large components into smaller, focused components (TopBar, GraphToolbar, ApplicationRow, FieldInput).
-- Centralized export logic in `src/features/workflow/utils/graphExport.ts` to avoid duplicate code and to keep components small.
-- Reworked `DetailPanel.tsx` to use explicit types (`NodeData` / `EdgeData`) and removed unsafe `any` casts.
-- Consolidated color mapping into `src/shared/utils/colors.ts` (getStageColor) used across UI.
-- Removed unused imports and replaced nested ternaries with clearer conditionals.
-- Added new running workflows feature with dedicated components and utilities.
-
-## Known Issues & Code Review Findings
-
-The following items were flagged during a code review and should be considered for follow-up work:
-
-1. Type safety
-
-- Inconsistent handling of field actions (`Field.Actions` vs `Field.FieldActions`). Recommend migrating to a single shape or using a discriminated union.
-- Add runtime validation of incoming workflow JSON (JSON Schema or zod) to avoid runtime errors.
-
-2. Duplication & consistency
-
-- Action extraction logic is duplicated in places (e.g., `DetailPanel` vs `StateNode`). Extract to a shared helper/hook.
-- Field rendering inconsistencies: `FormViewer`/`FieldInput` should fully support documented field types (date, checkbox, etc.).
-
-3. Performance
-
-- Grid auto-layout in `graphParser` is simplistic and may overlap nodes for large workflows. Consider integrating a layout engine (elkjs is a dependency and can be used for better layouts).
-- Avoid heavy data transformation during render of `DetailPanel` by precomputing derived data.
-
-4. State management
-
-- Current app state is mostly local. For complex flows, consider a lightweight global store (Zustand) or React Context with selectors.
-
-5. Accessibility & UX
-
-- Improve ARIA attributes and keyboard navigation in interactive components.
-- Enhance error reporting in the JSON editor to show helpful validation messages.
-
-6. Security
-
-- Sanitize any HTML or user-provided content before rendering. Avoid `dangerouslySetInnerHTML` or sanitize inputs if necessary.
-
-## Application Details Feature Bugs
-
-After reviewing the application details feature, several bugs and issues were identified:
-
-### Type Safety Issues
-
-1. **Duplicate Interface Definitions**: Interfaces like `AppDocument`, `AuditEntry`, and `WorkflowStage` are defined in multiple files instead of being in a shared types file.
-2. **Inconsistent Type Definitions**: The `WorkflowStage` interface is duplicated in both `ApplicationDetails.tsx` and `WorkflowProgress.tsx`.
-
-### Data Handling Bugs
-
-1. **Hardcoded Data**: All components in the application details feature use hardcoded data instead of properly handling data passed from props.
-2. **Missing Data Properties**: The `LoanApplication` interface doesn't include all the properties needed by the components.
-
-### Logic Bugs
-
-1. **Incorrect Email Generation**: The email generation in `ContactInfo.tsx` is overly simplistic and will break with many real names.
-2. **Hardcoded Interest Rate**: The interest rate in `FinancialDetails.tsx` is hardcoded instead of being configurable.
-3. **Incomplete Comment Functionality**: Comments in `AuditTrail.tsx` are never actually added to the audit trail - they just clear the input.
-
-### UI/UX Issues
-
-1. **Inconsistent Styling**: Extensive use of inline styles makes it difficult to maintain consistent styling.
-2. **Missing Error Handling**: No error handling for operations like downloading documents or adding comments.
-3. **Accessibility Issues**: Missing proper ARIA attributes, potential color contrast issues, and no keyboard navigation support.
-
-### Security Issues
-
-1. **Potential XSS Vulnerabilities**: User-generated content in the audit trail is displayed directly without sanitization.
+### Technical Debt
+1. **TypeScript**: Some components using 'any' types
+2. **Component Complexity**: Some components exceed 300 lines
+3. **Prop Drilling**: Context API not fully utilized
+4. **Code Duplication**: Similar patterns in multiple components
+5. **Documentation**: JSDoc comments incomplete
 
 ### Missing Features
+1. **Offline Support**: No PWA capabilities
+2. **i18n**: No internationalization
+3. **Export**: Limited export formats
+4. **Notifications**: No push notifications
+5. **Analytics**: No usage tracking
 
-1. **Incomplete Document Functionality**: Document upload and download buttons don't actually perform any actions.
-2. **Missing API Integration**: All data is hardcoded with no actual backend integration.
+## Development Environment
 
-For a detailed list of bugs and recommendations, see [CODE_REVIEW.md](CODE_REVIEW.md).
-
-## Recent Improvements
-
-Since the last review, several significant improvements have been made:
-
-1. **Enhanced Type Safety**
-
-   - Improved type handling in `DetailPanel.tsx` with explicit `NodeData` and `EdgeData` types
-   - Better field action handling with proper type checking in `getFieldActions` function
-   - Consistent use of TypeScript interfaces throughout the application
-   - Fixed TypeScript import issues with `verbatimModuleSyntax` flag
-
-2. **Comprehensive Testing Coverage**
-
-   - Added extensive test suite with Vitest and React Testing Library
-   - Tests for all major components including Dashboard, Workflow, Form, and Application Details features
-   - Proper test setup with MSW for API mocking and jsdom environment
-
-3. **Component Structure Improvements**
-
-   - Improved component composition with better separation of concerns
-   - Cleaner prop handling and more consistent component interfaces
-   - Better error handling and validation in components
-
-4. **Testing Infrastructure**
-   - Comprehensive test coverage with unit and integration tests
-   - Proper test setup with MSW for API mocking
-   - Test utilities for consistent testing patterns
-
-## Recommendations & Next Steps
-
-Short-term (low risk):
-
-- Add a small runtime validator for workflow JSON (zod or ajv) and surface errors in the JSON editor.
-- Extract field action parsing into `src/utils/fieldActions.ts` and reuse from `DetailPanel` and `StateNode`.
-- Complete `FieldInput` coverage for all documented field types and remove hardcoded options.
-- Implement proper API integration to replace hardcoded mock data.
-- Implement proper API integration for running workflows to replace hardcoded mock data.
-
-Medium-term:
-
-- Replace grid layout with an ELK-powered layout (uses `elkjs` already in dependencies). This will improve node placement for complex workflows.
-- Add unit tests for `graphParser` and `graphExport`.
-- Introduce a lightweight global store for shared app state (Zustand or Context + selectors).
-- Implement file upload functionality in the form components.
-- Add unit tests for `runningWorkflowParser`.
-
-Long-term:
-
-- Add E2E tests (Playwright) for the main user flows: dashboard → graph → form → action.
-- Implement CI with typecheck, eslint, and build on PRs.
-- Add comprehensive accessibility features and ARIA attributes.
-- Implement theming support for light/dark mode.
-- Implement real-time updates for running workflows using WebSocket connections.
-
-## Developer Quick Start
-
-1. Install dependencies
-
-```powershell
-npm ci
-```
-
-2. Run dev server
-
-```powershell
-npm run dev
-```
-
-3. Typecheck & lint
-
-```powershell
-npm run typecheck
-npm run lint
-```
-
-4. Run tests
-
-```powershell
-npm test
-```
-
-5. Build
-
-```powershell
-npm run build
-```
-
-## Project Status & Verification
-
-- Refactor: Core modularization and typing improvements are completed (key files: `DetailPanel`, `FormViewer`, `WorkflowGraph`, `graphExport`, `FieldInput`).
-- Testing: Comprehensive test coverage has been added across all features with Vitest and React Testing Library.
-- Performance: Optimizations implemented for better rendering and state management.
-- Lint/type checks: File-level fixes applied; full project-level typecheck/lint/build should be run in an environment with Node/npm installed to confirm.
-
-## Files to Inspect First (for maintainers)
-
-- `src/features/workflow/types/workflow.types.ts` — canonical shapes and suggested type improvements.
-- `src/features/workflow/utils/graphParser.ts` — conversion rules and layout logic.
-- `src/features/workflow/components/DetailPanel.tsx` — recently refactored; ensures safe rendering of fields/actions.
-- `src/features/form/components/FieldInput.tsx` — central input renderer; extend to cover missing field types.
-- `src/features/running-workflows/types/runningWorkflow.types.ts` — running workflow data structures.
-- `src/features/running-workflows/utils/runningWorkflowParser.ts` — conversion rules for running workflows.
-- `src/features/running-workflows/components/RunningWorkflowsPage.tsx` — main running workflows view.
-
-## Appendix: Example Workflow JSON
-
+### Scripts
 ```json
-{
-  "Workflow": {
-    "States": {
-      "Application": {
-        "Form": {
-          "Fields": [
-            {
-              "ID": "loan_amount",
-              "Name": "Requested Amount",
-              "Type": "number",
-              "DataSource": "{{ data.loan.amount }}",
-              "Actions": ["validate", "calculate"]
-            }
-          ]
-        }
-      },
-      "Review": {
-        "Form": {
-          "Fields": [
-            {
-              "ID": "decision",
-              "Name": "Approval Decision",
-              "Type": "select",
-              "DataSource": "{{ data.review.decision }}",
-              "Actions": ["validate"]
-            }
-          ]
-        }
-      },
-      "Completed": {}
-    }
-  }
-}
+"dev": "vite"                    // Start dev server
+"build": "tsc && vite build"      // Production build
+"preview": "vite preview"         // Preview production build
+"test": "vitest"                  // Run tests
+"test:coverage": "vitest --coverage" // Coverage report
+"lint": "eslint src"             // Lint code
+"typecheck": "tsc --noEmit"      // Type checking
 ```
 
----
-
-Maintainers: update this document as the codebase evolves. It is intended to be the single source of truth for architecture and short-term roadmap.
-
-## Current State (Sep 16, 2025)
-
-- Tests: All unit and component tests have been centralized under a top-level `tests/` folder. The `vitest` configuration and TypeScript app config were updated to include `tests/` and a `@test/*` path alias. A minimal `ResizeObserver` polyfill and MSW-based mocks are included in `tests/setup.ts`.
-- Duplicate test files that previously lived in `src/features/**/__tests__` have been removed to avoid test duplication and confusion. The canonical location for tests is now `tests/`.
-- Test status: The full test suite was run after the reorganization and reported all tests passing (21 test files, 92 tests). If you see failures locally, run `npm ci` then `npm test` to reproduce.
-- Code review: The code review findings and prioritized recommendations were added to `CODE_REVIEW.md`. Key topics: type-safety improvements, JSON validation, extracting duplicated logic, and adding CI for checks on PRs.
-- New feature: Added running workflows feature with dedicated components, types, and utilities for managing and monitoring active loan workflows.
-
-## Workflow Editor Status (Sep 18, 2025)
-
-- Plan: A detailed design and implementation plan was added to `docs/WORKFLOW_EDITOR_PLAN.md` (last updated 2025-09-18).
-- Scope: Visual editor supporting Process and Decision nodes, assignee assignment, three canonical actions per Process node (left/center/right), labeled decision transitions, validation rules, and an export transformer to canonical JSON.
-- Current progress: Planning and documentation complete; next steps are scaffolding the editor feature and implementing the React Flow canvas with Process/Decision node components.
-- Acceptance checklist (MVP):
-  - [ ] Add Process and Decision nodes; rename states.
-  - [ ] Assign people via Details Panel and Context Menu; node indicator updates for 0/1/many.
-  - [ ] Configure Left/Center/Right actions on Process node; connect ports to create labeled edges.
-  - [ ] Add multiple labeled transitions from Decision node and edit edge labels/operations.
-  - [ ] Run validation and export canonical JSON per the plan.
-
-Contact: see `docs/WORKFLOW_EDITOR_PLAN.md` for technical tasks and implementation roadmap.
-
-## Quick verification steps
-
-1. Install dependencies (clean install):
-
-```powershell
-npm ci
+### Environment Variables
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_AUTH_ENABLED=true
+VITE_MOCK_API=true
+VITE_LOG_LEVEL=debug
 ```
 
-2. Run tests (watch):
+## Deployment Configuration
 
-```powershell
-npm test
+### Build Output
+- Output directory: `/dist`
+- Static assets with hashing
+- Source maps for debugging
+- Environment-specific configs
+
+### Hosting Requirements
+- Static file hosting (Nginx, Apache, S3)
+- SSL/TLS certificate
+- CDN for assets
+- Reverse proxy for API
+
+## Future Roadmap
+
+### Q1 2025
+1. **WebSocket Integration** - Real-time updates
+2. **PWA Support** - Offline capabilities
+3. **Test Coverage** - Increase to 80%
+4. **Performance Monitoring** - Sentry integration
+
+### Q2 2025
+1. **i18n Support** - Multi-language
+2. **Advanced Analytics** - Usage tracking
+3. **Export Features** - PDF, Excel exports
+4. **Mobile App** - React Native version
+
+### Technical Improvements
+1. **Micro-frontends** - Module federation
+2. **GraphQL** - Replace REST API
+3. **Server-Side Rendering** - Next.js migration
+4. **Component Library** - Storybook documentation
+
+## Team & Contributions
+- Frontend architecture and implementation
+- CSS architecture refactoring (December 2024)
+- Design system implementation
+- Performance optimizations
+- Accessibility improvements
+
+## Version History
+- **v1.0.0** - Initial release
+- **v1.1.0** - Dark mode support
+- **v1.2.0** - Dynamic form builder
+- **v1.3.0** - React Router integration
+- **v1.4.0** - CSS architecture overhaul (current)
+
+## Last Updated
+December 22, 2024 - Complete CSS refactoring and design system implementation
+**Current Capabilities**:
+- ReactFlow-based interactive workflow graph display
+- Custom node types (StateNode) with form integration
+- Multiple custom edge types (CustomEdge, SmartStepEdge, OrthogonalEdge, EditableEdge, DraggableEdge)
+- Auto-layout using Dagre algorithm
+- JSON editor with real-time validation and preview
+- Graph export functionality to JSON and image formats
+- Node selection and form viewing capabilities
+- Zoom, pan, and minimap controls
+
+**Integration**: Tightly integrated with workflow configuration system
+
+### 3. Dynamic Form Builder
+**Status**: Active Development
+**Location**: `src/features/dynamic-form-builder/`
+**Current Capabilities**:
+- Drag-and-drop form field placement
+- Field palette with 11 field types:
+  - Text, Number, Textarea, File, Select, Radio, Checkbox, Date
+  - Section headers, Dividers, Static text
+- Field property inspector for configuration
+- Real-time form preview
+- Field validation settings (required, min/max, regex)
+- Field status control (default, readonly, disabled)
+- JSON import/export for form definitions
+- Field reordering and deletion
+- Form-wide settings configuration
+
+**Recent Updates**: CSS improvements and component refinements
+
+### 4. Workflow Configuration Editor
+**Status**: Fully Functional
+**Location**: `src/features/workflow-config-edit/`
+**Current Capabilities**:
+- Visual workflow builder with ReactFlow
+- Process and Decision node types
+- Node property editing panel
+- Form attachment to workflow nodes
+- People assignment to workflow states
+- Action configuration (approve, reject, escalate)
+- Workflow validation before export
+- Context menu for node/edge operations
+- Import/export workflow as JSON
+- Form picker dialog with search
+
+**Integration**: Works with form builder for complete workflow definition
+
+### 5. Application Details View
+**Status**: Recently Enhanced
+**Location**: `src/features/application-details/`
+**Current Capabilities**:
+- Comprehensive application information display
+- Multiple information sections:
+  - Application header with key metrics
+  - Contact information
+  - Financial details with calculations
+  - Risk snapshot with score visualization
+  - Document management section
+  - Audit trail with timestamped events
+  - Workflow progress visualization
+- Dark mode support (recently added)
+- Responsive layout with card-based design
+- Back navigation to dashboard
+
+### 6. Running Workflows Monitor
+**Status**: Fully Functional
+**Location**: `src/features/running-workflows/`
+**Current Capabilities**:
+- Real-time workflow instance monitoring
+- Resizable three-panel layout:
+  - Workflow list panel
+  - Graph visualization panel
+  - Details panel
+- Custom running state nodes with progress indicators
+- Workflow instance search and filtering
+- Toggle between graph and list views
+- Workflow state transition tracking
+- Instance metadata display
+
+### 7. Workflow Templates
+**Status**: Fully Functional
+**Location**: `src/features/workflow-templates/`
+**Current Capabilities**:
+- Pre-defined workflow template library
+- Template categories (New Application, Review, Assessment)
+- Visual template cards with descriptions
+- Template-based workflow creation wizard
+- People assignment interface
+- Template customization before creation
+- Direct navigation to workflow builder post-creation
+
+### 8. Form Viewer
+**Status**: Fully Functional
+**Location**: `src/features/form/`
+**Current Capabilities**:
+- Dynamic form rendering from JSON configuration
+- Support for all field types from form builder
+- Field-level validation and error display
+- Conditional field rendering
+- Form data collection and submission
+- Integration with workflow state forms
+
+## UI/UX State
+
+### Theme System
+**Current State**: Dark and Light Mode Support
+- Theme context provider at application root
+- CSS variable-based theming
+- Persistent theme preference in localStorage
+- System preference detection
+- Smooth theme transitions
+- Component-level dark mode classes
+
+### Component Library
+**Status**: Fully Integrated
+**Components**: shadcn/ui based on Radix UI primitives
+- Button, Card, Dialog, Dropdown Menu
+- Input, Label, Select, Switch
+- Table, Tabs, Textarea
+- All components support dark mode
+- Consistent styling with Tailwind CSS
+- Type-safe component variants
+
+### Styling System
+**Technologies**:
+- Tailwind CSS v4.1.13 (latest)
+- CSS Modules for component-specific styles
+- Class Variance Authority for variant management
+- Tailwind Merge for class composition
+
+### Layout System
+**Current Implementation**:
+- MainLayout wrapper for consistent navigation
+- Sidebar navigation with icon menu
+- Top bar with user menu and theme toggle
+- Footer with version information
+- Responsive design with mobile considerations
+- Resizable panels using react-resizable-panels
+
+## Data Management State
+
+### State Management
+**Current Approach**: React-only state management
+- Component-level useState hooks
+- Context API for theme management
+- Props drilling for data flow
+- useMemo for performance optimization
+- No external state management library
+
+### Data Sources
+**Current State**: Mock Data Implementation
+- All data currently from local mock files
+- No active backend API connections
+- Mock services for form operations
+- Static workflow templates
+- Sample loan application data
+- Hardcoded user/role information
+
+### Form Handling
+**Implementation**:
+- React Hook Form for form state
+- Zod schemas for validation
+- Custom validation rules support
+- Error message display
+- Form submission handling
+- Field-level state tracking
+
+## Technical Infrastructure
+
+### Build Configuration
+**Build Tool**: Vite 7.1.2
+- Fast HMR (Hot Module Replacement)
+- Optimized production builds
+- TypeScript support out-of-box
+- Path alias resolution (@/ imports)
+- Environment variable handling
+
+### TypeScript Configuration
+**Status**: Strict Mode Enabled
+- Full type coverage across codebase
+- Interface definitions for all data models
+- Type-safe component props
+- Generics for reusable components
+- Discriminated unions for state modeling
+
+### Testing Infrastructure
+**Current Setup**:
+- Vitest for unit testing
+- React Testing Library for component tests
+- Playwright for E2E testing
+- Coverage reporting with V8
+- Test scripts configured but minimal test coverage
+
+### Development Tools
+**Available Scripts**:
+- `npm run dev` - Start development server
+- `npm run build` - Production build
+- `npm run lint` - ESLint checking
+- `npm run typecheck` - TypeScript validation
+- `npm run test` - Run test suite
+- `npm run test:e2e` - Run E2E tests
+
+## Dependencies State
+
+### Core Dependencies (Production)
+**React Ecosystem**:
+- react: 18.3.1
+- react-dom: 18.3.1
+- react-router-dom: 6.26.2 (recently added)
+- react-hook-form: 7.62.0
+- @hookform/resolvers: 5.2.2
+
+**UI Libraries**:
+- @radix-ui/* - Complete primitive component set
+- lucide-react: 0.543.0 - Icon library
+- class-variance-authority: 0.7.1
+- clsx: 2.1.1
+- tailwind-merge: 3.3.1
+
+**Workflow Visualization**:
+- @xyflow/react: 12.8.4
+- reactflow: 11.11.4
+- @reactflow/node-resizer: 2.2.14
+- dagre: 0.8.5 - Graph layout
+- elkjs: 0.10.0 - Alternative layout engine
+
+**Utilities**:
+- zod: 4.1.9 - Schema validation
+- html-to-image: 1.11.11 - Export functionality
+- react-resizable-panels: 3.0.6
+
+### Development Dependencies
+**Build Tools**:
+- vite: 7.1.2
+- @vitejs/plugin-react: 5.0.0
+- vite-tsconfig-paths: 4.0.0
+- typescript: 5.8.3
+
+**Quality Tools**:
+- eslint: 9.33.0
+- @eslint/js: 9.33.0
+- typescript-eslint: 8.39.1
+- eslint-plugin-react-hooks: 5.2.0
+- eslint-plugin-react-refresh: 0.4.20
+
+**Testing**:
+- vitest: 3.2.4
+- @vitest/ui: 3.2.4
+- @vitest/coverage-v8: 3.2.4
+- @testing-library/react: 14.1.0
+- @testing-library/jest-dom: 6.2.0
+- @testing-library/user-event: 14.5.0
+- @playwright/test: 1.41.0
+- happy-dom: 18.0.1
+- jsdom: 22.1.0
+
+**CSS Processing**:
+- tailwindcss: 4.1.13
+- @tailwindcss/postcss: 4.1.13
+- autoprefixer: 10.4.21
+- postcss: 8.5.6
+
+## Routes and Navigation State
+
+### Current Route Structure
+```
+/ → /dashboard (redirect)
+/dashboard - Main dashboard view
+/create-workflow - Workflow creation from templates
+/running - Active workflows monitor
+/builder - Workflow configuration builder
+/form-builder/new - Dynamic form builder
+/applications/details - Application detail view
+/viewer - Workflow JSON viewer/editor
+/* → /dashboard (catch-all redirect)
 ```
 
-3. Run a single test run with coverage (CI-like):
+### Navigation System
+- React Router v6 implementation
+- Programmatic navigation via useNavigate
+- Route guards through conditional rendering
+- Consistent navigation through MainLayout
+- Sidebar menu-driven navigation
+- URL-based state for some views (application selection)
 
-```powershell
-npm run test:coverage
+## Performance Considerations
+
+### Current Optimizations
+- React.memo for expensive components
+- useMemo for computed values
+- Lazy loading potential (not yet implemented)
+- Virtual scrolling ready (not yet needed)
+- Debounced search inputs
+- Optimized re-renders in ReactFlow
+
+### Bundle Size
+- No code splitting currently implemented
+- Single bundle output
+- All dependencies included in main bundle
+- Potential for optimization with dynamic imports
+
+## Security State
+
+### Current Security Measures
+- No authentication system implemented
+- No authorization/role checking
+- No API security (mock data only)
+- No sensitive data handling
+- HTTPS enforcement (deployment dependent)
+- No secrets in codebase
+
+### Data Validation
+- Zod schemas for type safety
+- Form validation on client side
+- Input sanitization in form fields
+- No server-side validation (no backend)
+
+## Browser Support
+
+### Target Browsers
+**Production**:
+- > 0.2% market share
+- Not dead browsers
+- Excluding Opera Mini
+
+**Development**:
+- Latest Chrome
+- Latest Firefox
+- Latest Safari
+
+## Known Issues and Limitations
+
+### Current Limitations
+1. No backend integration - all data is mocked
+2. No real-time updates - static data only
+3. No user authentication/authorization
+4. No data persistence between sessions
+5. Limited test coverage
+6. No error boundary implementation
+7. No loading states for async operations
+8. No offline support
+9. No internationalization (i18n)
+10. No accessibility audit completed
+
+### Technical Debt
+1. Mock data scattered across features
+2. Some prop drilling could be optimized
+3. Limited error handling
+4. No centralized API client
+5. Inconsistent data model naming
+6. Missing TypeScript strict null checks in some files
+7. No performance monitoring
+8. Limited logging/debugging tools
+
+## Environment Configuration
+
+### Development Environment
+- Windows platform (win32)
+- Git repository initialized
+- Node.js environment (version unspecified)
+- NPM package manager
+- Local development server on Vite
+
+### File Structure
+```
+kratos-frontend/
+├── src/
+│   ├── app/              # Application root
+│   ├── assets/           # Static assets
+│   ├── components/       # Shared components
+│   ├── contexts/         # React contexts
+│   ├── features/         # Feature modules
+│   ├── lib/             # Utility libraries
+│   ├── pages/           # Page components
+│   ├── shared/          # Shared resources
+│   └── styles/          # Global styles
+├── public/              # Public assets
+├── .claude/             # Claude-specific files
+└── Configuration files
 ```
 
-If tests fail on your machine after a fresh `npm ci`, check that Node version matches the project's `.nvmrc` (if present) and that no global packages are interfering.
+## Deployment Readiness
 
-## Notes for Maintainers
+### Build Status
+- Development build: Functional
+- Production build: Available via `npm run build`
+- Type checking: Passing (with `npm run typecheck`)
+- Linting: Configured and available
+- Bundle optimization: Vite production defaults
 
-- When adding new tests prefer the `tests/` top-level layout. Group tests by feature (e.g., `tests/dashboard`, `tests/workflow`, `tests/application-details`, `tests/running-workflows`).
-- Keep MSW handlers under `tests/mocks` and add new API routes there when components need them.
-- Use `tests/test-utils.tsx` helpers (`renderWithProviders`, `createMockLoanApplication`) to ensure consistent test behavior (React Flow provider + deterministic color mocks).
-- For running workflows, maintain consistency with the workflow feature patterns and components.
+### Deployment Requirements
+- Node.js runtime for build process
+- Static file hosting capability
+- HTTPS certificate (recommended)
+- CDN for asset delivery (optional)
+- Environment variable configuration
 
-## Follow-ups
+## Maintenance Status
 
-- Add a CI pipeline that runs `npm ci`, `npm run typecheck`, `npm run lint`, and `npm test` on pull requests.
-- Consider adding E2E tests (Playwright) for the primary flows.
-- Add unit tests for running workflow components and utilities.
+### Active Maintenance
+- Regular commits to develop branch
+- Recent feature additions (dark mode, routing)
+- Active form builder development
+- Workflow configuration improvements
+- CSS and styling updates
+
+### Version Control
+- Git-based version control
+- Feature branch workflow
+- Develop branch as main integration branch
+- Recent commit history shows active development
+- No documented release tags or versions
+
+This comprehensive state document represents the current snapshot of the Kratos Frontend application as of the last commit (fdf7c65), providing a complete picture of the application's current implementation, capabilities, and limitations.

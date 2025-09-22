@@ -4,7 +4,7 @@ This document provides essential context about the Workflow Visualizer & Form Re
 
 ## Project Overview
 
-A web application that transforms JSON workflow specifications into interactive visual graphs and dynamic forms for business process automation, specifically designed for loan approval workflows.
+A web application that transforms JSON workflow specifications into interactive visual graphs and dynamic forms for business process automation, specifically designed for loan approval workflows. The application now includes a full routing system and supports both light and dark themes.
 
 ## Core Features
 
@@ -68,6 +68,137 @@ interface State {
 interface Workflow {
   States: Record<string, State>;
 }
+
+// New types for workflow builder
+interface Person {
+  id: string;
+  name: string;
+  type: 'user' | 'role';
+}
+
+interface FormRef {
+  /** unique id of the form */
+  id: string;
+  /** human-readable name */
+  name: string;
+  /** version number of the form */
+  version: number;
+  /** binding to determine whether to pin to version or track latest */
+  binding: 'pinned' | 'latest';
+}
+
+interface ProcessNodeData {
+  label: string;
+  internalId?: string;
+  assignees: Person[];
+  actions: {
+    left: { label: string; operation?: string };
+    center: { label: string; operation?: string };
+    right: { label: string; operation?: string };
+  };
+  /** deprecated: legacy list of names */
+  forms?: string[];
+  /** attached form reference */
+  form?: FormRef;
+  /** if true, transitions are blocked until form submission is valid */
+  requireFormToTransition?: boolean;
+  /** UI-only: handler injected by WorkflowBuilder to open Form config */
+  onOpenFormConfig?: (nodeId: string) => void;
+}
+
+interface DecisionNodeData {
+  label: string;
+  internalId?: string;
+  assignees: Person[];
+  transitions: Array<{
+    id: string;
+    label: string;
+    operation?: string;
+  }>;
+  forms?: string[];
+}
+
+type BuilderNodeData = ProcessNodeData | DecisionNodeData;
+
+interface BuilderNode {
+  id: string;
+  type: 'process' | 'decision';
+  position: { x: number; y: number };
+  data: BuilderNodeData;
+}
+
+interface BuilderEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceHandle?: string;
+  label: string;
+  operation?: string;
+}
+
+interface WorkflowBuilderConfig {
+  workflow: {
+    forms: Record<string, unknown>;
+    states: Record<string, {
+      forms?: Array<{
+        formName: string;
+        visibility?: 'visible' | 'hidden';
+        fieldOverrides?: Record<string, unknown>;
+      }>;
+      actions?: Record<string, {
+        nextState: string;
+        operation?: string;
+      }>;
+    }>;
+    startState?: string;
+  };
+}
+
+interface WorkflowValidationResult {
+  ok: boolean;
+  errors: string[];
+  warnings: string[];
+  coverage: { withForms: number; totalProcessNodes: number };
+}
+
+// New types for dynamic form builder
+interface FormBuilderFieldAction {
+  value: string;
+  label: string;
+}
+
+interface FormBuilderField {
+  id: string;
+  name: string;
+  type:
+    | 'text'
+    | 'number'
+    | 'textarea'
+    | 'file'
+    | 'select'
+    | 'radio'
+    | 'checkbox'
+    | 'date'
+    | 'section'
+    | 'divider';
+  status: 'default' | 'readonly' | 'disabled';
+  data: string;
+  fieldActions: string[];
+  validation?: {
+    required?: boolean;
+    min?: number;
+    max?: number;
+    regex?: string;
+  };
+  helpText?: string;
+  options?: Array<{ value: string; label: string }>;
+}
+
+interface FormConfig {
+  [formName: string]: {
+    fields: FormBuilderField[];
+  };
+}
 ```
 
 ### Key Components
@@ -87,6 +218,14 @@ interface Workflow {
 - `DocumentsSection.tsx` - Component for managing documents
 - `AuditTrail.tsx` - Component for displaying audit trail
 - `utils/graphParser.ts` - Converts workflow JSON to React Flow nodes/edges
+- `DynamicFormBuilder.tsx` - Visual interface for building dynamic forms
+- `WorkflowBuilder.tsx` - Visual interface for building workflows
+- `RunningWorkflowsPage.tsx` - Page for managing active workflow instances
+- `ApplicationTable.tsx` - Table component for displaying loan applications in the dashboard
+- `DashboardMain.tsx` - Main component for the dashboard view
+- `RunningStateNode.tsx` - Node component for running workflow states
+- `FormBuilderPage.tsx` - Main page component for the form builder
+- `RunningWorkflowDetailPanel.tsx` - Detail panel for running workflow instances
 
 ### Workflow Editor Components (Planned)
 - `WorkflowEditor.tsx` - Main editor component orchestrating all functionality
@@ -97,6 +236,16 @@ interface Workflow {
 - `ContextMenu.tsx` - Right-click context menu with keyboard accessibility
 - `EditorToolbar.tsx` - Toolbar with editor-specific controls
 - `ValidationEngine.tsx` - Workflow validation system
+- `BuilderDetailsPanel.tsx` - Details panel for the workflow builder
+- `FormPickerDialog.tsx` - Dialog for selecting forms to attach to nodes
+- `WorkflowBuilder.tsx` - Main component for building workflows
+
+### Dynamic Form Builder Components
+- `DynamicFormBuilder.tsx` - Main component for building dynamic forms
+- `FieldInspector.tsx` - Component for inspecting and configuring field properties
+- `FieldList.tsx` - Component for displaying and managing the list of form fields
+- `FormBuilderPage.tsx` - Main page component for the form builder
+- `FieldPalette.tsx` - Component for selecting field types to add to the form
 
 ### Data Flow
 1. JSON Definition (States + Actions)
@@ -114,6 +263,7 @@ kratos-frontend/
 │   ├── app/
 │   ├── assets/
 │   ├── components/
+│   ├── contexts/
 │   ├── features/
 │   ├── lib/
 │   ├── pages/
@@ -172,10 +322,12 @@ kratos-frontend/
 - `@features/…` → `src/features/…`
 - `@shared/…` → `src/shared/…`
 - `@pages/…` → `src/pages/…`
+- `@contexts/…` → `src/contexts/…`
 
 ## Available Scripts
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
+- `npm run build:dev` - Build for development
 - `npm run lint` - Run ESLint
 - `npm run preview` - Preview production build
 - `npm run typecheck` - Run TypeScript type checking
@@ -191,8 +343,12 @@ The project follows a feature-based architecture where each feature contains its
 ### Feature Organization
 - `application-details/` - Components for displaying detailed loan application information
 - `dashboard/` - Components for the loan application dashboard and queue management
+- `dynamic-form-builder/` - Components for building dynamic forms with a visual interface
 - `form/` - Components for dynamic form rendering and field input handling
+- `running-workflows/` - Components for managing and monitoring active workflow instances
 - `workflow/` - Components for workflow visualization and JSON editing
+- `workflow-config-edit/` - Components for editing workflow configurations
+- `workflow-templates/` - Components for managing workflow templates
 - `workflow-editor/` - Components for visual workflow design and editing (Planned)
 
 ### Shared Components
@@ -208,8 +364,9 @@ The project follows a feature-based architecture where each feature contains its
 - Use the configured path aliases for imports
 
 ### Legacy Structure
-- On Sep 16, 2025, legacy folders `src/components`, `src/utils`, and `src/types` were removed to avoid confusion
-- All active code now lives under `src/features` and `src/shared`
+- On Sep 22, 2025, legacy folders `src/utils`, and `src/types` were removed to avoid confusion
+- The `src/components` folder still exists but is only used for UI component libraries (shadcn/ui components)
+- All active application code now lives under `src/features` and `src/shared`
 
 ## Workflow JSON Specification
 
@@ -251,3 +408,12 @@ The project follows a feature-based architecture where each feature contains its
 2. **Layout Components**: All layout components (MainLayout, TopBar, Sidebar, Footer) have been updated to use Tailwind CSS classes for consistent styling.
 3. **Sidebar Positioning**: The sidebar has been fixed to properly handle both desktop and mobile views with correct positioning and z-index stacking.
 4. **Responsive Design**: Layout components now properly adapt to different screen sizes.
+5. **Routing**: The application now uses React Router for navigation between different views. The main routes include:
+   - `/dashboard` - Main dashboard view
+   - `/create-workflow` - Workflow template creation
+   - `/running` - Running workflows management
+   - `/builder` - Workflow builder
+   - `/form-builder/new` - Dynamic form builder
+   - `/applications/details` - Application details view
+   - `/viewer` - Workflow visualizer
+6. **Dark Mode**: The application now supports dark mode through a ThemeContext. The theme preference is stored in localStorage and respects system preferences by default.
