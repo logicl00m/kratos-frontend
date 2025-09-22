@@ -14,6 +14,12 @@
   z-index: 20;
 }
 
+.dark .builder-detail-panel {
+  border-left: 1px solid rgba(46, 52, 71, 0.9);
+  background: rgba(18, 18, 25, 0.98);
+  box-shadow: -28px 0 48px rgba(15, 23, 42, 0.25);
+}
+
 .panel-header {
   display: flex;
   align-items: center;
@@ -23,11 +29,20 @@
   background: rgba(248, 250, 252, 0.92);
 }
 
+.dark .panel-header {
+  border-bottom: 1px solid rgba(46, 52, 71, 0.8);
+  background: rgba(30, 30, 40, 0.92);
+}
+
 .panel-title {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: #0f172a;
+}
+
+.dark .panel-title {
+  color: #f1f5f9;
 }
 
 .panel-close {
@@ -43,9 +58,19 @@
   transition: background 0.2s ease, color 0.2s ease;
 }
 
+.dark .panel-close {
+  background: rgba(55, 65, 81, 0.7);
+  color: #cbd5e1;
+}
+
 .panel-close:hover {
   background: rgba(99, 102, 241, 0.2);
   color: #4338ca;
+}
+
+.dark .panel-close:hover {
+  background: rgba(129, 140, 248, 0.2);
+  color: #818cf8;
 }
 
 .panel-body {
@@ -58,6 +83,10 @@
   gap: 24px;
 }
 
+.dark .panel-body {
+  background: rgba(18, 18, 25, 0.98);
+}
+
 .panel-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -65,6 +94,10 @@
 .panel-body::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.45);
   border-radius: 999px;
+}
+
+.dark .panel-body::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.45);
 }
 
 .section {
@@ -76,6 +109,12 @@
   border: 1px solid rgba(208, 215, 230, 0.7);
   background: rgba(248, 250, 252, 0.95);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+.dark .section {
+  border: 1px solid rgba(46, 52, 71, 0.7);
+  background: rgba(30, 30, 40, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .section-header {
@@ -95,6 +134,10 @@
   color: #475569;
 }
 
+.dark .section-title {
+  color: #cbd5e1;
+}
+
 .action-btn {
   display: inline-flex;
   align-items: center;
@@ -110,14 +153,30 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+.dark .action-btn {
+  border: 1px solid rgba(46, 52, 71, 0.8);
+  background: rgba(30, 30, 40, 0.96);
+  color: #f1f5f9;
+}
+
 .action-btn:hover {
   transform: translateY(-1px);
   border-color: rgba(99, 102, 241, 0.5);
   box-shadow: 0 12px 22px rgba(15, 23, 42, 0.12);
 }
 
+.dark .action-btn:hover {
+  border-color: rgba(129, 140, 248, 0.5);
+  box-shadow: 0 12px 22px rgba(15, 23, 42, 0.2);
+}
+
 .action-btn.primary {
   border-color: transparent;
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  color: #ffffff;
+}
+
+.dark .action-btn.primary {
   background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
   color: #ffffff;
 }
@@ -136,6 +195,10 @@
   letter-spacing: 0.4px;
 }
 
+.dark .field-group label {
+  color: #94a3b8;
+}
+
 .input-field,
 .textarea-field,
 .search-input {
@@ -149,12 +212,27 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.dark .input-field,
+.dark .textarea-field,
+.dark .search-input {
+  border: 1px solid rgba(46, 52, 71, 0.8);
+  background: rgba(30, 30, 40, 0.96);
+  color: #f1f5f9;
+}
+
 .input-field:focus,
 .textarea-field:focus,
 .search-input:focus {
   outline: none;
   border-color: rgba(99, 102, 241, 0.6);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14);
+}
+
+.dark .input-field:focus,
+.dark .textarea-field:focus,
+.dark .search-input:focus {
+  border-color: rgba(129, 140, 248, 0.6);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25);
 }
 
 .input-field.mono {
@@ -177,6 +255,12 @@
   gap: 12px;
 }
 
+.dark .assignee-dropdown {
+  border: 1px solid rgba(46, 52, 71, 0.7);
+  background: rgba(18, 18, 25, 0.98);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+}
+
 .assignee-list {
   max-height: 180px;
   overflow-y: auto;
@@ -197,9 +281,19 @@
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+.dark .assignee-item {
+  border: 1px solid rgba(46, 52, 71, 0.9);
+  background: rgba(30, 30, 40, 0.9);
+}
+
 .assignee-item:hover {
   border-color: rgba(99, 102, 241, 0.45);
   background: rgba(224, 231, 255, 0.6);
+}
+
+.dark .assignee-item:hover {
+  border-color: rgba(129, 140, 248, 0.45);
+  background: rgba(30, 30, 45, 0.6);
 }
 
 .assignee-type {
@@ -207,6 +301,10 @@
   font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
+}
+
+.dark .assignee-type {
+  color: #94a3b8;
 }
 
 .assignee-chips {
@@ -227,6 +325,12 @@
   font-size: 12px;
 }
 
+.dark .assignee-chip {
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+}
+
 .assignee-chip button {
   border: none;
   background: none;
@@ -240,6 +344,10 @@
   font-size: 12px;
   font-style: italic;
   color: #94a3b8;
+}
+
+.dark .empty-state {
+  color: #64748b;
 }
 
 .actions-config {
@@ -256,6 +364,12 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+.dark .action-config {
+  border: 1px solid rgba(46, 52, 71, 0.7);
+  background: rgba(30, 30, 40, 0.96);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 .action-header {
   display: flex;
   justify-content: space-between;
@@ -270,10 +384,18 @@
   color: #475569;
 }
 
+.dark .action-side {
+  color: #cbd5e1;
+}
+
 .next-state {
   margin-top: 8px;
   font-size: 11px;
   color: #64748b;
+}
+
+.dark .next-state {
+  color: #94a3b8;
 }
 
 .state-badge {
@@ -285,6 +407,11 @@
   color: #92400e;
   font-size: 11px;
   font-weight: 600;
+}
+
+.dark .state-badge {
+  background: rgba(252, 211, 77, 0.15);
+  color: #facc15;
 }
 
 .transitions-list {
@@ -302,6 +429,12 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+.dark .transition-item {
+  border: 1px solid rgba(46, 52, 71, 0.7);
+  background: rgba(30, 30, 40, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
 .remove-btn {
   position: absolute;
   top: 10px;
@@ -315,9 +448,18 @@
   transition: background 0.2s ease, color 0.2s ease;
 }
 
+.dark .remove-btn {
+  color: #f87171;
+}
+
 .remove-btn:hover {
   background: rgba(254, 226, 226, 0.65);
   color: #b91c1c;
+}
+
+.dark .remove-btn:hover {
+  background: rgba(55, 65, 81, 0.65);
+  color: #f87171;
 }
 
 .form-view-btn {
@@ -337,7 +479,17 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.dark .form-view-btn {
+  background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+  color: #ffffff;
+}
+
 .form-view-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 32px rgba(79, 70, 229, 0.24);
+}
+
+.dark .form-view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px rgba(79, 70, 229, 0.35);
 }

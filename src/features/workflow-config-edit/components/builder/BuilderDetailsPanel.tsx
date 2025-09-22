@@ -28,7 +28,6 @@ import type {
 } from "@features/workflow-config-edit/types/builder.types";
 import "./BuilderDetailsPanel.css";
 import { searchForms } from "@features/workflow-config-edit/services/formsApi";
-import { DynamicFormBuilder } from "@features/dynamic-form-builder/components/DynamicFormBuilder";
 
 interface BuilderDetailsPanelProps {
   selectedNode: Node | null;
@@ -53,7 +52,6 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
   const [showAssigneeDropdown, setShowAssigneeDropdown] = useState(false);
   const [formQuery, setFormQuery] = useState("");
   const [formResults, setFormResults] = useState<Array<{ id: string; name: string; version: number }>>([]);
-  const [showFormDrawer, setShowFormDrawer] = useState(false);
 
   type ActionSide = "left" | "center" | "right";
 
@@ -427,7 +425,16 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                 </div>
 
                 <div className="field-group">
-                  <button type="button" className="action-btn" onClick={() => setShowFormDrawer(true)}>
+                  <button
+                    type="button"
+                    className="action-btn link"
+                    onClick={() => {
+                      if (!selectedNode) return;
+                      // Dispatch a custom event to request navigation to form builder
+                      const detail = { nodeId: selectedNode.id } as const;
+                      window.dispatchEvent(new CustomEvent('kratos:navigate-form-builder-new', { detail }));
+                    }}
+                  >
                     <Plus size={14} /> Create new
                   </button>
                 </div>
@@ -541,33 +548,7 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
         )}
       </div>
 
-      {showFormDrawer && (
-        <div className="drawer-overlay" aria-label="Create form">
-          <div className="drawer-panel">
-            <div className="drawer-header">
-              <h4>Create form</h4>
-              <button onClick={() => setShowFormDrawer(false)} aria-label="Close form drawer">
-                <X size={16} />
-              </button>
-            </div>
-            <div className="drawer-body">
-              <DynamicFormBuilder
-                onSave={(form) => {
-                  if (selectedNode && isProcessNode) {
-                    const data = nodeData as ProcessNodeData;
-                    onNodeUpdate(selectedNode.id, {
-                      ...data,
-                      form: { id: form.id!, name: form.name, version: form.version!, binding: 'pinned' },
-                    });
-                  }
-                  setShowFormDrawer(false);
-                }}
-                onCancel={() => setShowFormDrawer(false)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Drawer removed in favor of navigation-based flow */}
     </div>
   );
 };

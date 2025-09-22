@@ -8,9 +8,20 @@
   position: relative;
 }
 
+.dark .process-node {
+  background: #1e1e25;
+  border: 1px solid #2e3447;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
 .process-node.selected {
   border-color: #6366f1;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.dark .process-node.selected {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.3);
 }
 
 .node-header {
@@ -26,9 +37,17 @@
   color: #1f2937;
 }
 
+.dark .node-title {
+  color: #f1f5f9;
+}
+
 .node-internal-id {
   font-size: 12px;
   color: #6b7280;
+}
+
+.dark .node-internal-id {
+  color: #94a3b8;
 }
 
 .node-actions {
@@ -46,6 +65,10 @@
   color: #374151;
 }
 
+.dark .action-label {
+  color: #cbd5e1;
+}
+
 .action-indicator {
   display: inline-flex;
   align-items: center;
@@ -56,6 +79,11 @@
   font-size: 10px;
   font-weight: 600;
   color: #1f2937;
+}
+
+.dark .action-indicator {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .action-text {
@@ -76,6 +104,11 @@
   color: #6b7280;
 }
 
+.dark .node-assignees {
+  border-top: 1px solid #2e3447;
+  color: #94a3b8;
+}
+
 .assignee-names {
   white-space: nowrap;
   overflow: hidden;
@@ -87,6 +120,11 @@
   height: 12px;
   background: #9ca3af;
   border: 2px solid white;
+}
+
+.dark .process-handle {
+  background: #64748b;
+  border: 2px solid #1e1e25;
 }
 
 .handle-left {

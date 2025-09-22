@@ -14,7 +14,7 @@ Docs: https://docs.camunda.io/docs/components/modeler/web-modeler/advanced-model
 */
 
 // src/features/workflow-config-edit/components/builder/WorkflowBuilder.tsx
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -34,6 +34,7 @@ import ProcessNode from "./ProcessNode";
 import DecisionNode from "./DecisionNode";
 import BuilderDetailsPanel from "./BuilderDetailsPanel";
 import ContextMenu from "./ContextMenu";
+import { FormPickerDialog } from "./FormPickerDialog";
 import { validateWorkflowWithForms, exportToWorkflowJson } from "@features/workflow-config-edit/utils/builderUtils";
 import { mockPeople } from "@features/workflow-config-edit/data/mockPeople";
 import type {
@@ -119,6 +120,7 @@ interface WorkflowBuilderProps {
 
 const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const nodesRef = useRef<Node<BuilderNodeData>[]>(INITIAL_NODES);
   const [nodes, setNodes, onNodesChange] = useNodesState<BuilderNodeData>(
     INITIAL_NODES
   );
@@ -141,6 +143,39 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
   const [validationWarnings, setValidationWarnings] = useState<string[]>([]);
   const [formsCoverage, setFormsCoverage] = useState<{ withForms: number; totalProcessNodes: number }>({ withForms: 0, totalProcessNodes: 0 });
   const [showValidation, setShowValidation] = useState(false);
+  const [formPickerOpen, setFormPickerOpen] = useState(false);
+  const [formPickerNodeId, setFormPickerNodeId] = useState<string | null>(null);
+
+  // keep ref in sync for event handlers
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
+
+  const attachFormToNode = useCallback((currentNodes: Node<BuilderNodeData>[], nodeId: string, form: { id?: string; name: string; version?: number }) => {
+    return currentNodes.map((n) => {
+      if (n.id !== nodeId || n.type !== "process") return n;
+      const data = n.data as ProcessNodeData;
+      return {
+        ...n,
+        data: {
+          ...data,
+          form: { id: form.id ?? "", name: form.name, version: form.version ?? 1, binding: "pinned" },
+        },
+      } as Node<BuilderNodeData>;
+    });
+  }, []);
+
+  // Attach newly created form when navigating back from form builder
+  useEffect(() => {
+    function handler(event: Event) {
+      const { nodeId, form } = (event as CustomEvent<{ nodeId: string; form: { id?: string; name: string; version?: number } }>).detail || {};
+      if (!nodeId || !form) return;
+      const next = attachFormToNode(nodesRef.current, nodeId, form);
+      setNodes(next);
+    }
+    window.addEventListener("kratos:form-created", handler as EventListener);
+    return () => window.removeEventListener("kratos:form-created", handler as EventListener);
+  }, [attachFormToNode, setNodes]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -455,6 +490,10 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
               setSelectedNode(node);
               setSelectedEdge(null);
             }}
+            onOpenFormPicker={(nodeId) => {
+              setFormPickerNodeId(nodeId);
+              setFormPickerOpen(true);
+            }}
             isNode={!!contextMenu.nodeId}
           />
         )}
@@ -469,6 +508,29 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ onExport, onBack }) =
           onNodeUpdate={handleNodeUpdate}
           onEdgeUpdate={handleEdgeUpdate}
           availablePeople={mockPeople}
+        />
+
+        <FormPickerDialog
+          open={formPickerOpen}
+          onClose={() => setFormPickerOpen(false)}
+          onSelect={(form) => {
+            if (!formPickerNodeId) return;
+            setNodes((curr) =>
+              curr.map((n) => {
+                if (n.id !== formPickerNodeId || n.type !== 'process') return n;
+                const data = n.data as ProcessNodeData;
+                return {
+                  ...n,
+                  data: {
+                    ...data,
+                    form: { id: form.id, name: form.name, version: form.version, binding: 'pinned' },
+                  },
+                } as Node<BuilderNodeData>;
+              })
+            );
+            setFormPickerOpen(false);
+            setFormPickerNodeId(null);
+          }}
         />
 
         {showValidation && (

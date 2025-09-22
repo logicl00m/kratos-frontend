@@ -19,6 +19,7 @@ interface ContextMenuProps {
   onRename?: () => void;
   onAssignPeople?: () => void;
   onOpenFormConfig?: (nodeId: string) => void; // Added for form config
+  onOpenFormPicker?: (nodeId: string) => void; // New: open form picker modal
   nodeId?: string; // Added to identify the node
   isNode?: boolean;
 }
@@ -32,6 +33,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   onRename,
   onAssignPeople,
   onOpenFormConfig, // Destructure form config prop
+  onOpenFormPicker,
   nodeId, // Receive nodeId
   isNode = true,
 }) => {
@@ -112,8 +114,12 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           <button
             className="context-menu-item"
             onClick={() => {
-              if (nodeId && onOpenFormConfig) {
-                onOpenFormConfig(nodeId);
+              if (nodeId) {
+                if (onOpenFormPicker) {
+                  onOpenFormPicker(nodeId);
+                } else if (onOpenFormConfig) {
+                  onOpenFormConfig(nodeId);
+                }
               }
               onClose();
             }}
