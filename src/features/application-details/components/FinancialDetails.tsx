@@ -35,7 +35,10 @@ const FinancialDetails: React.FC<{ amount: number }> = ({ amount }) => (
         >
           Loan Amount
         </div>
-        <div style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a" }} className="dark:text-slate-100">
+        <div
+          style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a" }}
+          className="dark:text-slate-100"
+        >
           ${amount.toLocaleString()}
         </div>
       </div>
@@ -46,7 +49,10 @@ const FinancialDetails: React.FC<{ amount: number }> = ({ amount }) => (
         >
           Estimated Monthly Payment
         </div>
-        <div style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a" }} className="dark:text-slate-100">
+        <div
+          style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a" }}
+          className="dark:text-slate-100"
+        >
           ${(amount * 0.02).toFixed(2)}
         </div>
       </div>
@@ -57,7 +63,10 @@ const FinancialDetails: React.FC<{ amount: number }> = ({ amount }) => (
         >
           Interest Rate
         </div>
-        <div style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a" }} className="dark:text-slate-100">
+        <div
+          style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a" }}
+          className="dark:text-slate-100"
+        >
           12.5%
         </div>
       </div>

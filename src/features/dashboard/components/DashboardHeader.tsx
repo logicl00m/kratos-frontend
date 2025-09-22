@@ -3,35 +3,35 @@ import React from "react";
 import { Search, Activity, Filter } from "lucide-react";
 
 interface DashboardHeaderProps {
-  searchTerm: string;
-  myQueueOnly: boolean;
-  selectedStage: string;
-  selectedStatus: string;
-  selectedProduct: string;
-  selectedOwner: string;
-  ownerOptions: string[];
-  onSearchChange: (term: string) => void;
-  onMyQueueToggle: (checked: boolean) => void;
-  onStageChange: (stage: string) => void;
-  onStatusChange: (status: string) => void;
-  onProductChange: (product: string) => void;
-  onOwnerChange: (owner: string) => void;
+  searchTerm?: string;
+  myQueueOnly?: boolean;
+  selectedStage?: string;
+  selectedStatus?: string;
+  selectedProduct?: string;
+  selectedOwner?: string;
+  ownerOptions?: string[];
+  onSearchChange?: (term: string) => void;
+  onMyQueueToggle?: (checked: boolean) => void;
+  onStageChange?: (stage: string) => void;
+  onStatusChange?: (status: string) => void;
+  onProductChange?: (product: string) => void;
+  onOwnerChange?: (owner: string) => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
-  searchTerm,
-  myQueueOnly,
-  selectedStage,
-  selectedStatus,
-  selectedProduct,
-  selectedOwner,
-  ownerOptions,
-  onSearchChange,
-  onMyQueueToggle,
-  onStageChange,
-  onStatusChange,
-  onProductChange,
-  onOwnerChange,
+  searchTerm = "",
+  myQueueOnly = false,
+  selectedStage = "All Stages",
+  selectedStatus = "All Status",
+  selectedProduct = "All Products",
+  selectedOwner = "All Owners",
+  ownerOptions = ["All Owners"],
+  onSearchChange = () => {},
+  onMyQueueToggle = () => {},
+  onStageChange = () => {},
+  onStatusChange = () => {},
+  onProductChange = () => {},
+  onOwnerChange = () => {},
 }) => {
   return (
     <div className="dashboard-header">
@@ -39,9 +39,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <div className="dashboard-header-top">
           <div className="dashboard-logo-container">
             <Activity className="w-7 h-7 text-white" />
-            <h1 className="dashboard-title text-white">
-              Applications Queue
-            </h1>
+            <h1 className="dashboard-title text-white">Applications Queue</h1>
           </div>
           <div className="dashboard-header-actions">
             <button
@@ -78,7 +76,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 checked={myQueueOnly}
                 onChange={(e) => onMyQueueToggle(e.target.checked)}
               />
-              <span className="dashboard-my-queue-text text-white">My Queue</span>
+              <span className="dashboard-my-queue-text text-white">
+                My Queue
+              </span>
             </label>
           </div>
 
@@ -123,7 +123,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onChange={(e) => onOwnerChange(e.target.value)}
             >
               {ownerOptions.map((o) => (
-                <option key={o} className="text-gray-900">{o}</option>
+                <option key={o} className="text-gray-900">
+                  {o}
+                </option>
               ))}
             </select>
           </div>

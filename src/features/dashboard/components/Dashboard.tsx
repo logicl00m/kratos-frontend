@@ -1,5 +1,6 @@
 // src/features/dashboard/components/Dashboard.tsx
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   useDashboardApplications,
   useDashboardStats,
@@ -116,8 +117,24 @@ const Dashboard: React.FC<{
   };
 
   const handleApplicationClick = (app: LoanApplication) => {
-    // TODO: Implement with real workflow data from API
-    console.log("Application clicked:", app.id);
+    // Find the full workflow data for this application
+    const workflowApplication = rawApplications.find((rawApp: any) => rawApp.id === app.id);
+    
+    if (workflowApplication && onApplicationClick) {
+      // Transform the raw application data to WorkflowData format
+      // This is a simplified version - in a real implementation, you would fetch the full workflow data
+      const workflow: WorkflowData = {
+        workflow: {
+          id: workflowApplication.id,
+          currentState: workflowApplication.currentState,
+          currentStateEnteredAt: workflowApplication.metadata?.updatedAt || new Date().toISOString(),
+          forms: {}, // In a real implementation, this would be populated with actual form data
+          states: {} // In a real implementation, this would be populated with actual state data
+        }
+      };
+      
+      onApplicationClick(workflow);
+    }
   };
 
   // Use real stats data when available

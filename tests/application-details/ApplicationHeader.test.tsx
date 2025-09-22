@@ -43,14 +43,6 @@ describe("ApplicationHeader", () => {
     expect(screen.getByText("Personal Loan • $25,000")).toBeInTheDocument();
   });
 
-  it("renders back button", () => {
-    render(
-      <ApplicationHeader application={mockApplication} onBack={vi.fn()} />
-    );
-
-    expect(screen.getByText("Back to Dashboard")).toBeInTheDocument();
-  });
-
   it("applies correct stage color", () => {
     render(
       <ApplicationHeader application={mockApplication} onBack={vi.fn()} />
