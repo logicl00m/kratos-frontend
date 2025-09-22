@@ -7,14 +7,16 @@ import ReactFlow, {
   MiniMap,
   useNodesState,
   useEdgesState,
-  Node,
-  Edge,
+  type Node,
+  type Edge,
   ReactFlowProvider,
   Handle,
   Position,
-  NodeProps,
+  type NodeProps,
 } from "reactflow";
+
 import "reactflow/dist/style.css";
+
 import { Users, Plus, X, Check, AlertCircle } from "lucide-react";
 import { mockPeople } from "@features/workflow-config-edit/data/mockPeople";
 import type { WorkflowTemplate, AssignmentData } from "../types/template.types";
