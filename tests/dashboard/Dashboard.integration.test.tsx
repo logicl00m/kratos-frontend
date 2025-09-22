@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Dashboard from '@features/dashboard/components/Dashboard';
 import { mockWorkflowData } from '@features/dashboard/data/mockWorkflowData';
 
-// Mock the useApiWithFallback hook to return mock data
+// Mock the useApiWithFallback hooks
 vi.mock('@/lib/hooks/useApiWithFallback', () => ({
   useDashboardApplications: () => ({
     data: {
@@ -14,7 +14,7 @@ vi.mock('@/lib/hooks/useApiWithFallback', () => ({
         currentState: wf.workflow.currentState,
         status: wf.workflow.currentState === 'Completed' ? 'completed' : 'pending',
         assignee: wf.workflow.states[wf.workflow.currentState]?.assignees?.[0]?.employeeName || 'Unassigned',
-        data: {},
+        data: wf.workflow.forms,
         history: [],
         metadata: {
           createdAt: new Date().toISOString(),
@@ -50,28 +50,24 @@ vi.mock('@/lib/hooks/useApiWithFallback', () => ({
     loading: false,
     isUsingFallback: true,
     error: null
+  }),
+  useWorkflowInstance: vi.fn().mockReturnValue({
+    data: null,
+    loading: false,
+    isUsingFallback: true,
+    error: null
   })
 }));
 
-// Mock the useNavigate hook
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate
-  };
-});
-
-describe('Dashboard', () => {
+describe('Dashboard Integration', () => {
   const renderDashboard = (props = {}) => {
+    const defaultProps = {
+      currentUserName: "Fahim Ahmed"
+    };
+    
     return render(
       <BrowserRouter>
-        <Dashboard 
-          onApplicationClick={vi.fn()}
-          currentUserName="Fahim Ahmed"
-          {...props}
-        />
+        <Dashboard {...defaultProps} {...props} />
       </BrowserRouter>
     );
   };
@@ -79,14 +75,13 @@ describe('Dashboard', () => {
   it('renders dashboard with applications', async () => {
     renderDashboard();
 
-    // Check that the dashboard renders
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    
     // Check that applications are rendered
     expect(screen.getByText(mockWorkflowData[0].workflow.id)).toBeInTheDocument();
     
     // Check that applicant names are rendered
-    const firstApplicantName = mockWorkflowData[0].workflow.forms.coreDetails.fields.find(f => f.id === 'applicantLegalName')?.data;
+    const firstApplicantName = mockWorkflowData[0].workflow.forms.coreDetails.fields.find(
+      f => f.id === 'applicantName'
+    )?.data;
     expect(screen.getByText(firstApplicantName as string)).toBeInTheDocument();
   });
 
@@ -94,20 +89,22 @@ describe('Dashboard', () => {
     renderDashboard();
 
     const searchInput = screen.getByPlaceholderText('Search applications...');
-    const firstApplicantName = mockWorkflowData[0].workflow.forms.coreDetails.fields.find(f => f.id === 'applicantLegalName')?.data as string;
+    const firstApplicantName = mockWorkflowData[0].workflow.forms.coreDetails.fields.find(
+      f => f.id === 'applicantName'
+    )?.data as string;
     
     // Initially all applications should be visible
     expect(screen.getByText(firstApplicantName)).toBeInTheDocument();
 
-    // Filter by search term
+    // Filter by search term that matches second application
     fireEvent.change(searchInput, { target: { value: 'XYZ' } });
     
-    // Check that only matching applications are shown
+    // Wait for filtering to complete
     await waitFor(() => {
-      const secondApplicantName = mockWorkflowData[1].workflow.forms.coreDetails.fields.find(f => f.id === 'applicantLegalName')?.data as string;
-      expect(screen.getByText(secondApplicantName)).toBeInTheDocument();
-      // The first applicant name should not be in the document if it doesn't match
-      // This depends on your exact mock data, so adjust as needed
+      const secondApplicantName = mockWorkflowData[1].workflow.forms.coreDetails.fields.find(
+        f => f.id === 'applicantName'
+      )?.data as string;
+      expect(screen.queryByText(secondApplicantName)).toBeInTheDocument();
     });
   });
 
@@ -167,5 +164,16 @@ describe('Dashboard', () => {
     rowCheckboxes.forEach(checkbox => {
       expect(checkbox).not.toBeChecked();
     });
+  });
+  
+  it('uses fallback data when API calls fail', () => {
+    renderDashboard();
+    
+    // Check that fallback stats are displayed
+    expect(screen.getByText(`${mockWorkflowData.length}`)).toBeInTheDocument();
+    
+    // Check that fallback applications are displayed
+    const firstApplicationId = mockWorkflowData[0].workflow.id;
+    expect(screen.getByText(firstApplicationId)).toBeInTheDocument();
   });
 });

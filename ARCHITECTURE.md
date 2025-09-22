@@ -1,250 +1,664 @@
-# Project Architecture Guide
+# Kratos Frontend - System Architecture Documentation
 
-This document describes the current code structure, path aliases, and conventions for adding new features and extensions.
+## Executive Summary
+Kratos Frontend is a modern, scalable React application built with TypeScript, designed for enterprise-grade workflow management in financial institutions. The architecture emphasizes modularity, maintainability, and performance through a feature-based structure with clear separation of concerns.
 
-## Directory structure
+## Architectural Principles
 
-Root
+### Core Design Principles
+1. **Feature-First Architecture** - Organized by business domains for better scalability
+2. **Component Composition** - Small, reusable components following DRY principles
+3. **Type Safety** - TypeScript throughout for compile-time safety
+4. **State Separation** - Clear distinction between server and client state
+5. **Performance First** - Optimized rendering, code splitting, lazy loading
+6. **Accessibility** - WCAG 2.1 AA compliance target
+7. **Developer Experience** - Fast builds, hot reloading, clear patterns
 
-- `src/`
-  - `app/`
-    - `App.tsx` – Main application orchestrator
-    - `styles/` – Directory containing organized CSS files
-  - `assets/` – Static assets (images, svgs)
-  - `components/` (removed)
-  - `features/` – Feature-based code
-    - `application-details/`
-      - `components/`
-        - `ApplicationDetails.tsx`
-        - `ApplicationHeader.tsx`
-        - `WorkflowProgress.tsx`
-        - `ContactInfo.tsx`
-        - `FinancialDetails.tsx`
-        - `RiskSnapshot.tsx`
-        - `DocumentsSection.tsx`
-        - `AuditTrail.tsx`
-    - `dashboard/`
-      - `components/`
-        - `Dashboard.tsx`
-        - `DashboardHeader.tsx`
-        - `ApplicationTable.tsx`
-        - `ApplicationRow.tsx`
-        - `ResultsCount.tsx`
-      - `types/`
-        - `dashboard.types.ts`
-    - `form/`
-      - `components/`
-        - `FormViewer.tsx`
-        - `FieldInput.tsx`
-    - `workflow/`
-      - `components/`
-        - `WorkflowGraph.tsx`
-        - `GraphToolbar.tsx`
-        - `DetailPanel.tsx`
-        - `StateNode.tsx`
-        - `JsonEditor.tsx`
-      - `types/`
-        - `workflow.types.ts`
-      - `utils/`
-        - `graphParser.ts`
-        - `graphExport.ts`
-  - `pages/`
-    - `NotFoundPage.tsx`
-  - `shared/`
-    - `components/`
-      - `layout/`
-        - `TopBar.tsx`
-    - `utils/`
-      - `colors.ts`
-      - `download.ts`
-  - `types/` (removed)
-  - `utils/` (removed)
-  - `index.css` – global styles
-  - `main.tsx` – React entrypoint (wraps App with ReactFlowProvider)
+## System Architecture Overview
 
-Non-src
-
-- `public/` – Static served files (index.html, vite.svg)
-- `data/` – Sample JSON and mock data
-- `vite.config.ts` – Vite configuration, including path aliases
-- `tsconfig.app.json` – TypeScript compiler options and path aliases
-
-## Sample workflow JSON (data/)
-
-The `data/` directory contains example JSON fixtures used for local development, demos, and as test fixtures. Notable files include `data/small-sample.json` which models a workflow with a top-level `workflow` object containing `forms`, `states`, and per-state `actions`.
-
-These sample workflow files are consumed by several parts of the app:
-
-- `@features/workflow/components/JsonEditor` — edit and preview raw workflow JSON.
-- `@features/workflow/components/WorkflowGraph` — renders the workflow graph parsed from the JSON.
-- feature components under `src/features/application-details` — read `forms` and `fieldOverrides` to drive UI rendering of form fields and state-specific behavior.
-
-When extending or adding samples:
-
-- Add new `forms.<name>.fields[]` entries to define form fields and their `fieldActions`.
-- Add or update `states.<stateName>` to control per-state form visibility, `fieldOverrides`, and `actions`.
-- Keep changes compatible with the parser at `@features/workflow/utils/graphParser.ts`.
-
-## Path aliases
-
-Configured in `vite.config.ts` and `tsconfig.app.json`:
-
-- `@/…` → `src/…`
-- `@features/…` → `src/features/…`
-- `@shared/…` → `src/shared/…`
-- `@pages/…` → `src/pages/…`
-
-Example imports:
-
-- `import App from '@/app/App'`
-- `import { WorkflowGraph } from '@features/workflow/components/WorkflowGraph'`
-- `import { getStageColor } from '@shared/utils/colors'`
-
-## Conventions
-
-- Feature-first organization: each feature contains its own components, types, and utils.
-- Keep shared, generic building blocks under `src/shared`.
-- Prefer colocated types (`features/<feature>/types`) over global types.
-- Keep pages minimal; put logic in feature components.
-- Use semantic, stable keys in lists (avoid array index keys).
-- Keep components small and focused; extract utilities to `utils/` within the feature or to `src/shared/utils` when cross-cutting.
-- Use the configured path aliases for imports.
-
-### Barrel exports (recommended)
-
-To simplify imports, add `index.ts` files that re-export public modules:
-
-- `features/<feature>/components/index.ts`
-- `features/<feature>/types/index.ts`
-- `shared/components/index.ts`, etc.
-
-Example barrel for `features/workflow/components/index.ts`:
-
-```ts
-export { default as WorkflowGraph } from "./WorkflowGraph";
-export { default as GraphToolbar } from "./GraphToolbar";
-export { default as DetailPanel } from "./DetailPanel";
-export { default as StateNode } from "./StateNode";
-export { default as JsonEditor } from "./JsonEditor";
+```
+┌─────────────────────────────────────────────────────────┐
+│                    User Interface Layer                 │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────┐ │
+│  │   React     │ │  TypeScript  │ │   Tailwind CSS  │ │
+│  │  Components │ │    Types     │ │    + Custom     │ │
+│  └─────────────┘ └──────────────┘ └─────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│                  State Management Layer                 │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────┐ │
+│  │   Zustand   │ │ TanStack     │ │   React Hook    │ │
+│  │ (Client)    │ │ Query(Server)│ │   Form          │ │
+│  └─────────────┘ └──────────────┘ └─────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│                    Service Layer                        │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────┐ │
+│  │   API       │ │   Auth       │ │   Validation    │ │
+│  │  Client     │ │   Service    │ │    (Zod)        │ │
+│  └─────────────┘ └──────────────┘ └─────────────────┘ │
+├─────────────────────────────────────────────────────────┤
+│                   Infrastructure                        │
+│  ┌─────────────┐ ┌──────────────┐ ┌─────────────────┐ │
+│  │    Vite     │ │   Vitest     │ │      MSW        │ │
+│  │   Builder   │ │   Testing    │ │    Mocking      │ │
+│  └─────────────┘ └──────────────┘ └─────────────────┘ │
+└─────────────────────────────────────────────────────────┘
 ```
 
-Then import via:
+### 2. Component-Driven Development
+- **Atomic Design**: Small, reusable UI components in `src/components/ui/`
+- **Feature Components**: Complex, feature-specific components within feature modules
+- **Composition Over Inheritance**: Components are composed rather than extended
 
-```ts
-import { WorkflowGraph } from "@features/workflow/components";
+### 3. Type Safety First
+- **TypeScript Strict Mode**: Full type coverage with strict null checks
+- **Type Definitions**: Comprehensive interfaces and types for all data structures
+- **Runtime Validation**: Zod schemas for data validation at boundaries
+
+### 4. Unidirectional Data Flow
+- **Props Down, Events Up**: Classic React data flow pattern
+- **Local State Management**: useState for component state
+- **Context for Cross-Cutting Concerns**: Theme context for global UI state
+
+## Application Layers
+
+### Presentation Layer
+
+#### Component Architecture
+```
+Component Types:
+├── Page Components       (Route-level components)
+├── Layout Components     (MainLayout, Sidebar, TopBar)
+├── Feature Components    (Complex business components)
+├── UI Components        (Reusable presentational components)
+└── Utility Components   (HOCs, Providers)
 ```
 
-## Adding a new feature
+#### Component Structure Pattern
+```typescript
+// Standard component structure
+interface ComponentProps {
+  // Props definition
+}
 
-1. Create the feature folders
+const Component: React.FC<ComponentProps> = ({ props }) => {
+  // Hooks
+  // State
+  // Effects
+  // Handlers
+  // Render
+}
+```
 
-   - `src/features/<feature-name>/components`
-   - `src/features/<feature-name>/types` (optional)
-   - `src/features/<feature-name>/utils` (optional)
+### Business Logic Layer
 
-2. Build your components
+#### Feature Module Structure
+```
+feature/
+├── components/          # Feature-specific React components
+├── types/              # TypeScript type definitions
+├── utils/              # Business logic and helpers
+├── data/               # Mock data and constants
+├── services/           # API services (when implemented)
+├── hooks/              # Custom React hooks
+├── styles/             # Feature-specific styles
+└── index.ts            # Public API exports
+```
 
-   - Place UI in `components/`; keep files small and focused.
-   - Prefer local types under `types/` and local helpers under `utils/`.
+#### State Management Architecture
+```
+State Management Hierarchy:
+├── Component State      (useState for local state)
+├── Context State       (React Context for cross-cutting state)
+├── URL State          (React Router for navigation state)
+└── Form State         (React Hook Form for form management)
+```
 
-3. Expose via barrels (optional but recommended)
+### Data Layer
 
-   - Add `index.ts` in `components` and `types` to re-export public parts.
+#### Current Data Architecture (Mock Implementation)
+```
+Data Sources:
+├── Static Mock Files    (*.data.ts files)
+├── Mock Services       (Simulated API responses)
+├── Local Storage       (Theme preferences)
+└── Session Storage     (Temporary UI state)
+```
 
-4. Import using aliases
+#### Future Data Architecture (With Backend)
+```
+Data Flow:
+Client → API Client → Backend API → Database
+       ↓
+    Cache Layer
+       ↓
+    State Store
+       ↓
+    Components
+```
 
-   - `import { Thing } from '@features/<feature-name>/components'`
+## Module Architecture
 
-5. Write minimal docs (optional)
-   - Consider adding a short `README.md` inside your feature folder describing its purpose and public API.
+### Core Modules
 
-## Legacy folders
+#### 1. Application Shell (`src/app/`)
+**Responsibility**: Application bootstrap and routing configuration
 
-- On Sep 16, 2025, legacy folders `src/components`, `src/utils`, and `src/types` were removed to avoid confusion.
-- All active code now lives under `src/features` and `src/shared`.
+**Components**:
+- `App.tsx`: Root component with route definitions
+- Route configuration and navigation logic
+- Global providers setup
 
-## Notes
+**Dependencies**:
+- React Router for navigation
+- Feature modules for route components
+- Layout components for consistent UI
 
-- React Flow provider is set up in `src/main.tsx`. Components requiring React Flow context should render under `App`.
-- Export helpers:
-  - Workflow graph export lives at `@features/workflow/utils/graphExport` and uses `@shared/utils/download`.
-- Colors: `getStageColor` in `@shared/utils/colors` centralizes stage color mapping.
-- ESLint: config file renamed to `eslint.config.mjs` for ESM; `eslint.config.js` was removed.
-- TypeScript: Uses `verbatimModuleSyntax` flag which requires type-only imports for types.
+#### 2. Dashboard Module (`src/features/dashboard/`)
+**Responsibility**: Application overview and navigation hub
 
-## Workflow Editor (new feature)
+**Architecture Pattern**: Container-Presenter
+```
+Dashboard (Container)
+├── DashboardHeader (Presenter)
+├── DashboardFilters (Presenter)
+├── ApplicationTable (Container)
+│   └── ApplicationRow (Presenter)
+└── StatsContainer (Container)
+    └── StatsCard (Presenter)
+```
 
-We are adding a visual Workflow Editor feature for designing, validating, and exporting workflow configurations.
+**Data Flow**:
+1. Mock data loaded from `mockWorkflowData.ts`
+2. Transformed via `workflowTransformer.ts`
+3. Filtered and sorted in component state
+4. Rendered through presenter components
 
-- Location (recommended): `src/features/workflow-config-edit/` — contains editor canvas, custom nodes, details panel, and exporter utilities.
-- Base canvas: React Flow (already in dependencies). Consider `elkjs` for auto-layout improvements.
-- Data model and mapping rules are documented in `docs/WORKFLOW_EDITOR_PLAN.md` (last updated 2025-09-18).
-- Integration notes:
-  - Reuse `@shared` components (TopBar, icons, toasts) and `@features/workflow/utils/*` parsers where possible.
-  - Expose exporter transformer `canvasToWorkflowJSON(nodes, edges)` for consistency with existing `graphExport` utilities.
+#### 3. Workflow Visualization (`src/features/workflow/`)
+**Responsibility**: Graph-based workflow display and editing
 
-See `docs/WORKFLOW_EDITOR_PLAN.md` for detailed design, validation rules, accessibility guidance, and an implementation roadmap.
+**Architecture Pattern**: Custom Renderer with ReactFlow
+```
+WorkflowGraph (Controller)
+├── ReactFlow Instance
+├── Custom Nodes
+│   ├── StateNode
+│   └── Custom renderers
+├── Custom Edges
+│   ├── SmartStepEdge
+│   ├── OrthogonalEdge
+│   └── Other edge types
+└── Graph Controls
+    ├── Toolbar
+    └── Minimap
+```
 
-## Testing
+**Key Design Decisions**:
+- ReactFlow for graph rendering
+- Custom node/edge components for domain-specific visualization
+- Dagre for automatic layout calculation
+- Separation of graph data from visualization logic
 
-All unit and component tests are centralized under the `tests/` folder at the project root. Tests use Vitest with jsdom and React Testing Library. Network calls are mocked via MSW, and a minimal `ResizeObserver` polyfill is installed for components relying on React Flow.
+#### 4. Dynamic Form Builder (`src/features/dynamic-form-builder/`)
+**Responsibility**: Visual form design and configuration
 
-### Location and structure
+**Architecture Pattern**: Drag-and-Drop Builder
+```
+DynamicFormBuilder (Orchestrator)
+├── FieldPalette (Source)
+├── FieldList (Target/Canvas)
+├── FieldInspector (Editor)
+└── Form Preview (Renderer)
+```
 
-Root
+**State Management**:
+- Local state for form definition
+- Drag-and-drop state for UI interactions
+- Validation state for field rules
 
-- `tests/`
-  - `setup.ts` – Global test setup
-    - Registers `@testing-library/jest-dom`
-    - Sets up MSW server lifecycle with handlers from `tests/mocks/handlers.ts`
-    - Installs a minimal `ResizeObserver` polyfill required by React Flow
-  - `test-utils.tsx` – Shared helpers
-    - `renderWithProviders`/`renderWithReactFlow` wrappers
-    - `createMockLoanApplication()` factory
-    - Mocks `@shared/utils/colors` for stable, deterministic colors
-  - `mocks/`
-    - `handlers.ts` – MSW handlers for API routes used during tests
-  - `application-details/` – Tests covering Application Details feature
-  - `dashboard/` – Tests covering Dashboard feature
-  - `workflow/` – Tests covering Workflow graph and related components
-  - `form/` – Tests covering form rendering components
-  - `api.test.tsx` – High-level API-driven Dashboard tests
+#### 5. Workflow Configuration (`src/features/workflow-config-edit/`)
+**Responsibility**: Visual workflow design and configuration
 
-Tests mirror feature areas rather than living alongside source files to keep the production source tree clean.
+**Architecture Pattern**: Node-Based Editor
+```
+WorkflowBuilder (Main Controller)
+├── ReactFlow Canvas
+├── Node Types
+│   ├── ProcessNode
+│   └── DecisionNode
+├── BuilderDetailsPanel (Property Editor)
+├── FormPickerDialog (Form Selection)
+└── Context Menu (Operations)
+```
 
-### Configuration
+**Integration Points**:
+- Form Builder for form attachment
+- Workflow types for data model
+- Export to JSON for persistence
 
-- `vitest.config.ts`
-  - Resolves path aliases via `vite-tsconfig-paths`
-  - Uses `environment: 'jsdom'`
-  - Includes tests via `include: ['tests/**/*.test.{ts,tsx}']`
-  - Registers global setup using `setupFiles: ['./tests/setup.ts']`
-- `tsconfig.app.json`
-  - Includes both `src` and `tests` in the TypeScript program
-  - Defines test alias `@test/*` → `./tests/*`
+### Supporting Modules
 
-Common path aliases available in tests:
+#### Theme System (`src/contexts/ThemeContext.tsx`)
+**Architecture**: Context-based global state
+```typescript
+ThemeContext
+├── Theme Provider (Root level)
+├── Theme Hook (useTheme)
+├── CSS Variables (Dynamic theming)
+└── Local Storage (Persistence)
+```
 
-- `@features/*` → `src/features/*`
-- `@shared/*` → `src/shared/*`
-- `@pages/*` → `src/pages/*`
-- `@test/*` → `tests/*`
+#### Layout System (`src/shared/components/layout/`)
+**Architecture**: Compositional layout
+```
+MainLayout
+├── Sidebar (Navigation)
+├── TopBar (User controls)
+├── Content Area (Dynamic)
+└── Footer (Information)
+```
 
-### How to run
+#### UI Component Library (`src/components/ui/`)
+**Architecture**: Atomic design with shadcn/ui
+```
+Base Components (Radix UI Primitives)
+├── Styled with Tailwind CSS
+├── Variant system (CVA)
+├── Type-safe props
+└── Dark mode support
+```
 
-- Run all tests in watch mode:
+## Data Flow Architecture
 
-  npm test
+### Current Data Flow (Mock Implementation)
+```
+User Interaction
+    ↓
+Component Event Handler
+    ↓
+Local State Update
+    ↓
+Mock Data Transformation
+    ↓
+UI Re-render
+```
 
-- Run with UI:
+### Component Communication Patterns
 
-  npm run test:ui
+#### 1. Parent-Child Communication
+```typescript
+// Props down
+<ChildComponent data={parentData} onUpdate={handleUpdate} />
 
-- One-off run with coverage:
+// Events up
+const handleUpdate = (newData) => {
+  setParentState(newData);
+}
+```
 
-  npm run test:coverage
+#### 2. Cross-Component Communication
+```typescript
+// Via Context
+<ThemeContext.Provider value={theme}>
+  <ComponentA /> // Can access theme
+  <ComponentB /> // Can access theme
+</ThemeContext.Provider>
 
-### Notes on React Flow in tests
+// Via URL State
+navigate('/dashboard', { state: { filter: 'active' } });
+```
 
-- Components relying on React Flow context should be wrapped using the helpers in `tests/test-utils.tsx` (e.g., `renderWithReactFlow`).
-- The `ResizeObserver` polyfill defined in `tests/setup.ts` ensures React Flow works under jsdom.
+#### 3. Form Data Management
+```typescript
+// React Hook Form pattern
+const { register, handleSubmit, control } = useForm({
+  resolver: zodResolver(schema)
+});
+```
+
+## Routing Architecture
+
+### Route Structure
+```
+Application Routes:
+├── / (Root)
+│   └── Redirect to /dashboard
+├── /dashboard
+│   └── Dashboard feature
+├── /create-workflow
+│   └── Template selection
+├── /running
+│   └── Active workflows
+├── /builder
+│   └── Workflow builder
+├── /form-builder/new
+│   └── Form designer
+├── /applications/details
+│   └── Application details
+├── /viewer
+│   └── Workflow viewer
+└── /* (Catch-all)
+    └── Redirect to /dashboard
+```
+
+### Navigation Patterns
+1. **Programmatic Navigation**: `useNavigate()` hook
+2. **Declarative Navigation**: `<Route>` components
+3. **Protected Routes**: Conditional rendering
+4. **Route Parameters**: Via component state
+
+## Build and Bundle Architecture
+
+### Build Pipeline
+```
+Source Code (TypeScript + JSX)
+    ↓
+Vite Build System
+    ↓
+TypeScript Compilation
+    ↓
+Bundle Generation
+    ↓
+Asset Optimization
+    ↓
+Production Build
+```
+
+### Module Resolution
+```
+Path Aliases:
+@/ → src/
+@features/ → src/features/
+@components/ → src/components/
+@shared/ → src/shared/
+```
+
+### Asset Management
+- **Static Assets**: Public directory
+- **Dynamic Imports**: Potential for code splitting
+- **CSS Processing**: PostCSS with Tailwind
+- **Image Optimization**: Build-time processing
+
+## Development Architecture
+
+### Development Workflow
+```
+Development Server (Vite)
+├── Hot Module Replacement
+├── TypeScript Watch Mode
+├── CSS Processing
+└── Source Maps
+```
+
+### Testing Architecture
+```
+Testing Stack:
+├── Unit Tests (Vitest)
+│   ├── Component testing
+│   └── Utility testing
+├── Integration Tests (Testing Library)
+│   └── Feature testing
+└── E2E Tests (Playwright)
+    └── User flow testing
+```
+
+### Code Quality Architecture
+```
+Quality Gates:
+├── TypeScript Compiler
+├── ESLint (Linting)
+├── Prettier (Formatting)
+└── Pre-commit Hooks (Future)
+```
+
+## Security Architecture
+
+### Current Security Model
+```
+Client-Side Security:
+├── Input Validation (Zod)
+├── XSS Prevention (React defaults)
+├── No sensitive data storage
+└── HTTPS enforcement (deployment)
+```
+
+### Future Security Considerations
+```
+Enhanced Security:
+├── Authentication Layer
+├── Authorization (RBAC)
+├── API Security (JWT/OAuth)
+├── CORS Configuration
+└── Security Headers
+```
+
+## Performance Architecture
+
+### Rendering Optimization
+```
+Performance Strategies:
+├── React.memo (Prevent re-renders)
+├── useMemo (Expensive computations)
+├── useCallback (Stable references)
+└── Virtual DOM (React default)
+```
+
+### Bundle Optimization
+```
+Optimization Techniques:
+├── Tree Shaking (Vite default)
+├── Minification (Production build)
+├── Compression (gzip/brotli)
+└── Code Splitting (Future)
+```
+
+### Runtime Performance
+```
+Runtime Optimizations:
+├── Lazy Loading (Components)
+├── Debouncing (User inputs)
+├── Throttling (Scroll events)
+└── Web Workers (Heavy computation)
+```
+
+## Scalability Architecture
+
+### Horizontal Scalability
+```
+Feature Modules:
+- Independent development
+- Isolated testing
+- Parallel development teams
+- Feature flags ready
+```
+
+### Vertical Scalability
+```
+Component Hierarchy:
+- Reusable components
+- Compositional patterns
+- Shared utilities
+- Centralized types
+```
+
+### State Scalability
+```
+State Management Evolution:
+Current: Local State + Context
+Future Options:
+├── Redux (Complex state)
+├── Zustand (Simpler alternative)
+├── Jotai (Atomic state)
+└── TanStack Query (Server state)
+```
+
+## Integration Architecture
+
+### Current Integrations
+```
+Third-Party Libraries:
+├── ReactFlow (Workflow visualization)
+├── Radix UI (Component primitives)
+├── Tailwind CSS (Styling)
+├── React Hook Form (Forms)
+└── Zod (Validation)
+```
+
+### Future Integration Points
+```
+Backend Integration:
+├── REST API Client
+├── WebSocket (Real-time)
+├── GraphQL (Alternative)
+└── Server-Sent Events
+```
+
+### External System Integration
+```
+Integration Patterns:
+├── API Gateway Pattern
+├── Adapter Pattern (Data transformation)
+├── Facade Pattern (Simplified interface)
+└── Repository Pattern (Data access)
+```
+
+## Deployment Architecture
+
+### Static Deployment
+```
+Build Output:
+dist/
+├── index.html
+├── assets/
+│   ├── *.js (Bundled JavaScript)
+│   ├── *.css (Processed CSS)
+│   └── images/ (Static assets)
+└── favicon.ico
+```
+
+### Deployment Targets
+```
+Deployment Options:
+├── Static Hosting (Netlify, Vercel)
+├── CDN Distribution (CloudFront)
+├── Container (Docker + nginx)
+└── Traditional Server (Apache/nginx)
+```
+
+### Environment Configuration
+```
+Environment Variables:
+├── VITE_API_URL (Backend URL)
+├── VITE_ENV (Environment name)
+├── VITE_VERSION (App version)
+└── Feature flags (Future)
+```
+
+## Error Handling Architecture
+
+### Error Boundaries (Future Implementation)
+```typescript
+class ErrorBoundary extends Component {
+  // Catch React component errors
+  // Log to error service
+  // Display fallback UI
+}
+```
+
+### Error Recovery Patterns
+```
+Error Handling Strategy:
+├── Try-Catch (Async operations)
+├── Error Boundaries (Component trees)
+├── Fallback UI (Graceful degradation)
+└── User Notification (Toast/Alert)
+```
+
+## Monitoring and Observability (Future)
+
+### Application Monitoring
+```
+Monitoring Stack:
+├── Performance Monitoring
+├── Error Tracking
+├── User Analytics
+└── Custom Metrics
+```
+
+### Logging Architecture
+```
+Logging Levels:
+├── Debug (Development only)
+├── Info (General information)
+├── Warning (Potential issues)
+└── Error (Failures)
+```
+
+## Architecture Decision Records (ADRs)
+
+### ADR-001: React as UI Framework
+**Decision**: Use React for UI development
+**Rationale**: Component-based architecture, large ecosystem, team expertise
+
+### ADR-002: TypeScript for Type Safety
+**Decision**: Use TypeScript throughout
+**Rationale**: Type safety, better IDE support, refactoring confidence
+
+### ADR-003: Feature-Based Organization
+**Decision**: Organize code by features
+**Rationale**: Scalability, team autonomy, clear boundaries
+
+### ADR-004: Tailwind CSS for Styling
+**Decision**: Use Tailwind CSS with shadcn/ui
+**Rationale**: Utility-first CSS, consistent design, rapid development
+
+### ADR-005: ReactFlow for Workflows
+**Decision**: Use ReactFlow for workflow visualization
+**Rationale**: Flexible, well-maintained, extensive features
+
+### ADR-006: Vite as Build Tool
+**Decision**: Use Vite instead of Create React App
+**Rationale**: Faster builds, better DX, modern tooling
+
+### ADR-007: Local State Management
+**Decision**: Start with React state, no Redux initially
+**Rationale**: Simplicity, adequate for current needs, can evolve
+
+### ADR-008: Mock Data First
+**Decision**: Develop with mock data before backend
+**Rationale**: Parallel development, UI-first approach, faster iteration
+
+## Architecture Evolution Path
+
+### Phase 1: Current State (Complete)
+- Static mock data
+- Local state management
+- Feature modules
+- Basic routing
+
+### Phase 2: Backend Integration (Next)
+- API client implementation
+- Authentication system
+- Real data sources
+- Error boundaries
+
+### Phase 3: Enhanced State Management
+- Global state solution
+- Cache management
+- Optimistic updates
+- Real-time synchronization
+
+### Phase 4: Performance Optimization
+- Code splitting
+- Lazy loading
+- Service workers
+- Progressive Web App
+
+### Phase 5: Enterprise Features
+- Multi-tenancy
+- Role-based access
+- Audit logging
+- Advanced analytics
+
+## Conclusion
+
+The Kratos Frontend architecture is designed for maintainability, scalability, and developer productivity. The modular structure allows for independent feature development while maintaining consistency through shared components and patterns. The architecture supports gradual enhancement and can evolve from its current mock-data implementation to a full-featured enterprise application without major restructuring.

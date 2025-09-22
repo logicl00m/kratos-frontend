@@ -1,0 +1,175 @@
+/* Error Boundary Styles */
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  min-height: 200px;
+  animation: fadeIn var(--transition-base) ease-out;
+}
+
+.error-boundary--page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.error-boundary--section {
+  min-height: 400px;
+  background: var(--panel);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--stroke);
+}
+
+.error-boundary--component {
+  padding: var(--space-lg);
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--danger);
+}
+
+.error-content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+  animation: slideUp var(--transition-base) ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon {
+  color: var(--danger);
+  margin-bottom: var(--space-lg);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.error-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-md);
+}
+
+.error-boundary--component .error-title {
+  font-size: 1.125rem;
+}
+
+.error-message {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: 1.6;
+}
+
+.error-details {
+  background: var(--panel-hover);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin: var(--space-lg) 0;
+  text-align: left;
+}
+
+.error-details summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: var(--space-sm);
+  transition: color var(--transition-fast);
+}
+
+.error-details summary:hover {
+  color: var(--text);
+}
+
+.error-details pre {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--danger);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: var(--space-md);
+}
+
+.error-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+  transition: all var(--transition-base);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.error-actions .btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.error-actions .btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.error-actions .btn-secondary {
+  background: var(--panel);
+  color: var(--text);
+  border-color: var(--stroke);
+}
+
+.error-actions .btn-secondary:hover {
+  background: var(--panel-hover);
+  border-color: var(--accent);
+}
+
+.error-actions .btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.error-actions .btn-outline:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.error-persistent {
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--warning-bg);
+  color: var(--warning);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
