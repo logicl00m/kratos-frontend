@@ -5,6 +5,10 @@
   min-height: 100vh;
 }
 
+.dark .application-details-container {
+  background: #0f0f14;
+}
+
 .application-details-content {
   display: flex;
   flex-direction: column;

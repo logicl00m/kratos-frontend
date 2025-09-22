@@ -1,6 +1,6 @@
 // src/features/application-details/components/AuditTrail.tsx
 import React, { useState } from "react";
-import { Download, User } from "lucide-react";
+import { Download, User, MessageCircle } from "lucide-react";
 
 interface AuditEntry {
   user: string;
@@ -24,6 +24,7 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
         flexDirection: "column",
         minHeight: 0,
       }}
+      className="dark:bg-slate-800 dark:border-slate-700"
     >
       <div
         style={{
@@ -33,8 +34,11 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
           marginBottom: "16px",
         }}
       >
-        <h3 style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-          📝 Audit Trail ({auditTrail.length})
+        <h3 style={{ fontSize: "16px", fontWeight: "600", margin: 0, color: "#0f172a" }} className="dark:text-slate-100">
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <MessageCircle size={18} className="dark:text-blue-400" />
+            Audit Trail ({auditTrail.length})
+          </div>
         </h3>
         <button
           style={{
@@ -47,7 +51,9 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
             display: "flex",
             alignItems: "center",
             gap: "4px",
+            color: "#0f172a",
           }}
+          className="dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 hover:dark:bg-slate-600"
         >
           <Download size={14} />
           Export
@@ -67,7 +73,10 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
             fontSize: "14px",
             resize: "none",
             minHeight: "80px",
+            background: "white",
+            color: "#0f172a",
           }}
+          className="dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400"
         />
         <button
           style={{
@@ -81,6 +90,7 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
             marginTop: "8px",
             float: "right",
           }}
+          className="dark:bg-blue-600 hover:dark:bg-blue-700"
         >
           Add Comment
         </button>
@@ -110,6 +120,7 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
                 borderBottom: "1px solid #f3f4f6",
                 paddingBottom: "12px",
               }}
+              className="dark:border-slate-700"
             >
               <div
                 style={{
@@ -119,8 +130,8 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
                   marginBottom: "4px",
                 }}
               >
-                <User size={14} color="#6b7280" />
-                <span style={{ fontSize: "12px", fontWeight: "500" }}>
+                <User size={14} color="#6b7280" className="dark:text-slate-400" />
+                <span style={{ fontSize: "12px", fontWeight: "500", color: "#0f172a" }} className="dark:text-slate-100">
                   {entry.user}
                 </span>
                 <span
@@ -132,6 +143,11 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
                     fontSize: "10px",
                     color: entry.action === "system" ? "#6b7280" : "#4338ca",
                   }}
+                  className={`${
+                    entry.action === "system" 
+                      ? "dark:bg-slate-700 dark:text-slate-300" 
+                      : "dark:bg-blue-900 dark:text-blue-200"
+                  }`}
                 >
                   {entry.action}
                 </span>
@@ -141,7 +157,9 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
                   fontSize: "13px",
                   marginLeft: "22px",
                   marginBottom: "4px",
+                  color: "#0f172a",
                 }}
+                className="dark:text-slate-200"
               >
                 {entry.message}
               </div>
@@ -151,6 +169,7 @@ const AuditTrail: React.FC<{ auditTrail: AuditEntry[] }> = ({ auditTrail }) => {
                   color: "#9ca3af",
                   marginLeft: "22px",
                 }}
+                className="dark:text-slate-400"
               >
                 {entry.time}
               </div>

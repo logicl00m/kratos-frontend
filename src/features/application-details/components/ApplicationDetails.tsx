@@ -99,13 +99,7 @@ const ApplicationDetails: React.FC<ApplicationDetailsProps> = ({
   if (!app) {
     return (
       <div className="no-workflow-data">
-        <h3>No workflow data available</h3>
-        <button
-          onClick={onBack}
-          className="back-button"
-        >
-          Back to Dashboard
-        </button>
+        <h3 className="dark:text-slate-100">No workflow data available</h3>
       </div>
     );
   }

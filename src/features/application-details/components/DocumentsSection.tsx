@@ -1,6 +1,6 @@
 // src/features/application-details/components/DocumentsSection.tsx
 import React from "react";
-import { Upload, Check, Eye } from "lucide-react";
+import { Upload, Check, Eye, FileText } from "lucide-react";
 
 interface AppDocument {
   name: string;
@@ -30,6 +30,7 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
         flexDirection: "column",
         minHeight: 0,
       }}
+      className="dark:bg-slate-800 dark:border-slate-700"
     >
       <div
         style={{
@@ -39,8 +40,11 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
           marginBottom: "16px",
         }}
       >
-        <h3 style={{ fontSize: "16px", fontWeight: "600", margin: 0 }}>
-          📄 Documents ({completedCount}/{totalRequired})
+        <h3 style={{ fontSize: "16px", fontWeight: "600", margin: 0, color: "#0f172a" }} className="dark:text-slate-100">
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <FileText size={18} className="dark:text-blue-400" />
+            Documents ({completedCount}/{totalRequired})
+          </div>
         </h3>
         <button
           style={{
@@ -53,7 +57,9 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
             display: "flex",
             alignItems: "center",
             gap: "4px",
+            color: "#0f172a",
           }}
+          className="dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 hover:dark:bg-slate-600"
         >
           <Upload size={14} />
           Upload
@@ -68,6 +74,7 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
             borderRadius: "4px",
             overflow: "hidden",
           }}
+          className="dark:bg-slate-700"
         >
           <div
             style={{
@@ -75,9 +82,10 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
               height: "100%",
               background: "#3b82f6",
             }}
+            className="dark:bg-blue-500"
           />
         </div>
-        <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>
+        <span style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }} className="dark:text-slate-300">
           {progressPercent.toFixed(0)}% complete
         </span>
       </div>
@@ -95,17 +103,22 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
         {documents.map((doc) => {
           const key = `${doc.name}-${doc.filename || "none"}`;
           let statusBg = "#f3f4f6";
-          if (doc.status === "complete") statusBg = "#dcfce7";
-          else if (doc.status === "review") statusBg = "#fef3c7";
+          let statusColor = "#6b7280";
           let statusIcon: React.ReactNode;
-          if (doc.status === "complete")
-            statusIcon = <Check size={16} color="#166534" />;
-          else if (doc.status === "review")
-            statusIcon = <Eye size={16} color="#92400e" />;
-          else
-            statusIcon = (
-              <span style={{ fontSize: "12px", color: "#6b7280" }}>○</span>
-            );
+          
+          if (doc.status === "complete") {
+            statusBg = "#dcfce7";
+            statusColor = "#166534";
+            statusIcon = <Check size={16} color={statusColor} />;
+          } else if (doc.status === "review") {
+            statusBg = "#fef3c7";
+            statusColor = "#92400e";
+            statusIcon = <Eye size={16} color={statusColor} />;
+          } else {
+            statusBg = "#f3f4f6";
+            statusColor = "#6b7280";
+            statusIcon = <span style={{ fontSize: "12px", color: statusColor }}>○</span>;
+          }
 
           return (
             <div
@@ -118,6 +131,7 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
                 background: "#f9fafb",
                 borderRadius: "6px",
               }}
+              className="dark:bg-slate-700 dark:bg-opacity-50"
             >
               <div
                 style={{ display: "flex", alignItems: "center", gap: "12px" }}
@@ -132,20 +146,21 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
                     alignItems: "center",
                     justifyContent: "center",
                   }}
+                  className="dark:bg-opacity-50"
                 >
                   {statusIcon}
                 </div>
                 <div>
-                  <div style={{ fontSize: "14px", fontWeight: "500" }}>
+                  <div style={{ fontSize: "14px", fontWeight: "500", color: "#0f172a" }} className="dark:text-slate-100">
                     {doc.name}
                     {doc.required && (
-                      <span style={{ color: "#ef4444", marginLeft: "4px" }}>
+                      <span style={{ color: "#ef4444", marginLeft: "4px" }} className="dark:text-red-400">
                         *
                       </span>
                     )}
                   </div>
                   {doc.filename && (
-                    <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                    <div style={{ fontSize: "12px", color: "#6b7280" }} className="dark:text-slate-300">
                       {doc.filename}
                     </div>
                   )}
@@ -161,6 +176,7 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
                       borderRadius: "4px",
                       fontSize: "11px",
                     }}
+                    className="dark:bg-blue-600"
                   >
                     Complete
                   </span>
@@ -174,6 +190,7 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
                       borderRadius: "4px",
                       fontSize: "11px",
                     }}
+                    className="dark:bg-amber-600"
                   >
                     In Review
                   </span>
@@ -187,7 +204,9 @@ const DocumentsSection: React.FC<{ documents: AppDocument[] }> = ({
                       borderRadius: "4px",
                       fontSize: "11px",
                       cursor: "pointer",
+                      color: "#0f172a",
                     }}
+                    className="dark:bg-slate-700 dark:border-slate-600 dark:text-slate-100 hover:dark:bg-slate-600"
                   >
                     Upload
                   </button>

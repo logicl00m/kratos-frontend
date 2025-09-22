@@ -4,12 +4,19 @@
   padding: 20px 24px;
   border-bottom: 1px solid #e5e7eb;
 }
+
+.dark .workflow-progress {
+  background: #1e1e25;
+  border-bottom: 1px solid #2e3447;
+}
+
 .workflow-progress-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
 }
+
 .workflow-track {
   position: absolute;
   top: 20px;
@@ -19,12 +26,18 @@
   background: #e5e7eb;
   z-index: 0;
 }
+
+.dark .workflow-track {
+  background: #2e3447;
+}
+
 .workflow-stage {
   display: flex;
   flex-direction: column;
   align-items: center;
   z-index: 1;
 }
+
 .workflow-bubble {
   width: 40px;
   height: 40px;
@@ -35,6 +48,15 @@
   justify-content: center;
   margin-bottom: 8px;
 }
+
 .workflow-bubble.current { background: #3b82f6; }
 .workflow-bubble.completed { background: #10b981; }
-.workflow-label { font-size: 12px; color: #6b7280; }
+
+.workflow-label { 
+  font-size: 12px; 
+  color: #6b7280; 
+}
+
+.dark .workflow-label {
+  color: #94a3b8;
+}
