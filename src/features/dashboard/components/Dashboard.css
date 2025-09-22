@@ -521,6 +521,10 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
 }
 
+.dark .dashboard-table-header-checkbox:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+}
+
 .dashboard-table-body {
   background-color: white;
   border-style: solid;
@@ -588,6 +592,10 @@
 }
 
 .dashboard-table-checkbox:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+}
+
+.dark .dashboard-table-checkbox:focus {
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
 }
 

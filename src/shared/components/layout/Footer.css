@@ -8,6 +8,12 @@
   margin-top: auto;
 }
 
+.dark .app-footer {
+  background-color: #1f2937;
+  border-top: 1px solid #374151;
+  color: #9ca3af;
+}
+
 .footer-content {
   display: flex;
   align-items: center;
@@ -20,4 +26,8 @@
   color: #ef4444;
   display: inline;
   vertical-align: middle;
+}
+
+.dark .heart-icon {
+  color: #f87171;
 }
