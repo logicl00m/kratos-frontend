@@ -53,7 +53,6 @@ const Sidebar = ({ collapsed = false, onCollapseChange, mobile = false, onNaviga
     left: isCollapsed ? "-240px" : "0",
   } : {
     transition: "width 0.3s ease",
-    backgroundColor: "#1e293b",
     height: "100vh",
     position: "fixed" as const,
     left: 0,
