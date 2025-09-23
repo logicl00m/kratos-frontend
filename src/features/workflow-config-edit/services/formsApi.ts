@@ -1,98 +1,157 @@
-/*
-PROMPT (Copilot/GPT-5): formsApi in-memory stub + Zod
+// formsApi.ts - Updated to work with your actual backend API
 
-- Stub client for:
-  - searchForms(query: string): Promise<FormSummary[]>
-  - createForm(payload: FormDTO): Promise<FormRef & { json: object }>
-  - getForm(id: string, version?: number): Promise<FormDTO>
-- Use in-memory array for now; easy to swap to backend.
-- Add Zod validators for DTOs.
+export interface FormSummary {
+  id: string;
+  name: string;
+  version: number;
+}
 
-Types:
-- FormDTO: { id?: string; name: string; version?: number; json: object }
-- FormRef: { id: string; name: string; version: number; binding: 'pinned' | 'latest' }
-*/
+export interface FormDTO {
+  id?: string;
+  name: string;
+  version?: number;
+  json: Record<string, unknown>;
+}
 
-import { z } from 'zod';
-import type { FormRef } from '@features/workflow-config-edit/types/builder.types';
+const API_BASE = 'http://localhost:8080/api/v1/client/private';
 
-// Zod Schemas
-export const FormDTOSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1),
-  version: z.number().int().positive().optional(),
-  json: z.record(z.string(), z.unknown()),
-});
-export type FormDTO = z.infer<typeof FormDTOSchema>;
-
-export const FormSummarySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  version: z.number().int().positive(),
-});
-export type FormSummary = z.infer<typeof FormSummarySchema>;
-
-// In-memory store
-const formsStore: Array<Required<FormDTO>> = [
-  {
-    id: 'form-applicationCore',
-    name: 'applicationCore',
-    version: 3,
-    json: {
-      applicationCore: {
-        fields: [
-          { id: 'applicantLegalName', type: 'text', data: '{{ data.borrower.legalName }}', fieldActions: ['save','validate'] },
-          { id: 'requestedAmount', type: 'number', data: '{{ data.facility.requestedAmount }}', fieldActions: ['save','validate'] },
-        ],
-      },
+/**
+ * Fetch all forms from your backend
+ */
+const fetchAllForms = async () => {
+  const response = await fetch(`${API_BASE}/form/get/all`, {
+    method: 'POST',
+    headers: {
+      'accept': '*/*',
+      'X-Subject': 'fsadf', // You may want to make this dynamic
+      'Content-Type': 'application/json'
     },
-  },
-];
+    body: ''
+  });
 
-const delay = async (ms = 150) => new Promise((res) => setTimeout(res, ms));
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 
-export async function searchForms(query: string): Promise<FormSummary[]> {
-  await delay();
-  const q = query.trim().toLowerCase();
-  const matches = formsStore
-    .filter((f) => !q || f.name.toLowerCase().includes(q))
-    .sort((a, b) => b.version - a.version)
-    .map(({ id, name, version }) => ({ id, name, version }));
-  return FormSummarySchema.array().parse(matches);
-}
+  const result = await response.json();
+  
+  if (result.status !== 'S2000') {
+    throw new Error(result.message || 'Failed to fetch forms');
+  }
 
-export async function createForm(payload: FormDTO): Promise<FormRef & { json: object }> {
-  await delay();
-  const input = FormDTOSchema.parse(payload);
-  const existing = formsStore.filter((f) => f.name === input.name);
-  const nextVersion = existing.length > 0 ? Math.max(...existing.map((f) => f.version)) + 1 : 1;
-  const id = input.id ?? `form-${input.name}`;
-  const saved: Required<FormDTO> = {
-    id,
-    name: input.name,
-    version: nextVersion,
-    json: input.json,
+  return result.data || [];
+};
+
+/**
+ * Search forms by term - filters the full list
+ */
+export const searchForms = async (term: string): Promise<FormSummary[]> => {
+  if (!term || term.trim() === '') return [];
+
+  const forms = await fetchAllForms();
+  
+  // Filter forms by search term
+  const filtered = forms.filter((f: any) => 
+    f.formName.toLowerCase().includes(term.toLowerCase())
+  );
+
+  // Transform to FormSummary format expected by the UI
+  // Group by formName and assign versions
+  const grouped = filtered.reduce((acc: any, f: any) => {
+    if (!acc[f.formName]) {
+      acc[f.formName] = [];
+    }
+    acc[f.formName].push(f);
+    return acc;
+  }, {});
+
+  const result: FormSummary[] = [];
+  Object.keys(grouped).forEach(formName => {
+    grouped[formName].forEach((f: any, index: number) => {
+      result.push({
+        id: f.id,
+        name: f.formName,
+        version: index + 1
+      });
+    });
+  });
+
+  return result;
+};
+
+/**
+ * List all forms (paginated simulation)
+ */
+export const listForms = async (page = 1, limit = 20): Promise<FormSummary[]> => {
+  const forms = await fetchAllForms();
+  
+  // Group by formName to assign versions
+  const grouped = forms.reduce((acc: any, f: any) => {
+    if (!acc[f.formName]) {
+      acc[f.formName] = [];
+    }
+    acc[f.formName].push(f);
+    return acc;
+  }, {});
+
+  const allForms: FormSummary[] = [];
+  Object.keys(grouped).forEach(formName => {
+    grouped[formName].forEach((f: any, index: number) => {
+      allForms.push({
+        id: f.id,
+        name: f.formName,
+        version: index + 1
+      });
+    });
+  });
+
+  // Simulate pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  return allForms.slice(start, end);
+};
+
+/**
+ * Get a single form by ID
+ */
+export const getForm = async (id: string): Promise<FormDTO> => {
+  const forms = await fetchAllForms();
+  const form = forms.find((f: any) => f.id === id);
+  
+  if (!form) {
+    throw new Error(`Form with id ${id} not found`);
+  }
+
+  return {
+    id: form.id,
+    name: form.formName,
+    version: 1,
+    json: form.configJson
   };
-  formsStore.push(saved);
-  const ref: FormRef & { json: object } = {
-    id: saved.id,
-    name: saved.name,
-    version: saved.version,
-    binding: 'pinned',
-    json: saved.json,
+};
+
+/**
+ * Create a new form (you'll need to implement the actual endpoint)
+ */
+export const createForm = async (payload: FormDTO): Promise<{
+  id: string;
+  name: string;
+  version: number;
+  json: Record<string, unknown>;
+}> => {
+  // TODO: Implement actual create endpoint call
+  // For now, return the payload with a generated ID
+  return {
+    id: payload.id || `form-${Date.now()}`,
+    name: payload.name,
+    version: payload.version ?? 1,
+    json: payload.json
   };
-  return ref;
-}
+};
 
-export async function getForm(id: string, version?: number): Promise<FormDTO> {
-  await delay();
-  const candidates = formsStore.filter((f) => f.id === id);
-  if (candidates.length === 0) throw new Error('Form not found');
-  const selected = typeof version === 'number'
-    ? candidates.find((f) => f.version === version)
-    : [...candidates].sort((a, b) => b.version - a.version)[0];
-  if (!selected) throw new Error('Requested form version not found');
-  return { id: selected.id, name: selected.name, version: selected.version, json: selected.json };
-}
-
-export const formsApi = { searchForms, createForm, getForm } as const;
+export default {
+  searchForms,
+  listForms,
+  getForm,
+  createForm
+};

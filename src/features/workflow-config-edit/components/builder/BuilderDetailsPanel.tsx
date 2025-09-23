@@ -1,26 +1,17 @@
-/*
-PROMPT (Copilot/GPT-5): BuilderDetailsPanel → Form section
-
-Create a new Form section with these controls:
-
-- Attach existing: searchable combobox for forms (name + @vX).
-  - Data source: GET /api/forms?query= (to be stubbed now).
-  - Selection updates node.data.form (id, name, version).
-- Binding: radio Pinned (vX) / Track latest. Default Pinned.
-- Create new: button opens DynamicFormBuilder in a drawer/modal.
-  - On save, return { id, name, version, json }; attach to node; close drawer.
-- Require to transition: toggle bound to node.data.requireFormToTransition.
-- Preview: read-only preview using existing form builder preview component.
-- Form JSON viewer: collapsible panel showing the saved JSON (for debugging).
-- Validation hints: when no form attached, show inline error and a “Quick attach” CTA.
-
-A11y: labels tied to inputs; helper text via aria-describedby. Follow WAI forms labelling guidance.
-Docs: https://www.w3.org/WAI/tutorials/forms/labels/
-*/
 // src/features/workflow/components/builder/BuilderDetailsPanel.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Users, Plus, Trash2, Eye, Edit3, FileText } from "lucide-react";
+import {
+  X,
+  Users,
+  Plus,
+  Trash2,
+  Eye,
+  Edit3,
+  FileText,
+  Search,
+  Check,
+} from "lucide-react";
 import type { Node, Edge } from "reactflow";
 import type {
   ProcessNodeData,
@@ -28,7 +19,10 @@ import type {
   Person,
 } from "@features/workflow-config-edit/types/builder.types";
 import "./BuilderDetailsPanel.css";
-import { searchForms } from "@features/workflow-config-edit/services/formsApi";
+import {
+  searchForms,
+  listForms,
+} from "@features/workflow-config-edit/services/formsApi";
 
 interface BuilderDetailsPanelProps {
   selectedNode: Node | null;
@@ -62,6 +56,12 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
   const [formResults, setFormResults] = useState<
     Array<{ id: string; name: string; version: number }>
   >([]);
+  const [prefetchedForms, setPrefetchedForms] = useState<
+    Array<{ id: string; name: string; version: number }>
+  >([]);
+  const [showFormDropdown, setShowFormDropdown] = useState(false);
+  const [loadingForms, setLoadingForms] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   type ActionSide = "left" | "center" | "right";
 
@@ -161,25 +161,91 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowFormDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Search forms effect
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
+      setLoadingForms(true);
       try {
-        if (!formQuery) {
-          setFormResults([]);
-          return;
+        if (formQuery.trim()) {
+          const res = await searchForms(formQuery);
+          if (!cancelled) setFormResults(res);
+        } else {
+          // When no query, show all prefetched forms
+          if (!cancelled) setFormResults(prefetchedForms);
         }
-        const res = await searchForms(formQuery);
-        if (!cancelled) setFormResults(res);
-      } catch {
+      } catch (error) {
+        console.error("Failed to search forms:", error);
         if (!cancelled) setFormResults([]);
+      } finally {
+        if (!cancelled) setLoadingForms(false);
       }
     };
     run();
     return () => {
       cancelled = true;
     };
-  }, [formQuery]);
+  }, [formQuery, prefetchedForms]);
+
+  // Prefetch forms on mount
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const list = await listForms();
+        if (!cancelled) {
+          setPrefetchedForms(list);
+          setFormResults(list);
+        }
+      } catch (error) {
+        console.error("Failed to load forms:", error);
+        if (!cancelled) {
+          setPrefetchedForms([]);
+          setFormResults([]);
+        }
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleFormSelect = (form: {
+    id: string;
+    name: string;
+    version: number;
+  }) => {
+    if (!selectedNode) return;
+    const data = nodeData as ProcessNodeData;
+    onNodeUpdate(selectedNode.id, {
+      ...data,
+      form: {
+        id: form.id,
+        name: form.name,
+        version: form.version,
+        binding: data.form?.binding || "pinned",
+      },
+    });
+    setShowFormDropdown(false);
+    setFormQuery("");
+  };
+
+  const currentForm = isProcessNode ? (nodeData as ProcessNodeData).form : null;
 
   const nothingSelected = !selectedNode && !selectedEdge;
 
@@ -366,66 +432,85 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                     <FileText size={14} /> Form
                   </span>
                 </div>
-                <div className="field-group">
+
+                <div className="field-group" ref={dropdownRef}>
                   <label htmlFor="builder-form-search">Attach existing</label>
-                  <input
-                    id="builder-form-search"
-                    type="text"
-                    value={formQuery}
-                    onChange={(e) => setFormQuery(e.target.value)}
-                    placeholder="Search forms (name)"
-                    className="input-field"
-                    aria-describedby="builder-form-help"
-                  />
-                  <div id="builder-form-help" className="help-text">
-                    Search by name; latest first.
+                  <div className="form-select-wrapper">
+                    <div
+                      className="form-select-input"
+                      onClick={() => setShowFormDropdown(!showFormDropdown)}
+                    >
+                      <Search size={16} className="search-icon" />
+                      <input
+                        id="builder-form-search"
+                        type="text"
+                        value={
+                          showFormDropdown
+                            ? formQuery
+                            : currentForm
+                            ? `${currentForm.name}@v${currentForm.version}`
+                            : ""
+                        }
+                        onChange={(e) => {
+                          setFormQuery(e.target.value);
+                          setShowFormDropdown(true);
+                        }}
+                        onFocus={() => setShowFormDropdown(true)}
+                        placeholder="Search forms (name)"
+                        className="form-search-field"
+                      />
+                      {currentForm && !showFormDropdown && (
+                        <Check size={16} className="selected-icon" />
+                      )}
+                    </div>
+
+                    {showFormDropdown && (
+                      <div className="form-dropdown">
+                        {loadingForms ? (
+                          <div className="loading-state">Loading forms...</div>
+                        ) : formResults.length > 0 ? (
+                          <ul className="form-list">
+                            {formResults.map((form) => (
+                              <li
+                                key={`${form.id}@${form.version}`}
+                                className={`form-item ${
+                                  currentForm?.id === form.id ? "selected" : ""
+                                }`}
+                                onClick={() => handleFormSelect(form)}
+                              >
+                                <span className="form-name">
+                                  {form.name}@v{form.version}
+                                </span>
+                                {currentForm?.id === form.id && (
+                                  <Check size={16} className="check-icon" />
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <div className="empty-state">No forms found</div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  {formResults.length > 0 && (
-                    <ul className="combobox-list">
-                      {formResults.map((f) => (
-                        <li key={`${f.id}@${f.version}`}>
-                          <button
-                            type="button"
-                            className="combobox-item"
-                            onClick={() => {
-                              if (!selectedNode) return;
-                              const data = nodeData as ProcessNodeData;
-                              onNodeUpdate(selectedNode.id, {
-                                ...data,
-                                form: {
-                                  id: f.id,
-                                  name: f.name,
-                                  version: f.version,
-                                  binding: "pinned",
-                                },
-                              });
-                              setFormQuery("");
-                              setFormResults([]);
-                            }}
-                          >
-                            {f.name}@v{f.version}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <div className="help-text">
+                    Search by name; latest first.
+                    {currentForm && (
+                      <span className="current-form-info">
+                        Current: {currentForm.name}@v{currentForm.version}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="field-group">
                   <span className="label">Binding</span>
-                  <div
-                    className="radio-row"
-                    role="radiogroup"
-                    aria-label="Form binding"
-                  >
-                    <label className="radio-label">
+                  <div className="radio-group">
+                    <label className="radio-option">
                       <input
                         type="radio"
                         name="form-binding"
-                        checked={
-                          (nodeData as ProcessNodeData).form?.binding !==
-                          "latest"
-                        }
+                        checked={currentForm?.binding !== "latest"}
                         onChange={() => {
                           const data = nodeData as ProcessNodeData;
                           if (!data.form || !selectedNode) return;
@@ -435,21 +520,20 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                           });
                         }}
                       />
-                      <span>
-                        Pinned{" "}
-                        {(nodeData as ProcessNodeData).form
-                          ? `(v${(nodeData as ProcessNodeData).form!.version})`
-                          : ""}
+                      <span className="radio-label">
+                        Pinned
+                        {currentForm && currentForm.binding !== "latest" && (
+                          <span className="version-badge">
+                            v{currentForm.version}
+                          </span>
+                        )}
                       </span>
                     </label>
-                    <label className="radio-label">
+                    <label className="radio-option">
                       <input
                         type="radio"
                         name="form-binding"
-                        checked={
-                          (nodeData as ProcessNodeData).form?.binding ===
-                          "latest"
-                        }
+                        checked={currentForm?.binding === "latest"}
                         onChange={() => {
                           const data = nodeData as ProcessNodeData;
                           if (!data.form || !selectedNode) return;
@@ -459,36 +543,35 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                           });
                         }}
                       />
-                      <span>Track latest</span>
+                      <span className="radio-label">Track latest</span>
                     </label>
                   </div>
                 </div>
 
                 <div className="field-group">
-                  <label htmlFor="builder-require-form">
-                    Require to transition
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(
+                        (nodeData as ProcessNodeData).requireFormToTransition
+                      )}
+                      onChange={(e) => {
+                        const data = nodeData as ProcessNodeData;
+                        if (!selectedNode) return;
+                        onNodeUpdate(selectedNode.id, {
+                          ...data,
+                          requireFormToTransition: e.target.checked,
+                        });
+                      }}
+                    />
+                    <span>Require to transition</span>
                   </label>
-                  <input
-                    id="builder-require-form"
-                    type="checkbox"
-                    checked={Boolean(
-                      (nodeData as ProcessNodeData).requireFormToTransition
-                    )}
-                    onChange={(e) => {
-                      const data = nodeData as ProcessNodeData;
-                      if (!selectedNode) return;
-                      onNodeUpdate(selectedNode.id, {
-                        ...data,
-                        requireFormToTransition: e.target.checked,
-                      });
-                    }}
-                  />
                 </div>
 
                 <div className="field-group">
                   <button
                     type="button"
-                    className="action-btn link"
+                    className="action-btn create-new"
                     onClick={() => {
                       if (!selectedNode) return;
                       navigate("/form-builder/new", {
@@ -501,20 +584,14 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
                   </button>
                 </div>
 
-                {(nodeData as ProcessNodeData).form && (
+                {currentForm && (
                   <div className="field-group">
-                    <div className="json-viewer">
-                      <details>
-                        <summary>Form JSON</summary>
-                        <pre aria-label="Form JSON preview">
-                          {JSON.stringify(
-                            (nodeData as ProcessNodeData).form,
-                            null,
-                            2
-                          )}
-                        </pre>
-                      </details>
-                    </div>
+                    <details className="json-viewer">
+                      <summary>Form JSON</summary>
+                      <pre aria-label="Form JSON preview">
+                        {JSON.stringify(currentForm, null, 2)}
+                      </pre>
+                    </details>
                   </div>
                 )}
               </div>
@@ -615,8 +692,6 @@ const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
           </div>
         )}
       </div>
-
-      {/* Drawer removed in favor of navigation-based flow */}
     </div>
   );
 };
