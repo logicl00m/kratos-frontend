@@ -80,9 +80,9 @@ export const searchForms = async (term: string): Promise<FormSummary[]> => {
 };
 
 /**
- * List all forms (paginated simulation)
+ * List all forms
  */
-export const listForms = async (page = 1, limit = 20): Promise<FormSummary[]> => {
+export const listForms = async (): Promise<FormSummary[]> => {
   const forms = await fetchAllForms();
   
   // Group by formName to assign versions
@@ -105,10 +105,7 @@ export const listForms = async (page = 1, limit = 20): Promise<FormSummary[]> =>
     });
   });
 
-  // Simulate pagination
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  return allForms.slice(start, end);
+  return allForms;
 };
 
 /**
