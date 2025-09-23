@@ -1,7 +1,8 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { getAuthToken, clearAuthToken, isTokenExpired, willTokenExpireSoon, getSubject } from './auth';
 import { handleAxiosError, logApiError, type ApiError } from './errors';
-import type { ApiConfig, ApiResponse } from './types';
+import { extractResponseData, logResponseParsing } from './response-parser';
+import type { ApiConfig } from './types';
 import { DEFAULT_API_CONFIG, DEFAULT_HEADERS, isDevelopment } from './config';
 
 /**
@@ -103,14 +104,26 @@ const createApiClient = (config: Partial<ApiConfig> = {}): AxiosInstance => {
 export const apiClient = createApiClient();
 
 /**
- * Generic API request wrapper with type safety
+ * Generic API request wrapper with centralized response parsing
+ * Returns only the extracted data portion of the server response
  */
 export const apiRequest = async <T = unknown>(
   config: AxiosRequestConfig
-): Promise<ApiResponse<T>> => {
+): Promise<T> => {
   try {
-    const response = await apiClient.request<ApiResponse<T>>(config);
-    return response.data;
+    const response = await apiClient.request(config);
+    
+    // Log response parsing in development
+    if (isDevelopment()) {
+      logResponseParsing(
+        config.url || 'unknown',
+        config.method || 'unknown',
+        response
+      );
+    }
+    
+    // Extract and return only the data portion
+    return extractResponseData<T>(response);
   } catch (error) {
     // Re-throw as our custom ApiError
     throw error instanceof Error ? error : handleAxiosError(error as never);
@@ -118,75 +131,76 @@ export const apiRequest = async <T = unknown>(
 };
 
 /**
- * HTTP method helpers with type safety
+ * HTTP method helpers with centralized response parsing
+ * All methods return only the extracted data from the server response
  */
 export const api = {
   /**
-   * GET request
+   * GET request - returns extracted data
    */
   get: async <T = unknown>(
     url: string,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
+  ): Promise<T> => {
     return apiRequest<T>({ ...config, method: 'GET', url });
   },
 
   /**
-   * POST request
+   * POST request - returns extracted data
    */
   post: async <T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
+  ): Promise<T> => {
     return apiRequest<T>({ ...config, method: 'POST', url, data });
   },
 
   /**
-   * PUT request
+   * PUT request - returns extracted data
    */
   put: async <T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
+  ): Promise<T> => {
     return apiRequest<T>({ ...config, method: 'PUT', url, data });
   },
 
   /**
-   * PATCH request
+   * PATCH request - returns extracted data
    */
   patch: async <T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
+  ): Promise<T> => {
     return apiRequest<T>({ ...config, method: 'PATCH', url, data });
   },
 
   /**
-   * DELETE request
+   * DELETE request - returns extracted data
    */
   delete: async <T = unknown>(
     url: string,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> => {
+  ): Promise<T> => {
     return apiRequest<T>({ ...config, method: 'DELETE', url });
   },
 };
 
 /**
- * File upload helper
+ * File upload helper - returns extracted data
  */
-export const uploadFile = async (
+export const uploadFile = async <T = unknown>(
   url: string,
   file: File,
   onProgress?: (progress: number) => void
-): Promise<ApiResponse> => {
+): Promise<T> => {
   const formData = new FormData();
   formData.append('file', file);
 
-  return apiRequest({
+  return apiRequest<T>({
     method: 'POST',
     url,
     data: formData,
@@ -267,9 +281,9 @@ export const retryRequest = async <T = unknown>(
 };
 
 /**
- * Health check endpoint
+ * Health check endpoint - returns extracted data
  */
-export const healthCheck = async (): Promise<ApiResponse<{ status: string; timestamp: string }>> => {
+export const healthCheck = async (): Promise<{ status: string; timestamp: string }> => {
   return api.get('/health');
 };
 

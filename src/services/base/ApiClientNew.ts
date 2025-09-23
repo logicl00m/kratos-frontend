@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse, type AxiosError } from 'axios';
 import { extractResponseData, logResponseParsing } from '@/lib/api/response-parser';
 
 export interface ApiConfig {
@@ -15,13 +15,6 @@ export interface ApiError {
   details?: unknown;
 }
 
-export interface ApiResponse<T = unknown> {
-  data: T;
-  status: number;
-  headers: Record<string, string>;
-  config: AxiosRequestConfig;
-}
-
 export interface RequestInterceptor {
   onRequest?: (config: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>;
   onRequestError?: (error: AxiosError) => Promise<AxiosError>;
@@ -33,9 +26,9 @@ export interface ResponseInterceptor {
 }
 
 export class ApiClient {
-  private instance: AxiosInstance;
-  private requestInterceptors: RequestInterceptor[] = [];
-  private responseInterceptors: ResponseInterceptor[] = [];
+  private readonly instance: AxiosInstance;
+  private readonly requestInterceptors: RequestInterceptor[] = [];
+  private readonly responseInterceptors: ResponseInterceptor[] = [];
 
   constructor(config: ApiConfig = {}) {
     this.instance = axios.create({
@@ -70,13 +63,18 @@ export class ApiClient {
             error = await interceptor.onRequestError(error);
           }
         }
-        return Promise.reject(error);
+        return Promise.reject(new Error(`Request failed: ${error.message}`));
       }
     );
 
     // Response interceptor
     this.instance.interceptors.response.use(
       async (response) => {
+        // Log response parsing in development
+        if (import.meta.env.DEV && response.config.url && response.config.method) {
+          logResponseParsing(response.config.url, response.config.method, response);
+        }
+
         // Apply all response interceptors
         for (const interceptor of this.responseInterceptors) {
           if (interceptor.onResponse) {
@@ -105,74 +103,64 @@ export class ApiClient {
     this.responseInterceptors.push(interceptor);
   }
 
-  private handleError(error: AxiosError): ApiError {
+  private handleError(error: AxiosError): Error {
     if (error.response) {
       // Server responded with error status
-      return {
-        message: error.response.data?.message || error.message || 'Server error occurred',
-        code: error.response.data?.code || error.response.status,
-        status: error.response.status,
-        details: error.response.data,
-      };
+      const responseData = error.response.data as Record<string, unknown>;
+      return new Error(
+        responseData?.message as string || error.message || 'Server error occurred'
+      );
     } else if (error.request) {
       // Request made but no response
-      return {
-        message: 'No response from server. Please check your connection.',
-        code: 'NETWORK_ERROR',
-        details: error.request,
-      };
+      return new Error('No response from server. Please check your connection.');
     } else {
       // Request setup error
-      return {
-        message: error.message || 'An unexpected error occurred',
-        code: 'REQUEST_ERROR',
-        details: error,
-      };
+      return new Error(error.message || 'An unexpected error occurred');
     }
   }
 
-  // HTTP Methods
+  // HTTP Methods - Now return extracted data directly
   async get<T = unknown>(
     url: string,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
-    const response = await this.instance.get<T>(url, config);
-    return response;
+  ): Promise<T> {
+    const response = await this.instance.get(url, config);
+    return extractResponseData<T>(response);
   }
 
   async post<T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
-    const response = await this.instance.post<T>(url, data, config);
-    return response;
+  ): Promise<T> {
+    const response = await this.instance.post(url, data, config);
+    return extractResponseData<T>(response);
   }
 
   async put<T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
-    const response = await this.instance.put<T>(url, data, config);
-    return response;
+  ): Promise<T> {
+    const response = await this.instance.put(url, data, config);
+    return extractResponseData<T>(response);
   }
 
   async patch<T = unknown>(
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
-    const response = await this.instance.patch<T>(url, data, config);
-    return response;
+  ): Promise<T> {
+    const response = await this.instance.patch(url, data, config);
+    return extractResponseData<T>(response);
   }
 
   async delete<T = unknown>(
     url: string,
     config?: AxiosRequestConfig
-  ): Promise<ApiResponse<T>> {
-    const response = await this.instance.delete<T>(url, config);
-    return response;
+  ): Promise<T> {
+    const response = await this.instance.delete(url, config);
+    return extractResponseData<T>(response);
   }
 
   // Utility methods
@@ -180,7 +168,7 @@ export class ApiClient {
     url: string,
     formData: FormData,
     onProgress?: (progress: number) => void
-  ): Promise<ApiResponse<T>> {
+  ): Promise<T> {
     const config: AxiosRequestConfig = {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -200,7 +188,7 @@ export class ApiClient {
     url: string,
     filename?: string
   ): Promise<void> {
-    const response = await this.get(url, {
+    const response = await this.instance.get(url, {
       responseType: 'blob',
     });
 

@@ -1,10 +1,34 @@
-// Core API types
+// Core API types - standardized server response format
+export interface ServerResponse<T = unknown> extends Record<string, unknown> {
+  status: string; // e.g., "S2000" for success
+  message: string;
+  data: T; // This is what we extract and return to features
+}
+
+// Legacy API response interface - for backward compatibility  
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
   error?: string;
   status?: number;
+}
+
+// Response parsing and validation types
+export interface ApiError {
+  status: number;
+  message: string;
+  code?: string;
+  details?: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface ParsedApiResponse<T = unknown> {
+  data: T;
+  isSuccess: boolean;
+  message: string;
+  httpStatus: number;
+  customStatus: string;
 }
 
 // Auth types

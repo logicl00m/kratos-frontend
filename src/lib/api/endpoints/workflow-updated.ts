@@ -203,16 +203,18 @@ export const workflowInstanceApi = {
       `/api/v1/client/private/workflow-instance/${instanceId}/document/${documentId}/download`,
       { responseType: 'blob' }
     );
-    return response;
+    return response as Blob;
   }
 };
 
 /**
  * Running workflows monitoring API
+ * All endpoints now return extracted data directly from the server response
  */
 export const runningWorkflowApi = {
   /**
    * Get all running workflow instances
+   * Returns: RunningWorkflow[]
    */
   list: async (params?: {
     status?: 'running' | 'paused' | 'completed' | 'failed';
@@ -227,6 +229,7 @@ export const runningWorkflowApi = {
 
   /**
    * Get running workflow by instance ID
+   * Returns: RunningWorkflow
    */
   get: async (instanceId: string): Promise<RunningWorkflow> => {
     return api.get(`/api/v1/client/private/running-workflows/${instanceId}`);
@@ -234,6 +237,7 @@ export const runningWorkflowApi = {
 
   /**
    * Pause running workflow
+   * Returns: void (empty data)
    */
   pause: async (instanceId: string): Promise<void> => {
     return api.post(`/api/v1/client/private/running-workflows/${instanceId}/pause`);
@@ -241,6 +245,7 @@ export const runningWorkflowApi = {
 
   /**
    * Resume paused workflow
+   * Returns: void (empty data)
    */
   resume: async (instanceId: string): Promise<void> => {
     return api.post(`/api/v1/client/private/running-workflows/${instanceId}/resume`);
@@ -248,6 +253,7 @@ export const runningWorkflowApi = {
 
   /**
    * Stop running workflow
+   * Returns: void (empty data)
    */
   stop: async (
     instanceId: string,
@@ -260,6 +266,7 @@ export const runningWorkflowApi = {
 
   /**
    * Get workflow execution metrics
+   * Returns: workflow metrics object
    */
   getMetrics: async (instanceId: string): Promise<{
     executionTime: number;
@@ -280,10 +287,12 @@ export const runningWorkflowApi = {
 
 /**
  * Dashboard and analytics API
+ * All endpoints now return extracted data directly from the server response
  */
 export const dashboardApi = {
   /**
    * Get dashboard statistics
+   * Returns: DashboardStats
    */
   getStats: async (filters?: FilterOptions): Promise<DashboardStats> => {
     return api.get('/api/v1/client/private/dashboard/stats', { params: filters });
@@ -291,6 +300,7 @@ export const dashboardApi = {
 
   /**
    * Get applications for dashboard table
+   * Returns: PaginatedResponse<ApplicationInstance>
    */
   getApplications: async (params?: PaginatedRequest & FilterOptions): Promise<PaginatedResponse<ApplicationInstance>> => {
     return api.get('/api/v1/client/private/dashboard/applications', { params });
@@ -298,6 +308,7 @@ export const dashboardApi = {
 
   /**
    * Search applications
+   * Returns: ApplicationInstance[]
    */
   searchApplications: async (query: {
     term: string;
@@ -308,13 +319,14 @@ export const dashboardApi = {
 
   /**
    * Get workflow performance analytics
+   * Returns: analytics data object
    */
   getWorkflowAnalytics: async (workflowId?: string): Promise<{
     throughput: Array<{ date: string; count: number }>;
     averageCompletionTime: Array<{ date: string; time: number }>;
     statusDistribution: Array<{ status: string; count: number }>;
     bottlenecks: Array<{ state: string; averageTime: number; count: number }>;
-  }>> => {
+  }> => {
     return api.get('/api/v1/client/private/dashboard/analytics', {
       params: workflowId ? { workflowId } : undefined
     });
@@ -322,6 +334,7 @@ export const dashboardApi = {
 
   /**
    * Export dashboard data
+   * Returns: Blob (special case for binary data)
    */
   exportData: async (
     format: 'csv' | 'excel' | 'pdf',
@@ -331,11 +344,12 @@ export const dashboardApi = {
       params: { format, ...filters },
       responseType: 'blob'
     });
-    return response.data as unknown as Blob;
+    return response as Blob;
   },
 
   /**
    * Get user workload
+   * Returns: user workload data object
    */
   getUserWorkload: async (userId?: string): Promise<{
     assignedApplications: number;
@@ -347,7 +361,7 @@ export const dashboardApi = {
       count: number;
       averageTime: number;
     }>;
-  }>> => {
+  }> => {
     return api.get('/api/v1/client/private/dashboard/workload', {
       params: userId ? { userId } : undefined
     });

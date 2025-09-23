@@ -1,4 +1,4 @@
-import { ApiClient } from '../base/ApiClient';
+import { ApiClient } from '../base/ApiClientNew';
 
 export interface Application {
   id: string;
@@ -82,21 +82,31 @@ class ApplicationService {
     return ApplicationService.instance;
   }
 
+  /**
+   * Get all applications with filtering
+   * Returns: PaginatedResponse<Application> (extracted data)
+   */
   async getApplications(
     filters?: ApplicationFilters
   ): Promise<PaginatedResponse<Application>> {
-    const response = await this.apiClient.get<PaginatedResponse<Application>>(
+    return this.apiClient.get<PaginatedResponse<Application>>(
       '/applications',
       { params: filters }
     );
-    return response.data;
   }
 
+  /**
+   * Get single application by ID
+   * Returns: Application (extracted data)
+   */
   async getApplication(id: string): Promise<Application> {
-    const response = await this.apiClient.get<Application>(`/applications/${id}`);
-    return response.data;
+    return this.apiClient.get<Application>(`/applications/${id}`);
   }
 
+  /**
+   * Create new application
+   * Returns: Application (extracted data)
+   */
   async createApplication(data: CreateApplicationData): Promise<Application> {
     const formData = new FormData();
 
@@ -111,7 +121,7 @@ class ApplicationService {
       }
     });
 
-    const response = await this.apiClient.post<Application>(
+    return this.apiClient.post<Application>(
       '/applications',
       formData,
       {
@@ -120,69 +130,89 @@ class ApplicationService {
         },
       }
     );
-    return response.data;
   }
 
+  /**
+   * Update existing application
+   * Returns: Application (extracted data)
+   */
   async updateApplication(
     id: string,
     data: UpdateApplicationData
   ): Promise<Application> {
-    const response = await this.apiClient.patch<Application>(
-      `/applications/${id}`,
-      data
-    );
-    return response.data;
+    return this.apiClient.patch<Application>(`/applications/${id}`, data);
   }
 
+  /**
+   * Delete application
+   * Returns: void (empty data)
+   */
   async deleteApplication(id: string): Promise<void> {
-    await this.apiClient.delete(`/applications/${id}`);
+    return this.apiClient.delete(`/applications/${id}`);
   }
 
+  /**
+   * Approve application
+   * Returns: Application (extracted data)
+   */
   async approveApplication(id: string, comments?: string): Promise<Application> {
-    const response = await this.apiClient.post<Application>(
+    return this.apiClient.post<Application>(
       `/applications/${id}/approve`,
       { comments }
     );
-    return response.data;
   }
 
+  /**
+   * Reject application
+   * Returns: Application (extracted data)
+   */
   async rejectApplication(
     id: string,
     reason: string,
     comments?: string
   ): Promise<Application> {
-    const response = await this.apiClient.post<Application>(
+    return this.apiClient.post<Application>(
       `/applications/${id}/reject`,
       { reason, comments }
     );
-    return response.data;
   }
 
+  /**
+   * Assign application to user
+   * Returns: Application (extracted data)
+   */
   async assignApplication(id: string, userId: string): Promise<Application> {
-    const response = await this.apiClient.post<Application>(
+    return this.apiClient.post<Application>(
       `/applications/${id}/assign`,
       { userId }
     );
-    return response.data;
   }
 
+  /**
+   * Get application statistics
+   * Returns: ApplicationStatistics (extracted data)
+   */
   async getApplicationStatistics(
     filters?: ApplicationFilters
   ): Promise<ApplicationStatistics> {
-    const response = await this.apiClient.get<ApplicationStatistics>(
+    return this.apiClient.get<ApplicationStatistics>(
       '/applications/statistics',
       { params: filters }
     );
-    return response.data;
   }
 
+  /**
+   * Get application documents
+   * Returns: Document[] (extracted data)
+   */
   async getApplicationDocuments(id: string): Promise<Document[]> {
-    const response = await this.apiClient.get<Document[]>(
-      `/applications/${id}/documents`
-    );
-    return response.data;
+    return this.apiClient.get<Document[]>(`/applications/${id}/documents`);
   }
 
+  /**
+   * Upload document to application
+   * Returns: Document (extracted data)
+   */
   async uploadDocument(
     applicationId: string,
     file: File,
@@ -194,19 +224,26 @@ class ApplicationService {
       formData.append('metadata', JSON.stringify(metadata));
     }
 
-    const response = await this.apiClient.upload<Document>(
+    return this.apiClient.upload<Document>(
       `/applications/${applicationId}/documents`,
       formData
     );
-    return response.data;
   }
 
+  /**
+   * Delete document from application
+   * Returns: void (empty data)
+   */
   async deleteDocument(applicationId: string, documentId: string): Promise<void> {
-    await this.apiClient.delete(
+    return this.apiClient.delete(
       `/applications/${applicationId}/documents/${documentId}`
     );
   }
 
+  /**
+   * Export applications
+   * Returns: void (triggers file download)
+   */
   async exportApplications(
     filters?: ApplicationFilters,
     format: 'csv' | 'excel' | 'pdf' = 'excel'
@@ -217,30 +254,37 @@ class ApplicationService {
     );
   }
 
+  /**
+   * Get application history/audit trail
+   * Returns: AuditLog[] (extracted data)
+   */
   async getApplicationHistory(id: string): Promise<AuditLog[]> {
-    const response = await this.apiClient.get<AuditLog[]>(
-      `/applications/${id}/history`
-    );
-    return response.data;
+    return this.apiClient.get<AuditLog[]>(`/applications/${id}/history`);
   }
 
+  /**
+   * Bulk update multiple applications
+   * Returns: Application[] (extracted data)
+   */
   async bulkUpdateApplications(
     ids: string[],
     data: UpdateApplicationData
   ): Promise<Application[]> {
-    const response = await this.apiClient.post<Application[]>(
+    return this.apiClient.post<Application[]>(
       '/applications/bulk-update',
       { ids, data }
     );
-    return response.data;
   }
 
+  /**
+   * Search applications
+   * Returns: Application[] (extracted data)
+   */
   async searchApplications(query: string): Promise<Application[]> {
-    const response = await this.apiClient.get<Application[]>(
+    return this.apiClient.get<Application[]>(
       '/applications/search',
       { params: { q: query } }
     );
-    return response.data;
   }
 }
 
