@@ -1,4 +1,5 @@
-import { ApiClient } from '../base/ApiClient';
+import { api, setAuthToken as setTokens, getAuthToken, clearAuthToken, setUser as storeUser, getUser as getStoredUser } from '@/lib/api';
+import { API_ENDPOINTS } from '@/lib/api/config';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 

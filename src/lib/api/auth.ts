@@ -5,6 +5,7 @@ const TOKEN_KEY = 'kratos_auth_token';
 const REFRESH_TOKEN_KEY = 'kratos_refresh_token';
 const USER_KEY = 'kratos_user';
 const TOKEN_EXPIRY_KEY = 'kratos_token_expiry';
+const SUBJECT_KEY = 'kratos_subject';
 
 /**
  * Set authentication token and related data in localStorage
@@ -196,4 +197,38 @@ export const initializeAuth = (): { token: string | null; user: User | null; isV
     user,
     isValid
   };
+};
+
+/**
+ * Set the subject ID for API requests
+ */
+export const setSubject = (subjectId: string): void => {
+  try {
+    localStorage.setItem(SUBJECT_KEY, subjectId);
+  } catch (error) {
+    console.error('Failed to store subject ID:', error);
+  }
+};
+
+/**
+ * Get the subject ID for API requests
+ */
+export const getSubject = (): string | null => {
+  try {
+    return localStorage.getItem(SUBJECT_KEY);
+  } catch (error) {
+    console.error('Failed to retrieve subject ID:', error);
+    return null;
+  }
+};
+
+/**
+ * Clear the subject ID
+ */
+export const clearSubject = (): void => {
+  try {
+    localStorage.removeItem(SUBJECT_KEY);
+  } catch (error) {
+    console.error('Failed to clear subject ID:', error);
+  }
 };

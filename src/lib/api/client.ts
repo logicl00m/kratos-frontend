@@ -1,49 +1,45 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
-import { getAuthToken, clearAuthToken, isTokenExpired, willTokenExpireSoon } from './auth';
+import { getAuthToken, clearAuthToken, isTokenExpired, willTokenExpireSoon, getSubject } from './auth';
 import { handleAxiosError, logApiError, type ApiError } from './errors';
 import type { ApiConfig, ApiResponse } from './types';
-
-/**
- * Default API configuration
- */
-const DEFAULT_CONFIG: ApiConfig = {
-  baseURL: import.meta.env.VITE_API_URL || 'https://kratos-api.local.fintech23.xyz',
-  timeout: parseInt(import.meta.env.VITE_API_TIMEOUT as string) || 30000,
-  retryAttempts: parseInt(import.meta.env.VITE_API_RETRY_ATTEMPTS as string) || 3,
-  retryDelay: parseInt(import.meta.env.VITE_API_RETRY_DELAY as string) || 1000,
-};
+import { DEFAULT_API_CONFIG, DEFAULT_HEADERS, isDevelopment } from './config';
 
 /**
  * Create and configure the axios instance
  */
 const createApiClient = (config: Partial<ApiConfig> = {}): AxiosInstance => {
-  const finalConfig = { ...DEFAULT_CONFIG, ...config };
+  const finalConfig = { ...DEFAULT_API_CONFIG, ...config };
 
   const client = axios.create({
     baseURL: finalConfig.baseURL,
     timeout: finalConfig.timeout,
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
+      ...DEFAULT_HEADERS,
     },
   });
 
   // Request interceptor for authentication and logging
   client.interceptors.request.use(
     (config) => {
-      // Add authentication token if available and not expired
-      const token = getAuthToken();
-      if (token && !isTokenExpired()) {
-        config.headers.Authorization = `Bearer ${token}`;
+      // Add authentication token - use hardcoded token from env if available, otherwise use stored token
+      const hardcodedToken = import.meta.env.VITE_HARDCODED_ACCESS_TOKEN;
+      const storedToken = getAuthToken();
+      
+      if (hardcodedToken) {
+        config.headers.Authorization = `Bearer ${hardcodedToken}`;
+      } else if (storedToken && !isTokenExpired()) {
+        config.headers.Authorization = `Bearer ${storedToken}`;
       }
 
-      // Add X-Subject header (from your API spec)
+      // Add X-Subject header - use hardcoded subject ID from env if available, otherwise use stored subject
       if (!config.headers['X-Subject']) {
-        config.headers['X-Subject'] = '4a286067-5a97-451e-825c-942ce5bfc727';
+        const hardcodedSubject = import.meta.env.VITE_HARDCODED_SUBJECT_ID;
+        const storedSubject = getSubject();
+        config.headers['X-Subject'] = hardcodedSubject || storedSubject || finalConfig.defaultSubject;
       }
 
       // Log the request in development
-      if (import.meta.env.DEV) {
+      if (isDevelopment()) {
         console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
           params: config.params,
           data: config.data,
@@ -63,7 +59,7 @@ const createApiClient = (config: Partial<ApiConfig> = {}): AxiosInstance => {
   client.interceptors.response.use(
     (response: AxiosResponse) => {
       // Log successful responses in development
-      if (import.meta.env.DEV) {
+      if (isDevelopment()) {
         console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
           status: response.status,
           data: response.data,
@@ -238,10 +234,10 @@ export const downloadFile = async (
  */
 export const retryRequest = async <T = unknown>(
   requestFn: () => Promise<T>,
-  maxAttempts: number = DEFAULT_CONFIG.retryAttempts,
-  delay: number = DEFAULT_CONFIG.retryDelay
+  maxAttempts: number = DEFAULT_API_CONFIG.retryAttempts,
+  delay: number = DEFAULT_API_CONFIG.retryDelay
 ): Promise<T> => {
-  let lastError: ApiError;
+  let lastError: ApiError | undefined;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -266,7 +262,8 @@ export const retryRequest = async <T = unknown>(
     }
   }
 
-  throw lastError!;
+  // This should never be reached, but TypeScript requires it
+  throw lastError || new Error('Request failed after all retry attempts');
 };
 
 /**
@@ -287,7 +284,7 @@ export const createCustomApiClient = (config: Partial<ApiConfig>): AxiosInstance
  * Get the current API configuration
  */
 export const getApiConfig = (): ApiConfig => {
-  return DEFAULT_CONFIG;
+  return DEFAULT_API_CONFIG;
 };
 
 /**

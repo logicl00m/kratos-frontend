@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ApiError, dashboardApi, workflowInstanceApi, formApi, templateApi, runningWorkflowApi } from '@/lib/api';
+import { api, type ApiError } from '@/lib/api';
+import { API_ENDPOINTS, BACKEND_STATUS } from '@/lib/api/config';
+import { formsService } from '@/lib/services/formsService';
 import type { 
   DashboardStats, 
   ApplicationInstance, 
@@ -8,11 +10,11 @@ import type {
   FormDefinition,
   WorkflowTemplate,
   User
-} from '@/lib/api';
+} from '@/lib/api/types';
 
 // Fallback imports
 import { workflowTemplates } from '@features/workflow-templates/data/workflowTemplates';
-import { runningWorkflowsData, allWorkflows } from '@features/running-workflows/data/runningWorkflows.data';
+import { allWorkflows } from '@features/running-workflows/data/runningWorkflows.data';
 import { mockPeople } from '@features/workflow-config-edit/data/mockPeople';
 import type { WorkflowData } from '@features/dashboard/types/dashboard.types';
 
@@ -90,7 +92,18 @@ export const useDashboardStats = (filters?: FilterOptions) => {
   };
 
   return useApiWithFallback(
-    () => dashboardApi.getStats(filters).then(response => response.data!),
+    async () => {
+      const response = await api.post<{ status: string; data?: DashboardStats }>(
+        API_ENDPOINTS.CLIENT_PRIVATE.DASHBOARD.STATS,
+        filters ?? {}
+      );
+      
+      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
+        throw new Error('Failed to fetch dashboard stats');
+      }
+      
+      return response.data?.data ?? fallbackStats;
+    },
     fallbackStats,
     [filters]
   );
@@ -134,7 +147,18 @@ export const useDashboardApplications = (params?: PaginatedRequest & FilterOptio
   };
 
   return useApiWithFallback(
-    () => dashboardApi.getApplications(params).then(response => response.data!),
+    async () => {
+      const response = await api.post<{ status: string; data?: typeof fallbackResponse }>(
+        API_ENDPOINTS.CLIENT_PRIVATE.DASHBOARD.APPLICATIONS,
+        params ?? {}
+      );
+      
+      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
+        throw new Error('Failed to fetch dashboard applications');
+      }
+      
+      return response.data?.data ?? fallbackResponse;
+    },
     fallbackResponse,
     [params]
   );
@@ -166,7 +190,17 @@ export const useWorkflowTemplates = () => {
   }));
 
   return useApiWithFallback(
-    () => templateApi.list().then(response => response.data!),
+    async () => {
+      const response = await api.get<{ status: string; data?: WorkflowTemplate[] }>(
+        '/api/workflows/templates'
+      );
+      
+      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
+        throw new Error('Failed to fetch workflow templates');
+      }
+      
+      return response.data?.data ?? fallbackTemplates;
+    },
     fallbackTemplates
   );
 };
@@ -175,86 +209,21 @@ export const useWorkflowTemplates = () => {
  * Hook for running workflows with fallback
  */
 export const useRunningWorkflows = (filters?: { status?: 'running' | 'paused' | 'completed' | 'failed'; workflowId?: string; assignee?: string }) => {
-  // Transform API response to WorkflowData format
-  const transformApiWorkflow = (apiItem: any): WorkflowData => {
-    // Merge configuration states with runtime states
-    const configStates = apiItem.wfConfig?.config?.workflow?.states || {};
-    const runtimeStates = apiItem.data?.states || {};
-    
-    // Create merged states with runtime data taking precedence
-    const mergedStates: Record<string, any> = {};
-    
-    // Start with config states as the base structure
-    Object.keys(configStates).forEach(stateKey => {
-      mergedStates[stateKey] = {
-        ...configStates[stateKey],
-        ...(runtimeStates[stateKey] || {}),
-        assignees: runtimeStates[stateKey]?.assignees || configStates[stateKey]?.assignees || [],
-        history: runtimeStates[stateKey]?.history || configStates[stateKey]?.history || [],
-        forms: runtimeStates[stateKey]?.forms || configStates[stateKey]?.forms || [],
-        actions: runtimeStates[stateKey]?.actions || configStates[stateKey]?.actions || {}
-      };
-    });
-    
-    // Add any runtime-only states
-    Object.keys(runtimeStates).forEach(stateKey => {
-      if (!mergedStates[stateKey]) {
-        mergedStates[stateKey] = runtimeStates[stateKey];
-      }
-    });
-
-    return {
-      workflow: {
-        id: apiItem.data?.id || apiItem.id,
-        version: apiItem.data?.version || apiItem.wfConfig?.config?.workflow?.version || 1,
-        initialState: apiItem.data?.initialState || apiItem.wfConfig?.config?.workflow?.initialState,
-        currentState: apiItem.data?.currentState || apiItem.state,
-        currentStateEnteredAt: apiItem.data?.currentStateEnteredAt || new Date().toISOString(),
-        forms: apiItem.data?.forms || apiItem.wfConfig?.config?.workflow?.forms || {},
-        states: mergedStates
-      }
-    };
-  };
-
   // Use the original workflow data directly as fallback
   const fallbackWorkflowData: WorkflowData[] = allWorkflows;
 
   const apiResult = useApiWithFallback(
     async () => {
-      const response = await runningWorkflowApi.list(filters);
+      const response = await api.post<{ status: string; data?: WorkflowData[] }>(
+        API_ENDPOINTS.CLIENT_PRIVATE.WORKFLOW.GET_ALL,
+        filters ?? {}
+      );
       
-      // Handle the actual API response structure
-      if (response && typeof response === 'object') {
-        // Check if it's the API response format with status and data fields
-        if ('status' in response && 'data' in response && Array.isArray(response.data)) {
-          console.log('🔄 Transforming API response with', response.data.length, 'workflows');
-          // Transform each item in the API response
-          return response.data.map((item: any) => transformApiWorkflow(item));
-        }
-        // If response.data exists and is an array but no status field
-        if ('data' in response && Array.isArray(response.data)) {
-          // Check if items need transformation
-          const firstItem = response.data[0];
-          if (firstItem && 'wfConfig' in firstItem && 'data' in firstItem) {
-            console.log('🔄 Transforming nested API response');
-            return response.data.map((item: any) => transformApiWorkflow(item));
-          }
-          // Already transformed
-          return response.data as WorkflowData[];
-        }
-        // Direct array response
-        if (Array.isArray(response)) {
-          const firstItem = response[0];
-          if (firstItem && 'wfConfig' in firstItem && 'data' in firstItem) {
-            console.log('🔄 Transforming direct array response');
-            return response.map((item: any) => transformApiWorkflow(item));
-          }
-          return response as WorkflowData[];
-        }
+      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
+        throw new Error('Failed to fetch running workflows');
       }
       
-      console.warn('⚠️ Unexpected API response structure:', response);
-      return [];
+      return response.data?.data ?? fallbackWorkflowData;
     },
     fallbackWorkflowData,
     [filters]
@@ -334,7 +303,25 @@ export const useForms = (params?: PaginatedRequest) => {
   };
 
   return useApiWithFallback(
-    () => formApi.list(params).then(response => response.data!),
+    async () => {
+      try {
+        // Use the centralized forms service
+        const result = await formsService.listForms(params);
+        return result;
+      } catch {
+        // If forms service fails, try direct API call
+        const response = await api.post<{ status: string; data?: typeof fallbackResponse }>(
+          API_ENDPOINTS.CLIENT_PRIVATE.FORM.GET_ALL,
+          {}
+        );
+        
+        if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
+          throw new Error('Failed to fetch forms');
+        }
+        
+        return response.data?.data ?? fallbackResponse;
+      }
+    },
     fallbackResponse,
     [params]
   );
@@ -363,7 +350,17 @@ export const useWorkflowInstance = (instanceId: string) => {
   } : null;
 
   return useApiWithFallback(
-    () => workflowInstanceApi.get(instanceId).then(response => response.data!),
+    async () => {
+      const response = await api.get<{ status: string; data?: ApplicationInstance }>(
+        API_ENDPOINTS.CLIENT_PRIVATE.WORKFLOW_INSTANCE.GET(instanceId)
+      );
+      
+      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
+        throw new Error('Failed to fetch workflow instance');
+      }
+      
+      return response.data?.data ?? fallbackInstance;
+    },
     fallbackInstance,
     [instanceId]
   );

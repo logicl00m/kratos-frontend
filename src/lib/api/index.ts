@@ -39,7 +39,10 @@ export {
   willTokenExpireSoon,
   getTokenExpiryTime,
   logout,
-  initializeAuth
+  initializeAuth,
+  setSubject,
+  getSubject,
+  clearSubject
 } from './auth';
 
 // Error handling
@@ -54,24 +57,43 @@ export {
   extractValidationErrors
 } from './errors';
 
-// API endpoint modules
+// Configuration
 export {
+  DEFAULT_API_CONFIG,
+  API_ENDPOINTS,
+  DEFAULT_HEADERS,
+  HTTP_STATUS,
+  BACKEND_STATUS,
+  getApiConfig as getConfig,
+  isDevelopment,
+  isProduction
+} from './config';
+
+// Services
+export { formsService } from '../services/formsService';
+
+// API endpoint modules (if they still exist and work)
+export type {
+  // Configuration API (if available)
   configurationApi,
   workflowApi
 } from './endpoints/configuration';
 
-export {
+export type {
+  // Workflow API (if available) 
   workflowInstanceApi,
   runningWorkflowApi,
   dashboardApi
 } from './endpoints/workflow';
 
-export {
+export type {
+  // Form API (if available)
   formApi,
   formSubmissionApi
 } from './endpoints/form';
 
-export {
+export type {
+  // Auth API (if available)
   authApi,
   userApi,
   templateApi,
