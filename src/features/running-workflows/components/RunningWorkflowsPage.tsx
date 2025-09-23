@@ -38,7 +38,10 @@ import {
   getWorkflowOwner,
 } from "../utils/runningWorkflowParser";
 import { useRunningWorkflows } from "@/lib/hooks/useApiWithFallback";
-import type { WorkflowData, WorkflowDataWrapper } from "../types/runningWorkflow.types";
+import type {
+  WorkflowData,
+  WorkflowDataWrapper,
+} from "../types/runningWorkflow.types";
 import "./RunningWorkflowsPage.css";
 
 const nodeTypes = {
