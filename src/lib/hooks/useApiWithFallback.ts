@@ -175,73 +175,87 @@ export const useWorkflowTemplates = () => {
  * Hook for running workflows with fallback
  */
 export const useRunningWorkflows = (filters?: { status?: 'running' | 'paused' | 'completed' | 'failed'; workflowId?: string; assignee?: string }) => {
-  // Use the original workflow data directly, not the transformed instances
-  const fallbackWorkflowData: WorkflowData[] = runningWorkflowsData.instances.map(instance => {
-    // Find the original workflow data that corresponds to this instance
-    const originalWorkflow = allWorkflows.find(w => w.workflow.id === instance.id);
-    if (originalWorkflow) {
-      return originalWorkflow;
-    }
+  // Transform API response to WorkflowData format
+  const transformApiWorkflow = (apiItem: any): WorkflowData => {
+    // Merge configuration states with runtime states
+    const configStates = apiItem.wfConfig?.config?.workflow?.states || {};
+    const runtimeStates = apiItem.data?.states || {};
     
-    // If not found, create a minimal WorkflowData structure from the instance
+    // Create merged states with runtime data taking precedence
+    const mergedStates: Record<string, any> = {};
+    
+    // Start with config states as the base structure
+    Object.keys(configStates).forEach(stateKey => {
+      mergedStates[stateKey] = {
+        ...configStates[stateKey],
+        ...(runtimeStates[stateKey] || {}),
+        assignees: runtimeStates[stateKey]?.assignees || configStates[stateKey]?.assignees || [],
+        history: runtimeStates[stateKey]?.history || configStates[stateKey]?.history || [],
+        forms: runtimeStates[stateKey]?.forms || configStates[stateKey]?.forms || [],
+        actions: runtimeStates[stateKey]?.actions || configStates[stateKey]?.actions || {}
+      };
+    });
+    
+    // Add any runtime-only states
+    Object.keys(runtimeStates).forEach(stateKey => {
+      if (!mergedStates[stateKey]) {
+        mergedStates[stateKey] = runtimeStates[stateKey];
+      }
+    });
+
     return {
       workflow: {
-        id: instance.id,
-        version: 1,
-        initialState: 'start',
-        currentState: instance.currentState || 'start',
-        currentStateEnteredAt: instance.updatedAt,
-        forms: {},
-        states: {
-          [instance.currentState || 'start']: {
-            assignees: instance.currentAssignee ? [{
-              subjectId: instance.currentAssignee.id,
-              employeeName: instance.currentAssignee.name,
-              role: instance.currentAssignee.role || 'User',
-              email: instance.currentAssignee.email || `${instance.currentAssignee.name.toLowerCase().replace(' ', '.')}@company.com`,
-              primary: true,
-              since: instance.updatedAt
-            }] : [],
-            forms: [],
-            actions: {},
-            history: []
-          }
-        }
+        id: apiItem.data?.id || apiItem.id,
+        version: apiItem.data?.version || apiItem.wfConfig?.config?.workflow?.version || 1,
+        initialState: apiItem.data?.initialState || apiItem.wfConfig?.config?.workflow?.initialState,
+        currentState: apiItem.data?.currentState || apiItem.state,
+        currentStateEnteredAt: apiItem.data?.currentStateEnteredAt || new Date().toISOString(),
+        forms: apiItem.data?.forms || apiItem.wfConfig?.config?.workflow?.forms || {},
+        states: mergedStates
       }
-    } as WorkflowData;
-  });
+    };
+  };
+
+  // Use the original workflow data directly as fallback
+  const fallbackWorkflowData: WorkflowData[] = allWorkflows;
 
   const apiResult = useApiWithFallback(
-    () => runningWorkflowApi.list(filters).then(response => {
-      // Transform API data to WorkflowData format
-      const apiData = Array.isArray(response.data) ? response.data : [];
-      const transformedData = apiData.map(rw => ({
-        workflow: {
-          id: rw.id,
-          version: 1,
-          initialState: 'start',
-          currentState: rw.currentNode,
-          currentStateEnteredAt: rw.lastUpdated,
-          forms: {},
-          states: {
-            [rw.currentNode]: {
-              assignees: rw.assignee ? [{
-                subjectId: rw.id,
-                employeeName: rw.assignee,
-                role: 'User',
-                email: `${rw.assignee.toLowerCase().replace(' ', '.')}@company.com`,
-                primary: true,
-                since: rw.lastUpdated
-              }] : [],
-              forms: [],
-              actions: {},
-              history: []
-            }
-          }
+    async () => {
+      const response = await runningWorkflowApi.list(filters);
+      
+      // Handle the actual API response structure
+      if (response && typeof response === 'object') {
+        // Check if it's the API response format with status and data fields
+        if ('status' in response && 'data' in response && Array.isArray(response.data)) {
+          console.log('🔄 Transforming API response with', response.data.length, 'workflows');
+          // Transform each item in the API response
+          return response.data.map((item: any) => transformApiWorkflow(item));
         }
-      } as WorkflowData));
-      return transformedData;
-    }),
+        // If response.data exists and is an array but no status field
+        if ('data' in response && Array.isArray(response.data)) {
+          // Check if items need transformation
+          const firstItem = response.data[0];
+          if (firstItem && 'wfConfig' in firstItem && 'data' in firstItem) {
+            console.log('🔄 Transforming nested API response');
+            return response.data.map((item: any) => transformApiWorkflow(item));
+          }
+          // Already transformed
+          return response.data as WorkflowData[];
+        }
+        // Direct array response
+        if (Array.isArray(response)) {
+          const firstItem = response[0];
+          if (firstItem && 'wfConfig' in firstItem && 'data' in firstItem) {
+            console.log('🔄 Transforming direct array response');
+            return response.map((item: any) => transformApiWorkflow(item));
+          }
+          return response as WorkflowData[];
+        }
+      }
+      
+      console.warn('⚠️ Unexpected API response structure:', response);
+      return [];
+    },
     fallbackWorkflowData,
     [filters]
   );

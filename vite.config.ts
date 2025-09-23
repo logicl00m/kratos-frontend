@@ -14,4 +14,25 @@ export default defineConfig({
       '@pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
     },
   },
+  server: {
+    // Dev-time proxy to avoid CORS when backend runs on a different host/port
+    proxy: {
+      // Proxy any request starting with /api to the backend defined by VITE_API_URL
+      // VITE_API_URL may include a path (e.g. http://localhost:8080 or http://localhost:8080/api)
+      '^/api': {
+        target: process.env.VITE_API_URL || 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+        // Rewrite will remove a duplicated /api prefix if VITE_API_URL already contains /api
+        rewrite: (path) => {
+          const target = (process.env.VITE_API_URL || '').replace(/\/+$/, '');
+          if (target.endsWith('/api')) {
+            // strip the leading /api from the proxied path to avoid /api/api
+            return path.replace(/^\/api/, '');
+          }
+          return path;
+        }
+      }
+    }
+  }
 })

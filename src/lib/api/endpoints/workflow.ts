@@ -205,7 +205,10 @@ export const runningWorkflowApi = {
     workflowId?: string;
     assignee?: string;
   }): Promise<ApiResponse<RunningWorkflow[]>> => {
-    return api.get('/api/v1/client/private/running-workflows', { params });
+    // The backend expects a POST to /api/v1/client/private/workflow/get/all with filters in the body
+    // Keep backwards compatibility by supporting undefined params (send empty object)
+    const body = params ?? {};
+    return api.post('/api/v1/client/private/workflow/get/all', body);
   },
 
   /**
