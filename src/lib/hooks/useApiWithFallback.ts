@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api, type ApiError } from '@/lib/api';
-import { API_ENDPOINTS, BACKEND_STATUS } from '@/lib/api/config';
+import { API_ENDPOINTS } from '@/lib/api/config';
 import { formsService } from '@/lib/services/formsService';
 import type { 
   DashboardStats, 
@@ -93,16 +93,13 @@ export const useDashboardStats = (filters?: FilterOptions) => {
 
   return useApiWithFallback(
     async () => {
-      const response = await api.post<{ status: string; data?: DashboardStats }>(
+      // The centralized API client now returns extracted data directly
+      const data = await api.post<DashboardStats>(
         API_ENDPOINTS.CLIENT_PRIVATE.DASHBOARD.STATS,
         filters ?? {}
       );
       
-      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
-        throw new Error('Failed to fetch dashboard stats');
-      }
-      
-      return response.data?.data ?? fallbackStats;
+      return data ?? fallbackStats;
     },
     fallbackStats,
     [filters]
@@ -148,16 +145,13 @@ export const useDashboardApplications = (params?: PaginatedRequest & FilterOptio
 
   return useApiWithFallback(
     async () => {
-      const response = await api.post<{ status: string; data?: typeof fallbackResponse }>(
+      // The centralized API client now returns extracted data directly
+      const data = await api.post<typeof fallbackResponse>(
         API_ENDPOINTS.CLIENT_PRIVATE.DASHBOARD.APPLICATIONS,
         params ?? {}
       );
       
-      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
-        throw new Error('Failed to fetch dashboard applications');
-      }
-      
-      return response.data?.data ?? fallbackResponse;
+      return data ?? fallbackResponse;
     },
     fallbackResponse,
     [params]
@@ -191,15 +185,12 @@ export const useWorkflowTemplates = () => {
 
   return useApiWithFallback(
     async () => {
-      const response = await api.get<{ status: string; data?: WorkflowTemplate[] }>(
+      // The centralized API client now returns extracted data directly
+      const data = await api.get<WorkflowTemplate[]>(
         '/api/workflows/templates'
       );
       
-      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
-        throw new Error('Failed to fetch workflow templates');
-      }
-      
-      return response.data?.data ?? fallbackTemplates;
+      return data ?? fallbackTemplates;
     },
     fallbackTemplates
   );
@@ -214,16 +205,13 @@ export const useRunningWorkflows = (filters?: { status?: 'running' | 'paused' | 
 
   const apiResult = useApiWithFallback(
     async () => {
-      const response = await api.post<{ status: string; data?: WorkflowData[] }>(
+      // The centralized API client now returns extracted data directly
+      const data = await api.post<WorkflowData[]>(
         API_ENDPOINTS.CLIENT_PRIVATE.WORKFLOW.GET_ALL,
         filters ?? {}
       );
       
-      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
-        throw new Error('Failed to fetch running workflows');
-      }
-      
-      return response.data?.data ?? fallbackWorkflowData;
+      return data ?? fallbackWorkflowData;
     },
     fallbackWorkflowData,
     [filters]
@@ -310,16 +298,13 @@ export const useForms = (params?: PaginatedRequest) => {
         return result;
       } catch {
         // If forms service fails, try direct API call
-        const response = await api.post<{ status: string; data?: typeof fallbackResponse }>(
+        // The centralized API client now returns extracted data directly
+        const data = await api.post<typeof fallbackResponse>(
           API_ENDPOINTS.CLIENT_PRIVATE.FORM.GET_ALL,
           {}
         );
         
-        if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
-          throw new Error('Failed to fetch forms');
-        }
-        
-        return response.data?.data ?? fallbackResponse;
+        return data ?? fallbackResponse;
       }
     },
     fallbackResponse,
@@ -351,15 +336,12 @@ export const useWorkflowInstance = (instanceId: string) => {
 
   return useApiWithFallback(
     async () => {
-      const response = await api.get<{ status: string; data?: ApplicationInstance }>(
+      // The centralized API client now returns extracted data directly
+      const data = await api.get<ApplicationInstance>(
         API_ENDPOINTS.CLIENT_PRIVATE.WORKFLOW_INSTANCE.GET(instanceId)
       );
       
-      if (response.data?.status !== BACKEND_STATUS.SUCCESS) {
-        throw new Error('Failed to fetch workflow instance');
-      }
-      
-      return response.data?.data ?? fallbackInstance;
+      return data ?? fallbackInstance;
     },
     fallbackInstance,
     [instanceId]
