@@ -314,7 +314,7 @@ export const dashboardApi = {
     averageCompletionTime: Array<{ date: string; time: number }>;
     statusDistribution: Array<{ status: string; count: number }>;
     bottlenecks: Array<{ state: string; averageTime: number; count: number }>;
-  }>> => {
+  }> => {
     return api.get('/api/v1/client/private/dashboard/analytics', {
       params: workflowId ? { workflowId } : undefined
     });
@@ -347,7 +347,7 @@ export const dashboardApi = {
       count: number;
       averageTime: number;
     }>;
-  }>> => {
+  }> => {
     return api.get('/api/v1/client/private/dashboard/workload', {
       params: userId ? { userId } : undefined
     });

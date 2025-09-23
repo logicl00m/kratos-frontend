@@ -200,17 +200,34 @@ export const useWorkflowTemplates = () => {
  * Hook for running workflows with fallback
  */
 export const useRunningWorkflows = (filters?: { status?: 'running' | 'paused' | 'completed' | 'failed'; workflowId?: string; assignee?: string }) => {
+  // Import the correct type at runtime
+  type RunningWorkflowData = typeof allWorkflows[0];
+  
   // Use the original workflow data directly as fallback
-  const fallbackWorkflowData: WorkflowData[] = allWorkflows;
+  const fallbackWorkflowData: RunningWorkflowData[] = allWorkflows;
 
   const apiResult = useApiWithFallback(
     async () => {
-      // The centralized API client now returns extracted data directly
-      const data = await api.post<WorkflowData[]>(
-        API_ENDPOINTS.CLIENT_PRIVATE.WORKFLOW.GET_ALL,
-        filters ?? {}
-      );
+      console.group('🌐 useApiWithFallback - useRunningWorkflows');
+      console.log('📥 Filters:', filters);
       
+      // Use the new centralized service instead of direct API call
+      const { runningWorkflowService } = await import('@features/running-workflows/services/runningWorkflowService');
+      const data = await runningWorkflowService.getInstances(filters);
+      
+      console.log('🎯 Service Result:', data);
+      console.log('🎯 Result Type:', typeof data);
+      console.log('🎯 Is Array:', Array.isArray(data));
+      
+      if (Array.isArray(data)) {
+        console.log('🎯 Array Length:', data.length);
+        if (data.length > 0) {
+          console.log('🎯 First Item:', data[0]);
+          console.log('🎯 First Item Keys:', Object.keys(data[0] || {}));
+        }
+      }
+      
+      console.groupEnd();
       return data ?? fallbackWorkflowData;
     },
     fallbackWorkflowData,
@@ -362,13 +379,13 @@ function getCurrentAssignee(workflow: { states: Record<string, { assignees?: Arr
 /**
  * Utility function to extract form data from mock workflow
  */
-function extractFormData(forms: Record<string, { fields?: Array<{ id: string; data: unknown }> }>): Record<string, string | number | boolean | object> {
+function extractFormData(forms: Record<string, { fields?: Array<{ id: string; data: unknown; fieldActions?: Array<string | { operation: string }> }> }>): Record<string, string | number | boolean | object> {
   const data: Record<string, string | number | boolean | object> = {};
   
   Object.keys(forms).forEach(formKey => {
     const form = forms[formKey];
     if (form.fields) {
-      form.fields.forEach((field: { id: string; data: unknown }) => {
+      form.fields.forEach((field: { id: string; data: unknown; fieldActions?: Array<string | { operation: string }> }) => {
         const value = field.data;
         // Type guard to ensure we only store valid types
         if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || (typeof value === 'object' && value !== null)) {

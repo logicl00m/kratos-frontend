@@ -84,6 +84,24 @@ export function extractResponseData<T = unknown>(
   response: AxiosResponse
 ): T {
   const parsed = parseApiResponse<T>(response);
+  
+  // Add detailed logging in development
+  if (import.meta.env.DEV) {
+    console.group(`🎯 Response Data Extraction`);
+    console.log('📊 Parsed Response:', parsed);
+    console.log('📦 Extracted Data:', parsed.data);
+    console.log('📊 Data Type:', typeof parsed.data);
+    console.log('📊 Is Array:', Array.isArray(parsed.data));
+    if (Array.isArray(parsed.data)) {
+      console.log('📊 Array Length:', parsed.data.length);
+      console.log('📊 First Item:', parsed.data[0]);
+      if (parsed.data[0] && typeof parsed.data[0] === 'object') {
+        console.log('📊 First Item Keys:', Object.keys(parsed.data[0]));
+      }
+    }
+    console.groupEnd();
+  }
+  
   return parsed.data;
 }
 

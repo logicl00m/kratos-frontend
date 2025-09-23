@@ -1,0 +1,63 @@
+/* src/features/running-workflows/components/RunningWorkflowEdge.css */
+
+.running-workflow-edge-label {
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  fill: #1f2937;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.dark .running-workflow-edge-label {
+  fill: #f1f5f9;
+  stroke: #111827;
+}
+
+.running-workflow-edge-label.success {
+  fill: #059669;
+  stroke: #ffffff;
+}
+
+.dark .running-workflow-edge-label.success {
+  fill: #6ee7b7;
+  stroke: #111827;
+}
+
+.running-workflow-edge-label.danger {
+  fill: #dc2626;
+  stroke: #ffffff;
+}
+
+.dark .running-workflow-edge-label.danger {
+  fill: #fca5a5;
+  stroke: #111827;
+}
+
+.running-workflow-edge-label.warning {
+  fill: #d97706;
+  stroke: #ffffff;
+}
+
+.dark .running-workflow-edge-label.warning {
+  fill: #fbbf24;
+  stroke: #111827;
+}
+
+.running-workflow-edge-label.pending {
+  fill: #64748b;
+  stroke: #ffffff;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.dark .running-workflow-edge-label.pending {
+  fill: #cbd5e1;
+  stroke: #111827;
+}

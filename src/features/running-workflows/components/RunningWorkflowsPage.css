@@ -501,6 +501,11 @@
 .rwp-graph-container {
   flex: 1;
   position: relative;
+  background: #f9fafb;
+}
+
+.dark .rwp-graph-container {
+  background: #111827;
 }
 
 .rwp-controls {
@@ -945,4 +950,32 @@
 
 .react-flow__controls button svg {
   fill: currentColor;
+}
+
+/* Additional React Flow styling for better edge visibility */
+.react-flow__edge-path {
+  stroke-width: 2;
+  stroke-opacity: 0.8;
+}
+
+.react-flow__edge-path.selected {
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+
+.dark .react-flow__edge-path {
+  stroke: #9ca3af;
+  stroke-opacity: 0.9;
+}
+
+.dark .react-flow__edge-path.selected {
+  stroke: #d1d5db;
+}
+
+.react-flow__edge-text {
+  font-weight: 600;
+}
+
+.react-flow__edge-textbg {
+  fill: transparent;
 }

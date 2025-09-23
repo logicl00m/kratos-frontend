@@ -26,6 +26,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import RunningStateNode from "./RunningStateNode";
+import RunningWorkflowEdge from "./RunningWorkflowEdge";
 import {
   parseRunningWorkflowToGraph,
   getWorkflowStatus,
@@ -37,11 +38,16 @@ import {
   getWorkflowOwner,
 } from "../utils/runningWorkflowParser";
 import { useRunningWorkflows } from "@/lib/hooks/useApiWithFallback";
-import type { WorkflowData } from "../types/runningWorkflow.types";
+import type { WorkflowData, WorkflowDataWrapper } from "../types/runningWorkflow.types";
 import "./RunningWorkflowsPage.css";
 
 const nodeTypes = {
   runningStateNode: RunningStateNode,
+};
+
+const edgeTypes = {
+  default: RunningWorkflowEdge,
+  smoothstep: RunningWorkflowEdge,
 };
 
 interface RunningWorkflowsPageProps {
@@ -56,14 +62,14 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
     isUsingFallback: workflowsUsingFallback,
   } = useRunningWorkflows();
 
-  const allWorkflows = React.useMemo<WorkflowData[]>(
-    () => (workflowsData as unknown as WorkflowData[]) || [],
-    [workflowsData]
-  );
+  const allWorkflows = React.useMemo<WorkflowDataWrapper[]>(() => {
+    const data = workflowsData as WorkflowData[];
+    if (!data || !Array.isArray(data)) return [];
+    return data.map((w) => ({ workflow: w }));
+  }, [workflowsData]);
 
-  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowData | null>(
-    null
-  );
+  const [selectedWorkflow, setSelectedWorkflow] =
+    useState<WorkflowDataWrapper | null>(null);
 
   // Update selected workflow when data loads
   React.useEffect(() => {
@@ -93,19 +99,24 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
 
   const lowerSearchTerm = searchTerm.toLowerCase();
 
-  const filteredWorkflows = allWorkflows.filter((workflow) => {
-    const status = getWorkflowStatus(workflow).status;
-    const owner = getWorkflowOwner(workflow);
+  const filteredWorkflows = allWorkflows.filter((wrapper) => {
+    if (!wrapper?.workflow) return false;
+    const workflow = wrapper.workflow;
+
+    const status = getWorkflowStatus(wrapper).status;
+    const owner = getWorkflowOwner(wrapper);
     const ownerName = owner?.employeeName?.toLowerCase() ?? "";
+
     const matchesSearch =
-      workflow.workflow.id.toLowerCase().includes(lowerSearchTerm) ||
-      workflow.workflow.currentState.toLowerCase().includes(lowerSearchTerm) ||
+      workflow.id?.toLowerCase().includes(lowerSearchTerm) ||
+      workflow.currentState?.toLowerCase().includes(lowerSearchTerm) ||
       ownerName.includes(lowerSearchTerm);
+
     const matchesStatus = statusFilter === "all" || status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const handleWorkflowSelect = (workflow: WorkflowData) => {
+  const handleWorkflowSelect = (workflow: WorkflowDataWrapper) => {
     setSelectedWorkflow(workflow);
     setSelectedNodeId(null);
     if (!showDetailPanel) setShowDetailPanel(true);
@@ -345,6 +356,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
                         onEdgesChange={onEdgesChange}
                         onNodeClick={handleNodeClick}
                         nodeTypes={nodeTypes}
+                        edgeTypes={edgeTypes}
                         fitView
                         fitViewOptions={{ padding: 0.2 }}
                         proOptions={{ hideAttribution: true }}

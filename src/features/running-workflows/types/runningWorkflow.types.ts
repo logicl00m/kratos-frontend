@@ -67,15 +67,23 @@ export interface WorkflowForm {
 }
 
 export interface WorkflowData {
-  workflow: {
-    id: string;
-    version: number;
-    initialState: string;
-    currentState: string;
-    currentStateEnteredAt: string;
-    forms: Record<string, WorkflowForm>;
-    states: Record<string, WorkflowState>;
-  };
+  id: string;
+  version: number;
+  initialState: string;
+  currentState: string;
+  currentStateEnteredAt: string;
+  forms: Record<string, WorkflowForm>;
+  states: Record<string, WorkflowState>;
+  // Metadata from API transformation
+  __workflowConfigId?: string;
+  __workflowConfigName?: string;
+  __isArchived?: boolean;
+  __metadata?: Record<string, unknown>;
+}
+
+// Wrapper type for backward compatibility
+export interface WorkflowDataWrapper {
+  workflow: WorkflowData;
 }
 
 // Types for UI components (keeping existing interface for compatibility)

@@ -113,8 +113,13 @@ export const apiRequest = async <T = unknown>(
   try {
     const response = await apiClient.request(config);
     
-    // Log response parsing in development
+    // Log raw response in development
     if (isDevelopment()) {
+      console.group(`🌐 API Response: ${config.method?.toUpperCase()} ${config.url}`);
+      console.log('📥 Raw Response Status:', response.status);
+      console.log('📥 Raw Response Data:', response.data);
+      console.log('📥 Raw Response Headers:', response.headers);
+      
       logResponseParsing(
         config.url || 'unknown',
         config.method || 'unknown',
@@ -123,8 +128,25 @@ export const apiRequest = async <T = unknown>(
     }
     
     // Extract and return only the data portion
-    return extractResponseData<T>(response);
+    const extractedData = extractResponseData<T>(response);
+    
+    // Log extracted data
+    if (isDevelopment()) {
+      console.log('🎯 Extracted Data:', extractedData);
+      console.log('🎯 Extracted Data Type:', typeof extractedData);
+      console.log('🎯 Is Array:', Array.isArray(extractedData));
+      console.groupEnd();
+    }
+    
+    return extractedData;
   } catch (error) {
+    if (isDevelopment()) {
+      console.error('❌ API Request Error:', {
+        url: config.url,
+        method: config.method,
+        error: error
+      });
+    }
     // Re-throw as our custom ApiError
     throw error instanceof Error ? error : handleAxiosError(error as never);
   }
