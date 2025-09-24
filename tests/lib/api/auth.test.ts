@@ -23,6 +23,19 @@ describe('Auth Module', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
+
+    // Mock localStorage methods
+    const localStorageMock = {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    };
+
+    Object.defineProperty(window, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
+    });
   });
 
   describe('Token Management', () => {

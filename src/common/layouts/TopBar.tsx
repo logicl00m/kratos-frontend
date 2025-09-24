@@ -14,6 +14,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import CreateWorkflowModal from "@/shared/components/modals/CreateWorkflowModal";
 import "./TopBar.css";
 
 // Create New Dropdown Component
@@ -21,6 +22,7 @@ const CreateNewDropdown: React.FC<{ onNavigate: (itemId: string) => void }> = ({
   onNavigate,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,44 +61,59 @@ const CreateNewDropdown: React.FC<{ onNavigate: (itemId: string) => void }> = ({
   ];
 
   const handleItemClick = (itemId: string) => {
-    onNavigate(itemId);
     setIsOpen(false);
+    
+    if (itemId === "create-workflow") {
+      // Open the modal instead of navigating directly
+      setIsModalOpen(true);
+    } else {
+      // For other items, use the original navigation
+      onNavigate(itemId);
+    }
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="create-new-button"
-        aria-label="Create new"
-      >
-        <Plus size={20} />
-        <span className="create-new-text">Create New</span>
-      </button>
+    <>
+      <div className="relative" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="create-new-button"
+          aria-label="Create new"
+        >
+          <Plus size={20} />
+          <span className="create-new-text">Create New</span>
+        </button>
 
-      {isOpen && (
-        <div className="create-new-dropdown">
-          <div className="dropdown-content">
-            {menuItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
-                className="dropdown-item"
-              >
-                <div className="dropdown-item-icon">{item.icon}</div>
-                <div className="dropdown-item-text">
-                  <div className="dropdown-item-label">{item.label}</div>
-                  <div className="dropdown-item-description">
-                    {item.description}
+        {isOpen && (
+          <div className="create-new-dropdown">
+            <div className="dropdown-content">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleItemClick(item.id)}
+                  className="dropdown-item"
+                >
+                  <div className="dropdown-item-icon">{item.icon}</div>
+                  <div className="dropdown-item-text">
+                    <div className="dropdown-item-label">{item.label}</div>
+                    <div className="dropdown-item-description">
+                      {item.description}
+                    </div>
                   </div>
-                </div>
-                <ChevronRight className="dropdown-item-chevron" />
-              </button>
-            ))}
+                  <ChevronRight className="dropdown-item-chevron" />
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+
+      {/* Create Workflow Modal */}
+      <CreateWorkflowModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
   );
 };
 

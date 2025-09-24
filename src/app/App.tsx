@@ -16,7 +16,7 @@ import {
 import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
 import type { WorkflowData } from "@features/dashboard/types/dashboard.types";
 import "./App.css";
-import MainLayout from "@shared/components/layout/MainLayout";
+import MainLayout from "@/common/layouts/MainLayout";
 
 function App() {
   const navigate = useNavigate();
@@ -197,6 +197,11 @@ function App() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={DashboardPage} />
       <Route path="/create-workflow" element={CreateWorkflowPage} />
+      
+      {/* New routes for workflow creation modal */}
+      <Route path="/workflow-config/select" element={CreateWorkflowPage} />
+      <Route path="/workflow-builder/new" element={WorkflowBuilderPage} />
+      <Route path="/workflows/create" element={CreateWorkflowPage} />
       
       <Route path="/running" element={RunningPage} />
       <Route path="/builder" element={WorkflowBuilderPage} />
