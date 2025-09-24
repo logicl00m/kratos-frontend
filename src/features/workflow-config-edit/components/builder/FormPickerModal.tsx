@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { X, Search } from "lucide-react";
-import { searchForms } from "@features/workflow-config-edit/services/formsApi";
+import { getAllForms } from "@features/workflow-config-edit/services/formsApi";
 import "./FormPickerModal.css";
 
 export interface FormPickerModalProps {
@@ -25,6 +25,10 @@ export const FormPickerModal: React.FC<FormPickerModalProps> = ({
     Array<{ id: string; name: string; version: number }>
   >([]);
   const [loading, setLoading] = useState(false);
+  // Cache of all forms fetched on modal open
+  const [allForms, setAllForms] = useState<
+    Array<{ id: string; name: string; version: number }>
+  >([]);
 
   // Handle modal visibility
   useEffect(() => {
@@ -34,10 +38,43 @@ export const FormPickerModal: React.FC<FormPickerModalProps> = ({
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 100);
+      // Fetch and cache all forms once when modal opens
+      (async () => {
+        setLoading(true);
+        try {
+          const forms = await getAllForms();
+          const normalized = Array.isArray(forms)
+            ? forms.map((f: any) => ({
+                id: f?.id ?? String(f?.formId ?? ""),
+                name: f?.name ?? f?.formName ?? f?.title ?? "",
+                version: typeof f?.version === "number" ? f.version : 1,
+              }))
+            : [];
+          setAllForms(normalized);
+          // If there is an existing query, initialize results
+          if (query.trim()) {
+            const q = query.trim().toLowerCase();
+            setResults(
+              normalized.filter((it) =>
+                (it.name ?? "").toLowerCase().includes(q)
+              )
+            );
+          } else {
+            setResults([]);
+          }
+        } catch (err) {
+          console.error("Failed to fetch forms on modal open:", err);
+          setAllForms([]);
+          setResults([]);
+        } finally {
+          setLoading(false);
+        }
+      })();
     } else {
       document.body.style.overflow = "unset";
       setQuery("");
       setResults([]);
+      setAllForms([]);
     }
 
     return () => {
@@ -91,10 +128,12 @@ export const FormPickerModal: React.FC<FormPickerModalProps> = ({
 
       setLoading(true);
       try {
-        const searchResults = await searchForms(query);
-        if (!cancelled) {
-          setResults(searchResults);
-        }
+        // Filter cached forms instead of calling remote search
+        const q = query.trim().toLowerCase();
+        const filtered = allForms.filter((f) =>
+          (f?.name ?? "").toLowerCase().includes(q)
+        );
+        if (!cancelled) setResults(filtered);
       } catch (error) {
         console.error("Error searching forms:", error);
         if (!cancelled) {
@@ -114,7 +153,7 @@ export const FormPickerModal: React.FC<FormPickerModalProps> = ({
       cancelled = true;
       clearTimeout(timeoutId);
     };
-  }, [query]);
+  }, [query, allForms]);
 
   const handleFormSelect = (form: {
     id: string;
