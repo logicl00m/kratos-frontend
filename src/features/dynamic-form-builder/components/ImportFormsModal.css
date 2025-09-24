@@ -1,24 +1,27 @@
 .import-forms-modal {
   background-color: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   max-width: 600px !important;
 }
 
 .import-forms-modal.dark {
-  background-color: #1f2937;
-  border: 1px solid #374151;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .import-forms-modal-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(to bottom, #ffffff, #f9fafb);
 }
 
 .import-forms-modal-header.dark {
   border-bottom: 1px solid #374151;
+  background: linear-gradient(to bottom, #0f172a, #1e293b);
 }
 
 .import-forms-modal-title {
@@ -28,7 +31,7 @@
 }
 
 .import-forms-modal-title.dark {
-  color: #f9fafb;
+  color: #e2e8f0;
 }
 
 .import-forms-modal-description {
@@ -37,7 +40,7 @@
 }
 
 .import-forms-modal-description.dark {
-  color: #d1d5db;
+  color: #94a3b8;
 }
 
 .import-forms-modal-body {
@@ -64,22 +67,24 @@
 }
 
 .import-forms-modal-loading-text.dark {
-  color: #d1d5db;
+  color: #cbd5e1;
 }
 
 .import-forms-modal-error {
   background-color: #fef2f2;
   color: #dc2626;
   padding: 1rem;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   margin-bottom: 1rem;
   border: 1px solid #fecaca;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);
 }
 
 .import-forms-modal-error.dark {
-  background-color: #7f1d1d20;
+  background-color: #450a0a;
   color: #fca5a5;
-  border: 1px solid #7f1d1d80;
+  border: 1px solid #7f1d1d;
+  box-shadow: 0 1px 3px rgba(127, 29, 29, 0.3);
 }
 
 .import-forms-modal-scrollarea {
@@ -88,12 +93,13 @@
   border-radius: 0.5rem;
   padding: 0.75rem;
   background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .import-forms-modal-scrollarea.dark {
-  background-color: #1f293780;
-  border: 1px solid #374151;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .import-forms-modal-empty-state {
@@ -103,56 +109,67 @@
 }
 
 .import-forms-modal-empty-state.dark {
-  color: #9ca3af;
+  color: #94a3b8;
 }
 
 .import-forms-modal-form-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .import-forms-modal-form-item {
   padding: 0.75rem;
   border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
 }
 
 .import-forms-modal-form-item:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  background-color: #f9fafb;
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(to bottom, #f9fafb, #f1f5f9);
+  border-color: #d1d5db;
+}
+
+.import-forms-modal-form-item.dark {
+  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  border-color: #334155;
 }
 
 .import-forms-modal-form-item.dark:hover {
-  background-color: #37415180;
+  background: linear-gradient(to bottom, #334155, #1e293b);
+  border-color: #475569;
 }
 
 .import-forms-modal-form-item.selected {
-  border-color: #3b82f6;
-  background-color: #eff6ff;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+  border-color: #2563eb;
+  background: linear-gradient(to bottom, #dbeafe, #bfdbfe);
+  box-shadow: 0 6px 12px -2px rgba(37, 99, 235, 0.15);
 }
 
 .import-forms-modal-form-item.selected.dark {
-  background-color: #1e3a8a40;
-  border-color: #60a5fa;
+  background: linear-gradient(to bottom, #1e3a8a, #1e293b);
+  border-color: #3b82f6;
+  box-shadow: 0 6px 12px -2px rgba(59, 130, 246, 0.2);
 }
 
 .import-forms-modal-form-icon-wrapper {
-  padding: 0.5rem;
-  background-color: #dbeafe;
+  padding: 0.375rem;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   border-radius: 0.5rem;
   color: #2563eb;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
 }
 
 .import-forms-modal-form-icon-wrapper.dark {
-  background-color: #1e3a8a60;
-  color: #93c5fd;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: #bfdbfe;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
 }
 
 .import-forms-modal-form-content {
@@ -171,7 +188,7 @@
 }
 
 .import-forms-modal-form-name.dark {
-  color: #f9fafb;
+  color: #e2e8f0;
 }
 
 .import-forms-modal-form-meta {
@@ -184,13 +201,13 @@
 }
 
 .import-forms-modal-form-meta.dark {
-  color: #d1d5db;
+  color: #94a3b8;
 }
 
 .import-forms-modal-form-meta-item {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.25rem;
 }
 
 .import-forms-modal-form-id {
@@ -201,7 +218,7 @@
 }
 
 .import-forms-modal-form-id.dark {
-  color: #9ca3af;
+  color: #94a3b8;
 }
 
 .import-forms-modal-footer {
@@ -211,28 +228,357 @@
   margin-top: 1rem;
   padding-top: 0.75rem;
   border-top: 1px solid #e5e7eb;
+  background: linear-gradient(to top, #f9fafb, #ffffff);
 }
 
 .import-forms-modal-footer.dark {
   border-top: 1px solid #374151;
+  background: linear-gradient(to top, #1e293b, #0f172a);
 }
 
 .import-forms-modal-cancel-btn {
   padding: 0.375rem 1rem;
   font-size: 0.875rem;
+  background: linear-gradient(to bottom, #ffffff, #f3f4f6);
+  border: 1px solid #d1d5db;
+  color: #374047;
+  transition: all 0.2s;
+}
+
+.import-forms-modal-cancel-btn:hover {
+  background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+  border-color: #9ca3af;
+}
+
+.import-forms-modal-cancel-btn.dark {
+  background: linear-gradient(to bottom, #334155, #1e293b);
+  border: 1px solid #475569;
+  color: #e2e8f0;
+}
+
+.import-forms-modal-cancel-btn.dark:hover {
+  background: linear-gradient(to bottom, #475569, #334155);
+  border-color: #94a3b8;
 }
 
 .import-forms-modal-import-btn {
   padding: 0.375rem 1rem;
   font-size: 0.875rem;
-  background-color: #3b82f6;
+  background: linear-gradient(to bottom, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  transition: all 0.2s;
 }
 
-.import-forms-modal-import-btn:not(:disabled) {
-  background-color: #2563eb;
+.import-forms-modal-import-btn:not(:disabled):hover {
+  background: linear-gradient(to bottom, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
 }
 
 .import-forms-modal-import-btn:disabled {
-  background-color: #d1d5db;
+  background: linear-gradient(to bottom, #9ca3af, #6b7280);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.import-forms-modal-import-btn.dark {
+  background: linear-gradient(to bottom, #60a5fa, #3b82f6);
+}
+
+.import-forms-modal-import-btn.dark:not(:disabled):hover {
+  background: linear-gradient(to bottom, #93c5fd, #60a5fa);
+  box-shadow: 0 4px 6px -1px rgba(96, 165, 250, 0.3);
+}
+
+.import-forms-modal {
+  /* base palette */
+  --bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --stroke: #e5e7eb;
+
+  /* panels & elevations */
+  --panel-from: #ffffff;
+  --panel-to: #f9fafb;
+  --elev-from: #ffffff;
+  --elev-to: #f8fafc;
+  --hover-from: #f9fafb;
+  --hover-to: #f1f5f9;
+
+  /* accent */
+  --accent: #2563eb;
+  --accent-soft-from: #dbeafe;
+  --accent-soft-to: #bfdbfe;
+
+  /* shadows */
+  --shadow-strong: rgba(0, 0, 0, 0.15);
+  --shadow-accent: rgba(37, 99, 235, 0.15);
+
+  color-scheme: light;
+}
+
+/* Dark theme when provided by your ThemeContext */
+.import-forms-modal[data-theme="dark"],
+.import-forms-modal.dark {
+  --bg: #0f172a;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --stroke: #334155;
+
+  --panel-from: #0f172a;
+  --panel-to: #1e293b;
+  --elev-from: #1e293b;
+  --elev-to: #0f172a;
+  --hover-from: #334155;
+  --hover-to: #1e293b;
+
+  --accent: #3b82f6;
+  --accent-soft-from: #1e3a8a;
+  --accent-soft-to: #1e293b;
+
+  --shadow-strong: rgba(0, 0, 0, 0.30);
+  --shadow-accent: rgba(59, 130, 246, 0.20);
+
+  color-scheme: dark;
+}
+
+/* Optional: system preference fallback if you DON'T pass data-theme */
+@media (prefers-color-scheme: dark) {
+  .import-forms-modal:not([data-theme]) {
+    --bg: #0f172a;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --stroke: #334155;
+
+    --panel-from: #0f172a;
+    --panel-to: #1e293b;
+    --elev-from: #1e293b;
+    --elev-to: #0f172a;
+    --hover-from: #334155;
+    --hover-to: #1e293b;
+
+    --accent: #3b82f6;
+    --accent-soft-from: #1e3a8a;
+    --accent-soft-to: #1e293b;
+
+    --shadow-strong: rgba(0, 0, 0, 0.30);
+    --shadow-accent: rgba(59, 130, 246, 0.20);
+
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Modal container ---------- */
+.import-forms-modal {
+  background-color: var(--bg);
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px var(--shadow-strong);
+  overflow: hidden;
+  max-width: 600px !important;
+}
+
+/* ---------- Header ---------- */
+.import-forms-modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--stroke);
+  background: linear-gradient(to bottom, var(--panel-from), var(--panel-to));
+}
+.import-forms-modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.import-forms-modal-description {
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+/* ---------- Body ---------- */
+.import-forms-modal-body {
+  padding: 1rem;
+}
+
+/* Loading + Error */
+.import-forms-modal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.import-forms-modal-loading-icon {
+  margin-right: 0.5rem;
+}
+.import-forms-modal-loading-text {
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  color: var(--text);
+}
+.import-forms-modal-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #fecaca;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);
+}
+/* Dark-tuned error */
+.import-forms-modal[data-theme="dark"] .import-forms-modal-error,
+.import-forms-modal.dark .import-forms-modal-error,
+@media (prefers-color-scheme: dark) {
+  .import-forms-modal:not([data-theme]) .import-forms-modal-error {
+    background-color: #450a0a;
+    color: #fca5a5;
+    border: 1px solid #7f1d1d;
+    box-shadow: 0 1px 3px rgba(127, 29, 29, 0.3);
+  }
+}
+
+/* ---------- Scroll Area ---------- */
+.import-forms-modal-scrollarea {
+  height: 250px;
+  border: 1px solid var(--stroke);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background-color: var(--elev-from);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* ---------- Empty state ---------- */
+.import-forms-modal-empty-state {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--muted);
+}
+
+/* ---------- Form list & item ---------- */
+.import-forms-modal-form-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.import-forms-modal-form-item {
+  padding: 0.75rem;
+  border: 1px solid var(--stroke);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: linear-gradient(to bottom, var(--elev-from), var(--elev-to));
+}
+.import-forms-modal-form-item:hover {
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(to bottom, var(--hover-from), var(--hover-to));
+}
+.import-forms-modal-form-item.selected {
+  border-color: var(--accent);
+  background: linear-gradient(to bottom, var(--accent-soft-from), var(--accent-soft-to));
+  box-shadow: 0 6px 12px -2px var(--shadow-accent);
+}
+
+/* Icon, text, meta */
+.import-forms-modal-form-icon-wrapper {
+  padding: 0.375rem;
+  background: linear-gradient(135deg, var(--accent-soft-from), var(--accent-soft-to));
+  border-radius: 0.5rem;
+  color: var(--accent);
+  box-shadow: 0 1px 3px var(--shadow-accent);
+}
+.import-forms-modal-form-content { flex: 1; min-width: 0; }
+.import-forms-modal-form-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.import-forms-modal-form-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.import-forms-modal-form-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.import-forms-modal-form-id {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: monospace;
+  margin-top: 0.375rem;
+}
+
+/* ---------- Footer + Buttons ---------- */
+.import-forms-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--stroke);
+  background: linear-gradient(to top, var(--panel-to), var(--panel-from));
+}
+
+.import-forms-modal-cancel-btn {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  background: linear-gradient(to bottom, #ffffff, #f3f4f6);
+  border: 1px solid #d1d5db;
+  color: #374151;
+  transition: all 0.2s;
+}
+.import-forms-modal-cancel-btn:hover {
+  background: linear-gradient(to bottom, #f9fafb, #e5e7eb);
+  border-color: #9ca3af;
+}
+/* Dark-tuned cancel */
+.import-forms-modal[data-theme="dark"] .import-forms-modal-cancel-btn,
+.import-forms-modal.dark .import-forms-modal-cancel-btn,
+@media (prefers-color-scheme: dark) {
+  .import-forms-modal:not([data-theme]) .import-forms-modal-cancel-btn {
+    background: linear-gradient(to bottom, #334155, #1e293b);
+    border: 1px solid #475569;
+    color: #e2e8f0;
+  }
+}
+.import-forms-modal[data-theme="dark"] .import-forms-modal-cancel-btn:hover,
+.import-forms-modal.dark .import-forms-modal-cancel-btn:hover,
+@media (prefers-color-scheme: dark) {
+  .import-forms-modal:not([data-theme]) .import-forms-modal-cancel-btn:hover {
+    background: linear-gradient(to bottom, #475569, #334155);
+    border-color: #94a3b8;
+  }
+}
+
+/* Import button uses accent */
+.import-forms-modal-import-btn {
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  background: linear-gradient(to bottom, var(--accent), #1d4ed8);
+  color: #fff;
+  border: none;
+  transition: all 0.2s;
+}
+.import-forms-modal-import-btn:not(:disabled):hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px var(--shadow-accent);
+}
+.import-forms-modal-import-btn:disabled {
+  background: linear-gradient(to bottom, #9ca3af, #6b7280);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }

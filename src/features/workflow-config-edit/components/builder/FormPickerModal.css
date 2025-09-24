@@ -1,0 +1,328 @@
+/* FormPickerModal.css */
+
+.form-picker-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.form-picker-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.form-picker-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-picker-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.form-picker-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-picker-modal-close:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.form-picker-modal-body {
+  padding: 20px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.form-picker-search {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.form-picker-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.form-picker-search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.form-picker-search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-picker-results {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-picker-loading,
+.form-picker-no-results {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.form-picker-results-list {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  max-height: 300px;
+}
+
+.form-picker-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.form-picker-result-item:last-child {
+  border-bottom: none;
+}
+
+.form-picker-result-item:hover {
+  background-color: #f9fafb;
+}
+
+.form-picker-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.form-picker-result-name {
+  font-weight: 500;
+  color: #111827;
+  font-size: 14px;
+}
+
+.form-picker-result-version {
+  font-size: 12px;
+  color: #6b7280;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.form-picker-result-select {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.form-picker-result-select:hover {
+  background-color: #2563eb;
+}
+
+.form-picker-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.form-picker-empty-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.form-picker-empty-state p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.form-picker-modal-footer {
+  padding: 16px 24px 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.form-picker-modal-cancel {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.form-picker-modal-cancel:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .form-picker-modal {
+    background: #1f2937;
+    color: #f9fafb;
+  }
+
+  .form-picker-modal-header {
+    border-bottom-color: #374151;
+  }
+
+  .form-picker-modal-title {
+    color: #f9fafb;
+  }
+
+  .form-picker-modal-close {
+    color: #9ca3af;
+  }
+
+  .form-picker-modal-close:hover {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+
+  .form-picker-search-input {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+  }
+
+  .form-picker-search-input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+  }
+
+  .form-picker-results-list {
+    border-color: #374151;
+    background-color: #374151;
+  }
+
+  .form-picker-result-item {
+    border-bottom-color: #4b5563;
+  }
+
+  .form-picker-result-item:hover {
+    background-color: #4b5563;
+  }
+
+  .form-picker-result-name {
+    color: #f9fafb;
+  }
+
+  .form-picker-result-version {
+    color: #9ca3af;
+  }
+
+  .form-picker-modal-footer {
+    border-top-color: #374151;
+  }
+
+  .form-picker-modal-cancel {
+    border-color: #4b5563;
+    color: #d1d5db;
+    background-color: #374151;
+  }
+
+  .form-picker-modal-cancel:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .form-picker-modal {
+    width: 95vw;
+    max-height: 90vh;
+  }
+
+  .form-picker-modal-header,
+  .form-picker-modal-body,
+  .form-picker-modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

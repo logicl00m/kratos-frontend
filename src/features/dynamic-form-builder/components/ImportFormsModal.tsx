@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, FileJson, Calendar, User } from "lucide-react";
 import { getAllForms } from "@features/workflow-config-edit/services/formsApi";
 import type { Field } from "../types/form-builder.types";
+import { useTheme } from "@/contexts/ThemeContext";
 import "./ImportFormsModal.css";
 
 interface ImportFormsModalProps {
@@ -36,6 +37,7 @@ export function ImportFormsModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedForm, setSelectedForm] = useState<FormData | null>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (isOpen) {
@@ -104,29 +106,36 @@ export function ImportFormsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] import-forms-modal">
+      <DialogContent
+        data-theme={theme}
+        className={`max-h-[70vh] import-forms-modal ${
+          theme === "dark" ? "dark" : ""
+        }`}
+      >
         <DialogHeader className="import-forms-modal-header">
           <DialogTitle className="import-forms-modal-title">
             Import from Existing Forms
           </DialogTitle>
           <DialogDescription className="import-forms-modal-description">
-            Select a form from existing workflows to import its field configuration
+            Select a form from existing workflows to import its field
+            configuration
           </DialogDescription>
         </DialogHeader>
 
         <div className="import-forms-modal-body">
           {loading && (
             <div className="import-forms-modal-loading">
-              <Loader2 className="animate-spin import-forms-modal-loading-icon" size={32} />
-              <span className="import-forms-modal-loading-text">Loading existing forms...</span>
+              <Loader2
+                className="animate-spin import-forms-modal-loading-icon"
+                size={32}
+              />
+              <span className="import-forms-modal-loading-text">
+                Loading existing forms...
+              </span>
             </div>
           )}
 
-          {error && (
-            <div className="import-forms-modal-error">
-              {error}
-            </div>
-          )}
+          {error && <div className="import-forms-modal-error">{error}</div>}
 
           {!loading && !error && (
             <>
@@ -152,7 +161,7 @@ export function ImportFormsModal({
                           key={form.id}
                           onClick={() => setSelectedForm(form)}
                           className={`import-forms-modal-form-item ${
-                            selectedForm?.id === form.id ? 'selected' : ''
+                            selectedForm?.id === form.id ? "selected" : ""
                           }`}
                         >
                           <div className="flex items-start justify-between w-full">
@@ -200,15 +209,15 @@ export function ImportFormsModal({
               </ScrollArea>
 
               <div className="import-forms-modal-footer">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={onClose}
                   className="import-forms-modal-cancel-btn"
                 >
                   Cancel
                 </Button>
-                <Button 
-                  onClick={handleImport} 
+                <Button
+                  onClick={handleImport}
                   disabled={!selectedForm}
                   className="import-forms-modal-import-btn"
                 >

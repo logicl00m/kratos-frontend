@@ -13,7 +13,14 @@ Notes: “Binding type” and “formRef” patterns mirror Camunda form linking
 Docs: https://docs.camunda.io/docs/components/modeler/web-modeler/advanced-modeling/form-linking/
 */
 
-import React, { useState, useCallback, useRef, useEffect, createContext, useContext } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  createContext,
+  useContext,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReactFlow, {
   Controls,
@@ -34,7 +41,7 @@ import ProcessNode from "./ProcessNode";
 import DecisionNode from "./DecisionNode";
 import BuilderDetailsPanel from "./BuilderDetailsPanel";
 import ContextMenu from "./ContextMenu";
-import { FormPickerDialog } from "./FormPickerDialog";
+import { FormPickerModal } from "./FormPickerModal";
 import {
   validateWorkflowWithForms,
   exportToWorkflowJson,
@@ -426,12 +433,16 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
       return;
     }
 
-    const workflowJson = exportToWorkflowJson(nodes, edges, globalForm || undefined);
+    const workflowJson = exportToWorkflowJson(
+      nodes,
+      edges,
+      globalForm || undefined
+    );
     onExport?.(workflowJson);
 
     const blob = new Blob([JSON.stringify(workflowJson, null, 2)], {
       type: "application/json",
-      });
+    });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -481,15 +492,17 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
         <div className="builder-actions">
           {/* Global Form Selector */}
           <div className="global-form-selector">
-            <button 
+            <button
               className="global-form-btn"
               onClick={() => setGlobalFormPickerOpen(true)}
             >
               <FileText size={16} />
-              {globalForm ? `${globalForm.name}@v${globalForm.version}` : "Attach Global Form"}
+              {globalForm
+                ? `${globalForm.name}@v${globalForm.version}`
+                : "Attach Global Form"}
             </button>
             {globalForm && (
-              <button 
+              <button
                 className="clear-global-form"
                 onClick={() => setGlobalForm(null)}
                 title="Remove global form"
@@ -498,8 +511,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
               </button>
             )}
           </div>
-          
-          
+
           <button onClick={handleValidate} className="builder-btn">
             <Play size={16} /> Validate
           </button>
@@ -588,10 +600,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           availablePeople={mockPeople}
         />
 
-        <FormPickerDialog
+        <FormPickerModal
           open={formPickerOpen}
           onClose={() => setFormPickerOpen(false)}
-          onSelect={(form) => {
+          title="Attach Form to Node"
+          placeholder="Search for forms to attach to this node..."
+          onSelect={(form: { id: string; name: string; version: number }) => {
             if (!formPickerNodeId) return;
             setNodes((curr) =>
               curr.map((n) => {
@@ -616,10 +630,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           }}
         />
 
-        <FormPickerDialog
+        <FormPickerModal
           open={globalFormPickerOpen}
           onClose={() => setGlobalFormPickerOpen(false)}
-          onSelect={(form) => {
+          title="Attach Global Form"
+          placeholder="Search for global forms..."
+          onSelect={(form: { id: string; name: string; version: number }) => {
             setGlobalForm({
               id: form.id,
               name: form.name,
@@ -643,7 +659,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
                 {formsCoverage.totalProcessNodes}
                 {globalForm && (
                   <span className="global-form-indicator">
-                    {" "}• Global form: {globalForm.name}@v{globalForm.version}
+                    {" "}
+                    • Global form: {globalForm.name}@v{globalForm.version}
                   </span>
                 )}
               </div>
