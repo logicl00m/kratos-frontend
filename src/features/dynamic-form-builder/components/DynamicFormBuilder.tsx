@@ -13,6 +13,7 @@ Docs: https://www.w3.org/WAI/tutorials/forms/labels/
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Download,
   Upload,
@@ -477,44 +478,52 @@ export function DynamicFormBuilder({
               <span className="dfb__badge">Form builder</span>
               <h1 className="dfb__heading">Dynamic form configuration</h1>
               <div className="dfb__formname-input">
-                <label htmlFor="dfb-form-name">Form name</label>
-                <Input
-                  id="dfb-form-name"
-                  value={formName}
-                  onChange={(event) => setFormName(event.target.value)}
-                  placeholder="applicationCore"
-                  aria-label="Form name"
-                />
-                <span className="dfb__formname-help">
-                  This value becomes the top-level key in exported JSON.
-                </span>
+                <div>
+                  <Label
+                    className="dfb-formname-input__label"
+                    htmlFor="dfb-form-name"
+                  >
+                    Form name
+                  </Label>
+                  <Input
+                    id="dfb-form-name"
+                    value={formName}
+                    onChange={(event) => setFormName(event.target.value)}
+                    placeholder="applicationCore"
+                    aria-label="Form name"
+                    className="dfb-formname-input__input"
+                  />
+                  <p className="dfb-inspector__hint">
+                    This value becomes the top-level key in exported JSON.
+                  </p>
+                </div>
               </div>
             </div>
 
             <div className="dfb__actions">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={() => setIsImportModalOpen(true)}
-                className="dfb__actions-button dfb__actions-button--ghost"
+                className="dfb__actions-button dfb__actions-button--blue"
               >
                 <FileInput size={16} />
                 Import from Existing
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={importJSON}
-                className="dfb__actions-button dfb__actions-button--ghost"
+                className="dfb__actions-button dfb__actions-button--teal"
               >
                 <Upload size={16} />
                 Import JSON
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={exportJSON}
-                className="dfb__actions-button dfb__actions-button--ghost"
+                className="dfb__actions-button dfb__actions-button--amber"
               >
                 <Download size={16} />
                 Export JSON
@@ -523,17 +532,17 @@ export function DynamicFormBuilder({
                 variant="outline"
                 size="sm"
                 onClick={saveConfiguration}
-                className="dfb__actions-button dfb__actions-button--outline"
+                className="dfb__actions-button dfb__actions-button--primary"
               >
                 <Save size={16} />
                 Save
               </Button>
               {onCancel && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                   onClick={onCancel}
-                  className="dfb__actions-button dfb__actions-button--ghost"
+                  className="dfb__actions-button dfb__actions-button--muted"
                 >
                   Cancel
                 </Button>
