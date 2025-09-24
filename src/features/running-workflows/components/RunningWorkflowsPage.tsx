@@ -1,57 +1,24 @@
 // src/features/running-workflows/components/RunningWorkflowsPage.tsx
 
 import React, { useState } from "react";
-import ReactFlow, {
-  Controls,
-  Background,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  type Node,
-} from "reactflow";
+import type { Node } from "reactflow";
 import "reactflow/dist/style.css";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import {
-  RefreshCw,
-  Grid,
-  List,
-  Search,
-  Clock,
-  ArrowRight,
-  CheckCircle,
-  XCircle,
-  X,
-  AlertCircle,
-  FileText,
-  GripVertical,
-} from "lucide-react";
-import RunningStateNode from "./RunningStateNode";
-import RunningWorkflowEdge from "./RunningWorkflowEdge";
-import {
-  parseRunningWorkflowToGraph,
-  getWorkflowStatus,
-  calculateProgress,
-  getAllHistory,
-  getHistoryForState,
-  getWorkflowFormData,
-  getFormDataForState,
-  getWorkflowOwner,
-} from "../utils/runningWorkflowParser";
+import { AlertCircle, GripVertical } from "lucide-react";
 import { useRunningWorkflows } from "@/lib/hooks/useApiWithFallback";
 import type {
   WorkflowData,
   WorkflowDataWrapper,
 } from "../types/runningWorkflow.types";
+import { getWorkflowStatus, getWorkflowOwner } from "../utils/runningWorkflowParser";
+
+// Import modular components
+import WorkflowSidebar from "./WorkflowSidebar";
+import WorkflowToolbar from "./WorkflowToolbar";
+import WorkflowGraphView from "./WorkflowGraphView";
+import WorkflowListView from "./WorkflowListView";
+import WorkflowDetailPanel from "./WorkflowDetailPanel";
 import "./RunningWorkflowsPage.css";
-
-const nodeTypes = {
-  runningStateNode: RunningStateNode,
-};
-
-const edgeTypes = {
-  default: RunningWorkflowEdge,
-  smoothstep: RunningWorkflowEdge,
-};
 
 interface RunningWorkflowsPageProps {
   onBack?: () => void;
@@ -80,25 +47,12 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
       setSelectedWorkflow(allWorkflows[0]);
     }
   }, [allWorkflows, selectedWorkflow]);
+
   const [viewMode, setViewMode] = useState<"graph" | "list">("graph");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [showDetailPanel, setShowDetailPanel] = useState(true);
-
-  const { nodes: graphNodes, edges: graphEdges } = React.useMemo(() => {
-    return selectedWorkflow
-      ? parseRunningWorkflowToGraph(selectedWorkflow)
-      : { nodes: [], edges: [] };
-  }, [selectedWorkflow]);
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(graphNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(graphEdges);
-
-  React.useEffect(() => {
-    setNodes(graphNodes);
-    setEdges(graphEdges);
-  }, [graphNodes, graphEdges, setNodes, setEdges]);
 
   const lowerSearchTerm = searchTerm.toLowerCase();
 
@@ -128,54 +82,6 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
   const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
     setSelectedNodeId(node.id);
     if (!showDetailPanel) setShowDetailPanel(true);
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatDisplayValue = (value: unknown): string => {
-    if (Array.isArray(value)) {
-      return value
-        .map((item) => {
-          if (item && typeof item === "object" && "name" in item) {
-            return (item as { name?: string }).name || String(item);
-          }
-          return String(item ?? "");
-        })
-        .join(", ");
-    }
-    if (value && typeof value === "object") {
-      return JSON.stringify(value);
-    }
-    if (value == null) return "";
-    if (
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean"
-    ) {
-      return String(value);
-    }
-    // Fallback to JSON for other types to avoid [object Object]
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return "[unserializable]";
-    }
-  };
-
-  const getActionIcon = (actionText: string) => {
-    const lower = actionText.toLowerCase();
-    if (lower.includes("approve"))
-      return <CheckCircle size={16} className="success" />;
-    if (lower.includes("reject"))
-      return <XCircle size={16} className="danger" />;
-    return <ArrowRight size={16} />;
   };
 
   // Show loading state
@@ -210,54 +116,14 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
       )}
 
       {/* Header Controls */}
-      <div className="rwp-toolbar">
-        <div className="rwp-toolbar-left">
-          <div className="rwp-search-box">
-            <Search size={16} className="rwp-search-icon" />
-            <input
-              type="text"
-              placeholder="Search workflows..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="rwp-search-input"
-            />
-          </div>
-          <select
-            className="rwp-filter-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-          </select>
-        </div>
-
-        <div className="rwp-toolbar-right">
-          <div className="rwp-view-toggle">
-            <button
-              className={viewMode === "graph" ? "active" : ""}
-              onClick={() => setViewMode("graph")}
-              title="Graph View"
-            >
-              <Grid size={16} />
-            </button>
-            <button
-              className={viewMode === "list" ? "active" : ""}
-              onClick={() => setViewMode("list")}
-              title="List View"
-            >
-              <List size={16} />
-            </button>
-          </div>
-          <button className="rwp-refresh-btn">
-            <RefreshCw size={16} />
-            <span>Refresh</span>
-          </button>
-        </div>
-      </div>
+      <WorkflowToolbar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
       {/* Main Content with Resizable Panels */}
       <div className="rwp-content">
@@ -269,61 +135,11 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
             maxSize={30}
             className="rwp-panel-left running-workflows-page__list"
           >
-            <div className="rwp-sidebar">
-              <div className="rwp-sidebar-header">
-                <span className="rwp-sidebar-title">Workflow Instances</span>
-                <span className="rwp-sidebar-badge">
-                  {filteredWorkflows.length}
-                </span>
-              </div>
-
-              <div className="rwp-sidebar-list">
-                {filteredWorkflows.map((workflow) => {
-                  const statusInfo = getWorkflowStatus(workflow);
-                  const progress = calculateProgress(workflow);
-                  const owner = getWorkflowOwner(workflow);
-                  const isSelected =
-                    selectedWorkflow?.workflow.id === workflow.workflow.id;
-
-                  return (
-                    <button
-                      key={workflow.workflow.id}
-                      className={`rwp-workflow-card ${
-                        isSelected ? "selected" : ""
-                      }`}
-                      onClick={() => handleWorkflowSelect(workflow)}
-                    >
-                      <div className="rwp-card-header">
-                        <span className="rwp-card-id">
-                          {workflow.workflow.id}
-                        </span>
-                        <span
-                          className={`rwp-card-status ${statusInfo.status}`}
-                        >
-                          {statusInfo.label}
-                        </span>
-                      </div>
-
-                      <div className="rwp-card-info">
-                        <span className="rwp-card-state">
-                          {workflow.workflow.currentState}
-                        </span>
-                        <span className="rwp-card-owner">
-                          {owner?.employeeName || "Unassigned"}
-                        </span>
-                      </div>
-
-                      <div className="rwp-card-progress">
-                        <div
-                          className="rwp-progress-fill"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <WorkflowSidebar
+              workflows={filteredWorkflows}
+              selectedWorkflow={selectedWorkflow}
+              onWorkflowSelect={handleWorkflowSelect}
+            />
           </Panel>
 
           <PanelResizeHandle className="rwp-resize-handle">
@@ -351,96 +167,19 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
               {(() => {
                 if (viewMode === "graph" && selectedWorkflow) {
                   return (
-                    <div className="reactflow-wrapper rwp-graph-container">
-                      <ReactFlow
-                        nodes={nodes}
-                        edges={edges}
-                        onNodesChange={onNodesChange}
-                        onEdgesChange={onEdgesChange}
-                        onNodeClick={handleNodeClick}
-                        nodeTypes={nodeTypes}
-                        edgeTypes={edgeTypes}
-                        fitView
-                        fitViewOptions={{ padding: 0.2 }}
-                        proOptions={{ hideAttribution: true }}
-                        nodesConnectable={false}
-                      >
-                        <Background
-                          gap={16}
-                          size={1}
-                          color="rgba(99, 102, 241, 0.03)"
-                        />
-                        <Controls className="rwp-controls" />
-                        <MiniMap className="rwp-minimap" zoomable pannable />
-                      </ReactFlow>
-                    </div>
+                    <WorkflowGraphView
+                      workflow={selectedWorkflow}
+                      onNodeClick={handleNodeClick}
+                    />
                   );
                 }
                 if (viewMode === "list") {
                   return (
-                    <div className="rwp-list-container">
-                      <table className="rwp-table">
-                        <thead>
-                          <tr>
-                            <th>ID</th>
-                            <th>Status</th>
-                            <th>Current State</th>
-                            <th>Owner</th>
-                            <th>Last Updated</th>
-                            <th>Progress</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredWorkflows.map((workflow) => {
-                            const statusInfo = getWorkflowStatus(workflow);
-                            const progress = calculateProgress(workflow);
-                            const owner = getWorkflowOwner(workflow);
-
-                            return (
-                              <tr
-                                key={workflow.workflow.id}
-                                onClick={() => handleWorkflowSelect(workflow)}
-                                className={
-                                  selectedWorkflow?.workflow.id ===
-                                  workflow.workflow.id
-                                    ? "selected"
-                                    : ""
-                                }
-                              >
-                                <td className="rwp-table-id">
-                                  {workflow.workflow.id}
-                                </td>
-                                <td>
-                                  <span
-                                    className={`rwp-table-status ${statusInfo.status}`}
-                                  >
-                                    {statusInfo.label}
-                                  </span>
-                                </td>
-                                <td>{workflow.workflow.currentState}</td>
-                                <td>{owner?.employeeName || "Unassigned"}</td>
-                                <td>
-                                  {formatDate(
-                                    workflow.workflow.currentStateEnteredAt
-                                  )}
-                                </td>
-                                <td>
-                                  <div className="rwp-table-progress">
-                                    <div className="rwp-table-progress-bar">
-                                      <div
-                                        className="rwp-table-progress-fill"
-                                        style={{ width: `${progress}%` }}
-                                      />
-                                    </div>
-                                    <span>{progress}%</span>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                    <WorkflowListView
+                      workflows={filteredWorkflows}
+                      selectedWorkflow={selectedWorkflow}
+                      onWorkflowSelect={handleWorkflowSelect}
+                    />
                   );
                 }
                 return (
@@ -466,98 +205,11 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
                 maxSize={40}
                 className="rwp-panel-right running-workflows-page__details"
               >
-                <div className="rwp-detail-panel running-workflow-detail">
-                  <div className="rwp-detail-header">
-                    <h3 className="rwp-detail-title">
-                      {selectedNodeId
-                        ? `State: ${selectedNodeId}`
-                        : "Workflow Details"}
-                    </h3>
-                    <button
-                      className="rwp-detail-close"
-                      onClick={() => setShowDetailPanel(false)}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-
-                  <div className="rwp-detail-body">
-                    {selectedWorkflow && (
-                      <>
-                        {/* Action History */}
-                        <div className="rwp-detail-section">
-                          <h4 className="rwp-section-title">
-                            <Clock size={14} />
-                            Action History
-                          </h4>
-                          <div className="rwp-history-list">
-                            {(selectedNodeId
-                              ? getHistoryForState(
-                                  selectedWorkflow,
-                                  selectedNodeId
-                                )
-                              : getAllHistory(selectedWorkflow)
-                            )
-                              .slice(0, 5)
-                              .map((action) => (
-                                <div
-                                  key={action.id}
-                                  className="rwp-history-item"
-                                >
-                                  <div className="rwp-history-icon">
-                                    {getActionIcon(action.action)}
-                                  </div>
-                                  <div className="rwp-history-content">
-                                    <div className="rwp-history-action">
-                                      {action.action}
-                                    </div>
-                                    <div className="rwp-history-meta">
-                                      <span>{action.byUser.name}</span>
-                                      <span>{formatDate(action.at)}</span>
-                                    </div>
-                                    {action.stateTo && (
-                                      <div className="rwp-history-state">
-                                        → {action.stateTo}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-
-                        {/* Current Data */}
-                        <div className="rwp-detail-section">
-                          <h4 className="rwp-section-title">
-                            <FileText size={14} />
-                            Current Data
-                          </h4>
-                          <div className="rwp-data-grid">
-                            {Object.entries(
-                              selectedNodeId
-                                ? getFormDataForState(
-                                    selectedWorkflow,
-                                    selectedNodeId
-                                  )
-                                : getWorkflowFormData(selectedWorkflow)
-                            )
-                              .slice(0, 6)
-                              .map(([key, value]) => (
-                                <div key={key} className="rwp-data-item">
-                                  <span className="rwp-data-label">
-                                    {key.replace(/([A-Z])/g, " $1").trim()}
-                                  </span>
-                                  <span className="rwp-data-value">
-                                    {formatDisplayValue(value)}
-                                  </span>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <WorkflowDetailPanel
+                  workflow={selectedWorkflow}
+                  selectedNodeId={selectedNodeId}
+                  onClose={() => setShowDetailPanel(false)}
+                />
               </Panel>
             </>
           )}
