@@ -7,6 +7,7 @@ import type {
   DecisionNodeData,
   Person,
 } from "@features/workflow-config-edit/types/builder.types";
+import { useTheme } from "@/contexts/ThemeContext";
 
 import { StateInfoSection } from "./StateInfoSection";
 import { AssigneesSection } from "./AssigneesSection";
@@ -46,7 +47,7 @@ export const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
   const isDecisionNode = selectedNode?.type === "decision";
 
   // Prefetch forms when the panel opens for a process node (mirrors FormPickerModal behavior)
-    React.useEffect(() => {
+  React.useEffect(() => {
     let cancelled = false;
     if (selectedNode && isProcessNode) {
       (async () => {
@@ -56,7 +57,10 @@ export const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
         } catch (err) {
           if (!cancelled) {
             // log but don't block UI
-            console.warn('Prefetching forms failed in BuilderDetailsPanel:', err);
+            console.warn(
+              "Prefetching forms failed in BuilderDetailsPanel:",
+              err
+            );
           }
         }
       })();

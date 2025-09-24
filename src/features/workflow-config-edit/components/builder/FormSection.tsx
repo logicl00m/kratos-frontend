@@ -36,7 +36,9 @@ export const FormSection: React.FC<FormSectionProps> = ({
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   // Cache of normalized forms fetched when dropdown opens
-  const [allForms, setAllForms] = useState<Array<{ id: string; name: string; version: number }>>([]);
+  const [allForms, setAllForms] = useState<
+    Array<{ id: string; name: string; version: number }>
+  >([]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -78,7 +80,9 @@ export const FormSection: React.FC<FormSectionProps> = ({
         const source = allForms.length > 0 ? allForms : [];
         if (searchQuery.trim()) {
           const q = searchQuery.trim().toLowerCase();
-          const filtered = source.filter((s) => s.name.toLowerCase().includes(q));
+          const filtered = source.filter((s) =>
+            s.name.toLowerCase().includes(q)
+          );
           if (!cancelled) setForms(filtered);
         } else {
           if (!cancelled) setForms(source);

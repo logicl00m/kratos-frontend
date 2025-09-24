@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTheme } from "../../../../contexts/ThemeContext";
 import { Users, UserPlus, X, Search } from "lucide-react";
 import type { Person } from "@features/workflow-config-edit/types/builder.types";
 import "./AssigneesSection.css";
@@ -16,6 +17,7 @@ export const AssigneesSection: React.FC<AssigneesSectionProps> = ({
   onAdd,
   onRemove,
 }) => {
+  const { theme } = useTheme();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
@@ -42,14 +44,14 @@ export const AssigneesSection: React.FC<AssigneesSectionProps> = ({
   );
 
   return (
-    <div className="assignees-section">
+    <div className={`assignees-section ${theme === "dark" ? "dark" : ""}`}>
       <div className="section-header">
-        <h4 className="section-title">
+        <h4 className={`section-title ${theme === "dark" ? "dark" : ""}`}>
           <Users size={14} />
           <span>Assignees</span>
         </h4>
         <button
-          className="add-btn"
+          className={`add-btn ${theme === "dark" ? "dark" : ""}`}
           onClick={() => setIsSearching(true)}
           title="Add assignee"
         >
