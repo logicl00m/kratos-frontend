@@ -85,7 +85,7 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
   if (!instance) return null;
 
   return (
-    <div className="running-detail-panel">
+    <div className="running-detail-panel running-workflow-detail">
       <div className="rdp-header">
         <div>
           <h3 className="rdp-title">{instance.id}</h3>
@@ -125,16 +125,22 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Created</span>
-              <span className="rdp-value">{formatDate(instance.createdAt)}</span>
+              <span className="rdp-value">
+                {formatDate(instance.createdAt)}
+              </span>
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Last Updated</span>
-              <span className="rdp-value">{formatDate(instance.updatedAt)}</span>
+              <span className="rdp-value">
+                {formatDate(instance.updatedAt)}
+              </span>
             </div>
             <div className="rdp-info-item">
               <span className="rdp-label">Due Date</span>
               <span className="rdp-value">
-                {instance.dueDate ? formatDate(instance.dueDate) : "No deadline"}
+                {instance.dueDate
+                  ? formatDate(instance.dueDate)
+                  : "No deadline"}
               </span>
             </div>
           </div>
@@ -251,10 +257,13 @@ const RunningWorkflowDetailPanel: React.FC<RunningWorkflowDetailPanelProps> = ({
                       {item.changes.map((change) => {
                         const key =
                           change.fieldId ||
-                          `${change.fieldName || "change"}-${change.changeType}`;
+                          `${change.fieldName || "change"}-${
+                            change.changeType
+                          }`;
                         return (
                           <div key={key}>
-                            - {change.fieldName || change.fieldId}: {change.changeType.toLowerCase()}
+                            - {change.fieldName || change.fieldId}:{" "}
+                            {change.changeType.toLowerCase()}
                           </div>
                         );
                       })}

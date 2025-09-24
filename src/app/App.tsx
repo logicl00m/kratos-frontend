@@ -7,7 +7,6 @@ import RunningWorkflowsPage from "@features/running-workflows/components/Running
 import WorkflowBuilder from "@features/workflow-config-edit/components/builder/WorkflowBuilder";
 import FormBuilderPage from "@features/dynamic-form-builder/FormBuilderPage";
 import CreateWorkflow from "@features/workflow-templates/components/CreateWorkflow";
-import WorkflowInitiation from "@features/workflow-initiation/components/WorkflowInitiation";
 import WorkflowGraph from "@features/workflow/components/WorkflowGraph";
 import JsonEditor from "@features/workflow/components/JsonEditor";
 import {
@@ -37,7 +36,6 @@ function App() {
     const map: Record<string, string> = {
       dashboard: "/dashboard",
       "create-workflow": "/create-workflow",
-      "initiate-workflow": "/initiate-workflow",
       running: "/running",
       builder: "/builder",
       "form-builder": "/form-builder/new",
@@ -86,11 +84,7 @@ function App() {
     </MainLayout>
   );
 
-  const InitiateWorkflowPage = (
-    <MainLayout title="Initiate Workflow" onNavigate={handleNavigation}>
-      <WorkflowInitiation onBack={() => navigate("/dashboard")} />
-    </MainLayout>
-  );
+  
 
   const FormBuilderRoute = (
     <MainLayout title="Form Builder" onNavigate={handleNavigation}>
@@ -203,7 +197,7 @@ function App() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={DashboardPage} />
       <Route path="/create-workflow" element={CreateWorkflowPage} />
-      <Route path="/initiate-workflow" element={InitiateWorkflowPage} />
+      
       <Route path="/running" element={RunningPage} />
       <Route path="/builder" element={WorkflowBuilderPage} />
       <Route path="/form-builder/new" element={FormBuilderRoute} />

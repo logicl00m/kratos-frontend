@@ -49,6 +49,64 @@
 .builder-actions {
   display: flex;
   gap: 12px;
+  align-items: center;
+}
+
+.global-form-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.global-form-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d0d7e6;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark .global-form-btn {
+  border: 1px solid rgba(46, 52, 71, 0.9);
+  background: rgba(18, 18, 25, 0.94);
+  color: #f1f5f9;
+}
+
+.global-form-btn:hover {
+  background: rgba(243, 244, 246, 0.94);
+  transform: translateY(-1px);
+}
+
+.dark .global-form-btn:hover {
+  background: rgba(30, 30, 40, 0.94);
+}
+
+.clear-global-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: #ef4444;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-global-form:hover {
+  background: #dc2626;
+  transform: scale(1.1);
 }
 
 .builder-btn {
@@ -197,106 +255,133 @@
 
 .validation-panel {
   position: absolute;
-  bottom: 24px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  min-width: 320px;
-  max-width: 440px;
-  border-radius: 18px;
-  border: 1px solid rgba(208, 215, 230, 0.9);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 26px 48px rgba(15, 23, 42, 0.2);
-  overflow: hidden;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: 90%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  border: 1px solid #e2e8f0;
 }
 
 .dark .validation-panel {
-  border: 1px solid rgba(46, 52, 71, 0.9);
-  background: rgba(18, 18, 25, 0.98);
-  box-shadow: 0 26px 48px rgba(15, 23, 42, 0.3);
+  background: #1e293b;
+  border: 1px solid #334155;
 }
 
 .validation-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(208, 215, 230, 0.85);
+  border-bottom: 1px solid #e2e8f0;
   font-weight: 600;
-  font-size: 14px;
+  color: #0f172a;
 }
 
 .dark .validation-header {
-  border-bottom: 1px solid rgba(46, 52, 71, 0.85);
+  border-bottom: 1px solid #334155;
   color: #f1f5f9;
 }
 
 .validation-header button {
   margin-left: auto;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: rgba(226, 232, 240, 0.7);
-  color: #475569;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: white;
+  color: #64748b;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .dark .validation-header button {
-  background: rgba(55, 65, 81, 0.7);
-  color: #cbd5e1;
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #94a3b8;
 }
 
-.validation-header button:hover {
-  background: rgba(99, 102, 241, 0.2);
-  color: #4338ca;
+.validation-body {
+  padding: 20px;
 }
 
-.dark .validation-header button:hover {
-  background: rgba(129, 140, 248, 0.2);
-  color: #818cf8;
+.coverage-row {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
 }
 
-.validation-errors {
-  margin: 0;
-  padding: 16px 20px;
-  list-style: none;
-  display: grid;
-  gap: 10px;
-}
-
-.dark .validation-errors {
+.dark .coverage-row {
+  background: #1e293b;
   color: #f1f5f9;
 }
 
+.global-form-indicator {
+  font-size: 12px;
+  color: #64748b;
+  font-style: italic;
+}
+
+.dark .global-form-indicator {
+  color: #94a3b8;
+}
+
+.validation-errors,
+.validation-warnings {
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.validation-errors li,
+.validation-warnings li {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
 .validation-errors li {
-  position: relative;
-  padding-left: 18px;
-  color: #dc2626;
-  font-size: 13px;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
 .dark .validation-errors li {
-  color: #f87171;
+  background: #7f1d1d;
+  color: #fecaca;
+  border: 1px solid #b91c1c;
 }
 
-.validation-errors li::before {
-  content: "-";
-  position: absolute;
-  left: 4px;
-  top: 0;
+.validation-warnings li {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fed7aa;
+}
+
+.dark .validation-warnings li {
+  background: #713f12;
+  color: #fed7aa;
+  border: 1px solid #b45309;
 }
 
 .validation-success {
-  padding: 18px 20px;
+  padding: 16px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
   text-align: center;
-  color: #047857;
-  font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .dark .validation-success {
-  color: #34d399;
+  background: #14532d;
+  color: #bbf7d0;
 }
 
 .react-flow__node {

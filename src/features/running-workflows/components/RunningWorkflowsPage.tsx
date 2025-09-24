@@ -198,7 +198,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
   }
 
   return (
-    <div className="rwp-container">
+    <div className="rwp-container running-workflows-page">
       {/* Show data source indicator */}
       {workflowsUsingFallback && (
         <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
@@ -267,7 +267,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
             defaultSize={20}
             minSize={15}
             maxSize={30}
-            className="rwp-panel-left"
+            className="rwp-panel-left running-workflows-page__list"
           >
             <div className="rwp-sidebar">
               <div className="rwp-sidebar-header">
@@ -333,7 +333,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
           {/* Center Canvas */}
           <Panel
             defaultSize={showDetailPanel ? 50 : 80}
-            className="rwp-panel-center"
+            className="rwp-panel-center running-workflows-page__graph"
           >
             <div className="rwp-main">
               {selectedWorkflow && (
@@ -351,7 +351,7 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
               {(() => {
                 if (viewMode === "graph" && selectedWorkflow) {
                   return (
-                    <div className="rwp-graph-container">
+                    <div className="reactflow-wrapper rwp-graph-container">
                       <ReactFlow
                         nodes={nodes}
                         edges={edges}
@@ -464,9 +464,9 @@ const RunningWorkflowsPage: React.FC<RunningWorkflowsPageProps> = () => {
                 defaultSize={30}
                 minSize={20}
                 maxSize={40}
-                className="rwp-panel-right"
+                className="rwp-panel-right running-workflows-page__details"
               >
-                <div className="rwp-detail-panel">
+                <div className="rwp-detail-panel running-workflow-detail">
                   <div className="rwp-detail-header">
                     <h3 className="rwp-detail-title">
                       {selectedNodeId

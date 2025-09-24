@@ -13,8 +13,7 @@ Notes: “Binding type” and “formRef” patterns mirror Camunda form linking
 Docs: https://docs.camunda.io/docs/components/modeler/web-modeler/advanced-modeling/form-linking/
 */
 
-// src/features/workflow-config-edit/components/builder/WorkflowBuilder.tsx
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, createContext, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ReactFlow, {
   Controls,
@@ -30,7 +29,7 @@ import ReactFlow, {
 } from "reactflow";
 import type { Connection, Node, Edge } from "reactflow";
 import "reactflow/dist/style.css";
-import { Plus, Download, Play, AlertCircle } from "lucide-react";
+import { Plus, Download, Play, AlertCircle, FileText } from "lucide-react";
 import ProcessNode from "./ProcessNode";
 import DecisionNode from "./DecisionNode";
 import BuilderDetailsPanel from "./BuilderDetailsPanel";
@@ -46,11 +45,18 @@ import type {
   ProcessNodeData,
   DecisionNodeData,
   Person,
+  FormRef,
 } from "@features/workflow-config-edit/types/builder.types";
 import "./WorkflowBuilder.css";
 
+// Create context for global form
+const GlobalFormContext = createContext<FormRef | null>(null);
+
 const nodeTypes = {
-  process: ProcessNode,
+  process: (props: any) => {
+    const globalForm = useContext(GlobalFormContext);
+    return <ProcessNode {...props} globalForm={globalForm} />;
+  },
   decision: DecisionNode,
 };
 
@@ -153,6 +159,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
   const [showValidation, setShowValidation] = useState(false);
   const [formPickerOpen, setFormPickerOpen] = useState(false);
   const [formPickerNodeId, setFormPickerNodeId] = useState<string | null>(null);
+  const [globalForm, setGlobalForm] = useState<FormRef | null>(null);
+  const [globalFormPickerOpen, setGlobalFormPickerOpen] = useState(false);
 
   // keep ref in sync for event handlers
   useEffect(() => {
@@ -394,7 +402,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
   const handleValidate = () => {
     const { errors, warnings, coverage } = validateWorkflowWithForms(
       nodes,
-      edges
+      edges,
+      globalForm || undefined
     );
     setValidationErrors(errors);
     setValidationWarnings(warnings);
@@ -405,7 +414,8 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
   const handleExport = () => {
     const { errors, warnings, coverage } = validateWorkflowWithForms(
       nodes,
-      edges
+      edges,
+      globalForm || undefined
     );
     setValidationErrors(errors);
     setValidationWarnings(warnings);
@@ -416,12 +426,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
       return;
     }
 
-    const workflowJson = exportToWorkflowJson(nodes, edges);
+    const workflowJson = exportToWorkflowJson(nodes, edges, globalForm || undefined);
     onExport?.(workflowJson);
 
     const blob = new Blob([JSON.stringify(workflowJson, null, 2)], {
       type: "application/json",
-    });
+      });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -469,11 +479,27 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
       <div className="builder-header">
         <div className="builder-title">Workflow Builder</div>
         <div className="builder-actions">
-          {onBack && (
-            <button onClick={onBack} className="builder-btn">
-              Back to Dashboard
+          {/* Global Form Selector */}
+          <div className="global-form-selector">
+            <button 
+              className="global-form-btn"
+              onClick={() => setGlobalFormPickerOpen(true)}
+            >
+              <FileText size={16} />
+              {globalForm ? `${globalForm.name}@v${globalForm.version}` : "Attach Global Form"}
             </button>
-          )}
+            {globalForm && (
+              <button 
+                className="clear-global-form"
+                onClick={() => setGlobalForm(null)}
+                title="Remove global form"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          
+          
           <button onClick={handleValidate} className="builder-btn">
             <Play size={16} /> Validate
           </button>
@@ -500,26 +526,28 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           fitView
           proOptions={{ hideAttribution: true }}
         >
-          <Background gap={12} size={1} />
-          <Controls />
-          <MiniMap style={{ height: 100, width: 140 }} zoomable pannable />
+          <GlobalFormContext.Provider value={globalForm}>
+            <Background gap={12} size={1} />
+            <Controls />
+            <MiniMap style={{ height: 100, width: 140 }} zoomable pannable />
 
-          <Panel position="top-left">
-            <div className="node-palette">
-              <button onClick={addProcessNode} className="node-btn">
-                <div className="node-icon process">
-                  <Plus size={14} />
-                </div>
-                <span>Process</span>
-              </button>
-              <button onClick={addDecisionNode} className="node-btn">
-                <div className="node-icon decision">
-                  <Plus size={14} />
-                </div>
-                <span>Decision</span>
-              </button>
-            </div>
-          </Panel>
+            <Panel position="top-left">
+              <div className="node-palette">
+                <button onClick={addProcessNode} className="node-btn">
+                  <div className="node-icon process">
+                    <Plus size={14} />
+                  </div>
+                  <span>Process</span>
+                </button>
+                <button onClick={addDecisionNode} className="node-btn">
+                  <div className="node-icon decision">
+                    <Plus size={14} />
+                  </div>
+                  <span>Decision</span>
+                </button>
+              </div>
+            </Panel>
+          </GlobalFormContext.Provider>
         </ReactFlow>
 
         {contextMenu && (
@@ -588,6 +616,20 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           }}
         />
 
+        <FormPickerDialog
+          open={globalFormPickerOpen}
+          onClose={() => setGlobalFormPickerOpen(false)}
+          onSelect={(form) => {
+            setGlobalForm({
+              id: form.id,
+              name: form.name,
+              version: form.version,
+              binding: "pinned",
+            });
+            setGlobalFormPickerOpen(false);
+          }}
+        />
+
         {showValidation && (
           <div className="validation-panel">
             <div className="validation-header">
@@ -599,6 +641,11 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
               <div className="coverage-row" aria-live="polite">
                 Forms coverage: {formsCoverage.withForms}/
                 {formsCoverage.totalProcessNodes}
+                {globalForm && (
+                  <span className="global-form-indicator">
+                    {" "}• Global form: {globalForm.name}@v{globalForm.version}
+                  </span>
+                )}
               </div>
               {validationErrors.length > 0 && (
                 <ul className="validation-errors">

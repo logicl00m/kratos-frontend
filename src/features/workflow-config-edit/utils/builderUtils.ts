@@ -5,6 +5,7 @@ import type {
   DecisionNodeData,
   WorkflowBuilderConfig,
   WorkflowValidationResult,
+  FormRef,
 } from "@features/workflow-config-edit/types/builder.types";
 import { selectFormsCoverage } from "@features/workflow-config-edit/state/workflowSelectors";
 
@@ -62,21 +63,22 @@ export function validateWorkflow(
 
 export function validateWorkflowWithForms(
   nodes: Node<BuilderNodeData>[],
-  edges: Edge<unknown>[]
+  edges: Edge<unknown>[],
+  globalForm?: FormRef
 ): WorkflowValidationResult {
   const baseErrors = validateWorkflow(nodes, edges);
-  const { withForms, total } = selectFormsCoverage(nodes);
+  const { withForms, total } = selectFormsCoverage(nodes, globalForm);
 
   const errors = [...baseErrors];
   const warnings: string[] = [];
 
-  // Each process node must have a form
+  // Each process node must have a form, unless a global form is provided
   nodes.forEach((node) => {
     if (node.type === 'process') {
       const data = node.data as ProcessNodeData;
-      if (!data.form) {
+      if (!data.form && !globalForm) {
         errors.push(`${data.label ?? node.id} has no form attached`);
-      } else if (data.form.binding === 'latest') {
+      } else if (data.form?.binding === 'latest' || (globalForm?.binding === 'latest' && !data.form)) {
         warnings.push(`${data.label ?? node.id} tracks latest; builds may be non-deterministic`);
       }
     }
@@ -96,7 +98,8 @@ export function validateWorkflowWithForms(
  */
 export function exportToWorkflowJson(
   nodes: Node<BuilderNodeData>[],
-  edges: Edge<unknown>[]
+  edges: Edge<unknown>[],
+  globalForm?: FormRef
 ): WorkflowBuilderConfig {
   const states: WorkflowBuilderConfig["workflow"]["states"] = {};
 
@@ -156,6 +159,7 @@ export function exportToWorkflowJson(
     forms: {},
     states,
     startState: nodes[0]?.id,
+    globalForm, // Add global form to exported workflow
   };
 
   return { workflow };

@@ -98,6 +98,7 @@ export interface WorkflowBuilderConfig {
       }>;
     }>;
     startState?: string;
+    globalForm?: FormRef; // Global form that applies to all process nodes
   };
 }
 
