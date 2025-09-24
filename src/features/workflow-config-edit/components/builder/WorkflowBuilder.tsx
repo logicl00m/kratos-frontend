@@ -55,6 +55,8 @@ import type {
   FormRef,
 } from "@features/workflow-config-edit/types/builder.types";
 import "./WorkflowBuilder.css";
+import { Save } from "lucide-react";
+import { saveConfiguration } from "@features/workflow-config-edit/services/configurationService";
 
 // Create context for global form
 const GlobalFormContext = createContext<FormRef | null>(null);
@@ -451,6 +453,35 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const handleSave = async () => {
+    const { errors } = validateWorkflowWithForms(
+      nodes,
+      edges,
+      globalForm || undefined
+    );
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setShowValidation(true);
+      return;
+    }
+
+    try {
+      const workflowJson = exportToWorkflowJson(
+        nodes,
+        edges,
+        globalForm || undefined
+      );
+      await saveConfiguration(workflowJson);
+
+      // Show success notification (add a toast state if you want)
+      alert("Workflow saved successfully!");
+    } catch (error) {
+      console.error("Failed to save workflow:", error);
+      alert("Failed to save workflow. Please try again.");
+    }
+  };
+
   const handleAssignPeople = (nodeId: string) => {
     const node = nodes.find((n) => n.id === nodeId);
     if (!node) return;
@@ -515,6 +546,12 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({
           <button onClick={handleValidate} className="builder-btn">
             <Play size={16} /> Validate
           </button>
+
+          {/* Add Save button here */}
+          <button onClick={handleSave} className="builder-btn secondary">
+            <Save size={16} /> Save
+          </button>
+
           <button onClick={handleExport} className="builder-btn primary">
             <Download size={16} /> Export
           </button>

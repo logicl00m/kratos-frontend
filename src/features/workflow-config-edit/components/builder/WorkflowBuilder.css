@@ -428,3 +428,12 @@
 .dark .react-flow__handle-valid {
   background: #34d399;
 }
+
+.builder-btn.secondary {
+  background-color: #6366f1;
+  color: white;
+}
+
+.builder-btn.secondary:hover {
+  background-color: #5558e3;
+} 
