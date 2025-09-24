@@ -7,9 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Workflow, ArrowRight } from "lucide-react";
+import "./CreateWorkflowModal.css";
 
 interface CreateWorkflowModalProps {
   isOpen: boolean;
@@ -36,19 +36,19 @@ const ActionCard: React.FC<ActionCardProps> = ({
       className="w-full p-0 bg-transparent border-0 outline-none"
       onClick={onClick}
     >
-      <Card className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 hover:border-primary/20 group w-full h-full">
-        <CardHeader className="text-center pb-4">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+      <div className="create-workflow-action-card w-full h-full">
+        <div className="create-workflow-action-card-header">
+          <div className="create-workflow-icon-wrapper">
             {icon}
           </div>
-          <h3 className="text-xl font-semibold text-foreground">{title}</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <h3 className="create-workflow-action-card-title">{title}</h3>
+          <p className="create-workflow-action-card-description">
             {description}
           </p>
-        </CardHeader>
-        <CardContent className="pt-0">
+        </div>
+        <div className="create-workflow-action-card-content pt-0">
           <Button 
-            className="w-full group-hover:bg-primary/90" 
+            className="create-workflow-action-button" 
             size="lg"
             onClick={(e) => {
               e.stopPropagation();
@@ -58,8 +58,8 @@ const ActionCard: React.FC<ActionCardProps> = ({
             {buttonText}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </button>
   );
 };
@@ -83,23 +83,23 @@ const CreateWorkflowModal: React.FC<CreateWorkflowModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="sm:max-w-4xl max-w-[95vw] p-0 overflow-hidden"
+        className="create-workflow-modal-content sm:max-w-4xl max-w-[95vw] p-0 overflow-hidden"
         onOpenAutoFocus={(e) => {
           // Focus will be set to the first action card
           e.preventDefault();
         }}
       >
-        <DialogHeader className="p-6 pb-4 text-center">
-          <DialogTitle className="text-2xl font-bold">
+        <DialogHeader className="create-workflow-modal-header">
+          <DialogTitle className="create-workflow-modal-title">
             Start a new workflow
           </DialogTitle>
-          <DialogDescription className="text-base mt-2">
+          <DialogDescription className="create-workflow-modal-description">
             Choose how you want to start creating your workflow.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-6 pb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="create-workflow-modal-body">
+          <div className="create-workflow-modal-grid">
             <ActionCard
               icon={<FileText className="w-8 h-8 text-primary" />}
               title="Create from Existing Configuration"

@@ -1,0 +1,121 @@
+.create-workflow-modal .radix-dialog-content {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.create-workflow-modal-header {
+  padding: 1.5rem;
+  padding-bottom: 1rem;
+  text-align: center;
+  border-bottom: none;
+}
+
+.create-workflow-modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: hsl(var(--foreground));
+  margin: 0;
+}
+
+.create-workflow-modal-description {
+  font-size: 1rem;
+  color: hsl(var(--muted-foreground));
+  margin-top: 0.5rem;
+}
+
+.create-workflow-modal-content {
+  padding: 0;
+}
+
+.create-workflow-modal-body {
+  padding: 1.5rem;
+}
+
+.create-workflow-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two column layout (side-by-side) */
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.create-workflow-action-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: hsl(var(--card));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  min-width: 0; /* Allows flex/grid items to shrink below content size */
+}
+
+/* Responsive adjustments - on small screens keep vertical, larger screens side-by-side */
+@media (max-width: 767px) {
+  .create-workflow-modal-grid {
+    grid-template-columns: 1fr; /* Single column on small screens */
+  }
+}
+
+@media (min-width: 768px) {
+  .create-workflow-modal-grid {
+    grid-template-columns: repeat(2, 1fr); /* Two columns on medium and larger screens */
+  }
+}
+
+.create-workflow-action-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  border-color: hsl(var(--primary) / 0.2);
+  scale: 1.02;
+}
+
+.create-workflow-action-card-header {
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+.create-workflow-icon-wrapper {
+  margin: 0 auto 1rem;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: hsl(var(--primary) / 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.create-workflow-action-card:hover .create-workflow-icon-wrapper {
+  background: hsl(var(--primary) / 0.2);
+}
+
+.create-workflow-action-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin: 0 0 0.5rem 0;
+}
+
+.create-workflow-action-card-description {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  line-height: 1.5;
+  margin: 0;
+}
+
+.create-workflow-action-card-content {
+  padding-top: 0;
+}
+
+.create-workflow-action-button {
+  width: 100%;
+}
+
+.create-workflow-action-button:hover {
+  background: hsl(var(--primary) / 0.9);
+}
+
