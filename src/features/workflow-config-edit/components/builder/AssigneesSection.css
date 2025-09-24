@@ -188,7 +188,7 @@
 .chip-name {
   font-size: 12px;
   font-weight: 500;
-  color: #000000;
+  color: #e2e8f0;
 }
 
 .chip-type {
@@ -294,4 +294,78 @@
 .assignees-section:not(.dark) .chip-remove:hover {
   background: rgba(239, 68, 68, 0.06);
   color: #dc2626;
+}
+
+/* Dark theme overrides: apply when the root has the .dark class */
+.assignees-section.dark .section-title {
+  color: #94a3b8;
+}
+
+.assignees-section.dark .add-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.assignees-section.dark .add-btn:hover {
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.assignees-section.dark .search-input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #f1f5f9;
+}
+
+.assignees-section.dark .search-input:focus {
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.assignees-section.dark .search-results {
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.assignees-section.dark .person-option {
+  color: #f1f5f9;
+}
+
+.assignees-section.dark .person-option:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.assignees-section.dark .no-results {
+  color: #94a3b8;
+}
+
+.assignees-section.dark .assignee-chip {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.assignees-section.dark .chip-name {
+  color: #e2e8f0;
+}
+
+.assignees-section.dark .chip-type {
+  color: #94a3b8;
+  background: rgba(100, 116, 139, 0.1);
+}
+
+.assignees-section.dark .chip-remove {
+  color: #94a3b8;
+}
+
+.assignees-section.dark .chip-remove:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.assignees-section.dark .empty-assignees {
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px dashed rgba(51, 65, 85, 0.3);
 }
