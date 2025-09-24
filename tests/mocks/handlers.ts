@@ -15,7 +15,7 @@ export const handlers = [
   }),
 
   // Dashboard API handlers used by the app during tests
-  http.get('/api/v1/client/private/dashboard/stats', () => {
+  http.post('/api/v1/client/private/dashboard/stats', () => {
     return Response.json({
       success: true,
       data: {
@@ -28,7 +28,7 @@ export const handlers = [
     });
   }),
 
-  http.get('/api/v1/client/private/dashboard/applications', () => {
+  http.post('/api/v1/client/private/dashboard/applications', () => {
     return Response.json({
       success: true,
       data: [

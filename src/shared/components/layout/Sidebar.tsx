@@ -54,12 +54,6 @@ const Sidebar = ({
       icon: <PlusCircle size={20} />,
     },
     {
-      id: "initiate-workflow",
-      label: "Initiate Workflow",
-      icon: <PlayCircle size={20} />,
-    },
-    { id: "applications", label: "Applications", icon: <FileText size={20} /> },
-    {
       id: "running",
       label: "Running Workflows",
       icon: <PlayCircle size={20} />,

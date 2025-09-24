@@ -79,12 +79,17 @@ const createApiClient = (config: Partial<ApiConfig> = {}): AxiosInstance => {
       
       // Handle 401 errors (unauthorized)
       if (apiError.status === 401) {
-        console.warn('🔒 Authentication failed. Clearing tokens and redirecting to login.');
+        console.warn('🔒 Authentication failed. Clearing tokens.');
         clearAuthToken();
         
-        // Only redirect if we're not already on the login page
-        if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login';
+        // Check if we should redirect to login based on environment
+        // By default, do not redirect to keep the app functional without auth
+        const shouldRedirect = import.meta.env.VITE_ENABLE_AUTH_REDIRECT === 'true';
+        if (shouldRedirect) {
+          // Only redirect if we're not already on the login page
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
         }
       }
 
