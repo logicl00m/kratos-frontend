@@ -1,4 +1,6 @@
 import { api } from '@/lib/api';
+// Re-export search/list helpers from the centralized formsService for backward compatibility
+export { searchForms, listForms } from '@/lib/services/formsService';
 
 export interface FormDTO {
   id?: string;
@@ -13,16 +15,7 @@ interface CreateFormPayload {
   };
 }
 
-interface CreateFormResponse {
-  id: string;
-  name: string;
-  version: number;
-  json: Record<string, unknown>;
-  // Add other response fields as needed
-}
-
 export async function createForm(dto: FormDTO): Promise<FormDTO> {
-  // Transform DTO to match API payload structure
   const payload: CreateFormPayload = {
     data: {
       formJson: dto.json
@@ -30,22 +23,29 @@ export async function createForm(dto: FormDTO): Promise<FormDTO> {
   };
 
   try {
-    // Call the exact endpoint you specified
     const response = await api.post<any>(
       '/api/v1/client/private/form/create',
       payload
     );
 
-    // Extract the actual response data
-    // Assuming the API returns the created form data
     return {
       id: response.id || Date.now().toString(),
       name: dto.name,
       version: response.version || 1,
-      json: dto.json // Keep the original JSON since that's what was sent
+      json: dto.json
     };
   } catch (error) {
     console.error('Failed to create form:', error);
+    throw error;
+  }
+}
+
+export async function getAllForms(): Promise<any[]> {
+  try {
+    const response = await api.post<any>('/api/v1/client/private/form/get/all');
+    return response.data || response || [];
+  } catch (error) {
+    console.error('Failed to get forms:', error);
     throw error;
   }
 }
@@ -58,7 +58,7 @@ export async function updateForm(dto: FormDTO): Promise<FormDTO> {
   };
 
   try {
-    const response = await api.put<CreateFormResponse>(
+    const response = await api.put<any>(
       `/api/v1/client/private/form/${dto.id}`,
       payload
     );

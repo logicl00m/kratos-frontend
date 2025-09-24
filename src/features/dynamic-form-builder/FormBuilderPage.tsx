@@ -17,14 +17,14 @@ const FormBuilderPage: React.FC = () => {
   return (
     <DynamicFormBuilder
       onSave={(form) => {
+        // Only navigate if coming from workflow builder with a nodeId
         if (nodeId && from === "/builder") {
-          if (confirm("Form saved! Return to workflow builder?")) {
-            navigate(from, {
-              replace: true,
-              state: { attachForm: form, nodeId },
-            });
-          }
+          navigate(from, {
+            replace: true,
+            state: { attachForm: form, nodeId },
+          });
         }
+        // Otherwise stay on the current page
       }}
       onCancel={() => navigate(from, { replace: true })}
     />

@@ -22,10 +22,12 @@ import {
   Edit2,
   Copy,
   Trash2,
+  FileInput,
 } from "lucide-react";
 import FieldPalette from "./FieldPalette";
 import FieldList from "./FieldList";
 import FieldInspector from "./FieldInspector";
+import { ImportFormsModal } from "./ImportFormsModal";
 import type { Field, FormConfig } from "../types/form-builder.types";
 import "../dynamic-form-builder.css";
 import {
@@ -111,11 +113,9 @@ function FieldContextMenu({
 }: Readonly<FieldContextMenuProps>) {
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Escape") {
-      // Close is handled by outside listener in parent via window click; no-op here
       (event.currentTarget as HTMLDivElement).blur();
     }
     if (event.key === "Enter") {
-      // Activate first item by default
       onEdit();
     }
   };
@@ -197,6 +197,7 @@ export function DynamicFormBuilder({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [saveFeedback, setSaveFeedback] = useState<string | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false); // MOVED INSIDE COMPONENT
   const saveFeedbackTimeout = useRef<number | null>(null);
 
   useEffect(() => {
@@ -402,7 +403,6 @@ export function DynamicFormBuilder({
   };
 
   const saveConfiguration = async () => {
-    // Translate internal state to FormDTO
     const dto: FormDTO = {
       id: initialForm?.id,
       name: formName,
@@ -447,6 +447,25 @@ export function DynamicFormBuilder({
     setContextMenu({ field, index, position: adjusted });
   };
 
+  const handleImportForms = (
+    importedFields: Field[],
+    importedFormName: string
+  ) => {
+    setFields(importedFields);
+    setFormName(importedFormName);
+    setSelectedField(null);
+    setSaveFeedback(
+      `Imported ${importedFields.length} fields from ${importedFormName}`
+    );
+
+    if (saveFeedbackTimeout.current) {
+      window.clearTimeout(saveFeedbackTimeout.current);
+    }
+    saveFeedbackTimeout.current = window.setTimeout(
+      () => setSaveFeedback(null),
+      2500
+    );
+  };
   return (
     <div className="dfb dfb-skin" role="application" onDragEnd={handleDragEnd}>
       <FieldPalette onFieldDragStart={handleFieldDragStart} />
@@ -473,6 +492,15 @@ export function DynamicFormBuilder({
             </div>
 
             <div className="dfb__actions">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsImportModalOpen(true)}
+                className="dfb__actions-button dfb__actions-button--ghost"
+              >
+                <FileInput size={16} />
+                Import from Existing
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -647,6 +675,11 @@ export function DynamicFormBuilder({
           }}
         />
       )}
+      <ImportFormsModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onImport={handleImportForms}
+      />
     </div>
   );
 }
