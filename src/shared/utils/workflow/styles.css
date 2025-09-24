@@ -1,0 +1,432 @@
+/* Global workflow node styles - Workflow Builder look and feel */
+
+/* Process Node Styles */
+.workflow-process-node {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  position: relative;
+}
+
+.dark .workflow-process-node {
+  background: #1e1e25;
+  border: 1px solid #2e3447;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.workflow-process-node.selected {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.dark .workflow-process-node.selected {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.3);
+}
+
+/* Decision Node Styles */
+.workflow-decision-node {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 1px solid #9ca3af;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  position: relative;
+}
+
+.dark .workflow-decision-node {
+  background: linear-gradient(135deg, #2e3447 0%, #1e1e25 100%);
+  border: 1px solid #4b5563;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.workflow-decision-node.selected {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+/* State Node Styles (Viewer style) */
+.workflow-state-node {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 180px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.dark .workflow-state-node {
+  background: #1f2937;
+  border: 1px solid #374151;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.workflow-state-node.selected {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Common Node Elements */
+.node-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.node-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.dark .node-title {
+  color: #f1f5f9;
+}
+
+.node-internal-id {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.dark .node-internal-id {
+  color: #94a3b8;
+}
+
+/* Actions Styling */
+.node-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.action-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #374151;
+}
+
+.dark .action-label {
+  color: #cbd5e1;
+}
+
+.action-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #1f2937;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.action-label.left .action-indicator {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+.action-label.center .action-indicator {
+  background: rgba(107, 114, 128, 0.1);
+  color: #4b5563;
+}
+
+.action-label.right .action-indicator {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.dark .action-indicator {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Assignees Styling */
+.node-assignees {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.dark .node-assignees {
+  border-top: 1px solid #2e3447;
+  color: #94a3b8;
+}
+
+.assignee-names {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Form Chip Styling */
+.node-form-chip-wrap {
+  margin-top: 12px;
+}
+
+.form-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  outline: none;
+}
+
+.form-chip.connected {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #047857;
+}
+
+.form-chip.connected:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.form-chip.connected.global {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #1d4ed8;
+}
+
+.form-chip.disconnected {
+  background: rgba(156, 163, 175, 0.1);
+  border-color: rgba(156, 163, 175, 0.3);
+  color: #4b5563;
+}
+
+/* Handle Styling */
+.process-handle,
+.decision-handle {
+  width: 12px;
+  height: 12px;
+  background: #9ca3af;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.dark .process-handle,
+.dark .decision-handle {
+  background: #64748b;
+  border: 2px solid #1e1e25;
+}
+
+.handle-left {
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.handle-center {
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.handle-right {
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.handle-target {
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Decision Node Specific */
+.decision-icon {
+  color: #8b5cf6;
+}
+
+.dark .decision-icon {
+  color: #a78bfa;
+}
+
+.node-transitions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.transition-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.transition-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dark .transition-indicator {
+  background: #a78bfa;
+}
+
+.transition-label {
+  color: #374151;
+}
+
+.dark .transition-label {
+  color: #d1d5db;
+}
+
+/* State Node Specific (Viewer style) */
+.state-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.state-node-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1f2937;
+}
+
+.dark .state-node-label {
+  color: #f3f4f6;
+}
+
+.expand-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.expand-button:hover {
+  color: #374151;
+}
+
+.dark .expand-button {
+  color: #9ca3af;
+}
+
+.dark .expand-button:hover {
+  color: #d1d5db;
+}
+
+.state-node-form-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 4px;
+  font-size: 11px;
+  color: #6366f1;
+  margin-bottom: 6px;
+}
+
+.dark .state-node-form-badge {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+}
+
+.state-node-fields {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dark .state-node-fields {
+  border-top: 1px solid #374151;
+}
+
+.field-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 11px;
+}
+
+.field-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.field-icon {
+  color: #6b7280;
+}
+
+.dark .field-icon {
+  color: #9ca3af;
+}
+
+.field-name {
+  color: #374151;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dark .field-name {
+  color: #d1d5db;
+}
+
+.field-status {
+  color: #9ca3af;
+}
+
+.dark .field-status {
+  color: #6b7280;
+}
+
+/* Node Forms List */
+.node-forms {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.dark .node-forms {
+  border-top: 1px solid #374151;
+  color: #9ca3af;
+}
