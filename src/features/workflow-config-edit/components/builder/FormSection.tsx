@@ -7,10 +7,7 @@ import {
   ChevronDown,
   AlertCircle,
 } from "lucide-react";
-import {
-  searchForms,
-  listForms,
-} from "@features/workflow-config-edit/services/formsApi";
+import { getAllForms } from "@features/workflow-config-edit/services/formsApi";
 import type { FormRef } from "@features/workflow-config-edit/types/builder.types";
 import "./FormSection.css";
 
@@ -38,6 +35,8 @@ export const FormSection: React.FC<FormSectionProps> = ({
   >([]);
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  // Cache of normalized forms fetched when dropdown opens
+  const [allForms, setAllForms] = useState<Array<{ id: string; name: string; version: number }>>([]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -58,13 +57,32 @@ export const FormSection: React.FC<FormSectionProps> = ({
 
   useEffect(() => {
     let cancelled = false;
-    const loadForms = async () => {
+
+    const loadAndFilter = async () => {
       setLoading(true);
       try {
-        const results = searchQuery.trim()
-          ? await searchForms(searchQuery)
-          : await listForms();
-        if (!cancelled) setForms(results);
+        // Fetch all forms once when dropdown opens
+        if (isOpen && allForms.length === 0) {
+          const raw = await getAllForms();
+          const normalized = Array.isArray(raw)
+            ? raw.map((f: any) => ({
+                id: f?.id ?? String(f?.formId ?? ""),
+                name: f?.name ?? f?.formName ?? f?.title ?? "",
+                version: typeof f?.version === "number" ? f.version : 1,
+              }))
+            : [];
+          if (!cancelled) setAllForms(normalized);
+        }
+
+        // Use cached normalized list and filter locally
+        const source = allForms.length > 0 ? allForms : [];
+        if (searchQuery.trim()) {
+          const q = searchQuery.trim().toLowerCase();
+          const filtered = source.filter((s) => s.name.toLowerCase().includes(q));
+          if (!cancelled) setForms(filtered);
+        } else {
+          if (!cancelled) setForms(source);
+        }
       } catch (error) {
         console.error("Failed to load forms:", error);
         if (!cancelled) setForms([]);
@@ -74,12 +92,13 @@ export const FormSection: React.FC<FormSectionProps> = ({
     };
 
     if (isOpen) {
-      loadForms();
+      loadAndFilter();
     }
 
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, isOpen]);
 
   const displayValue = form ? `${form.name}@v${form.version}` : "";

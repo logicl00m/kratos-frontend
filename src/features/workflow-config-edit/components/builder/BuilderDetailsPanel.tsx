@@ -12,6 +12,7 @@ import { StateInfoSection } from "./StateInfoSection";
 import { AssigneesSection } from "./AssigneesSection";
 import { FormSection } from "./FormSection";
 import { ActionsSection } from "./ActionsSection";
+import { getAllForms } from "@features/workflow-config-edit/services/formsApi";
 import "./BuilderDetailsPanel.css";
 
 interface BuilderDetailsPanelProps {
@@ -40,12 +41,33 @@ export const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
   availablePeople,
 }) => {
   const navigate = useNavigate();
-
-  if (!selectedNode && !selectedEdge) return null;
-
   const nodeData = selectedNode?.data;
   const isProcessNode = selectedNode?.type === "process";
   const isDecisionNode = selectedNode?.type === "decision";
+
+  // Prefetch forms when the panel opens for a process node (mirrors FormPickerModal behavior)
+    React.useEffect(() => {
+    let cancelled = false;
+    if (selectedNode && isProcessNode) {
+      (async () => {
+        try {
+          // call getAllForms to warm any network/cache and normalize shape if needed
+          await getAllForms();
+        } catch (err) {
+          if (!cancelled) {
+            // log but don't block UI
+            console.warn('Prefetching forms failed in BuilderDetailsPanel:', err);
+          }
+        }
+      })();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+    // Intentionally depend on selectedNode id/type to run when panel opens for a node
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedNode?.id, selectedNode?.type]);
 
   const handleRename = () => {
     const newName = prompt("Enter new state name:", nodeData?.label);
@@ -153,6 +175,10 @@ export const BuilderDetailsPanel: React.FC<BuilderDetailsPanelProps> = ({
       });
     }
   };
+
+  if (!selectedNode && !selectedEdge) {
+    return null;
+  }
 
   return (
     <div className="builder-details-panel">
