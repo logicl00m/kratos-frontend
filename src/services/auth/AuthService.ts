@@ -1,5 +1,4 @@
-import { api, setAuthToken as setTokens, getAuthToken, clearAuthToken, setUser as storeUser, getUser as getStoredUser } from '@/lib/api';
-import { API_ENDPOINTS } from '@/lib/api/config';
+import { api, auth } from '@/lib/api';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -55,51 +54,9 @@ export interface AuthActions {
 
 class AuthService {
   private static instance: AuthService;
-  private apiClient: ApiClient;
   private refreshPromise: Promise<void> | null = null;
 
   private constructor() {
-    this.apiClient = new ApiClient({
-      baseURL: import.meta.env.VITE_AUTH_API_URL || '/api/auth',
-    });
-
-    // Add auth interceptor
-    this.apiClient.addRequestInterceptor({
-      onRequest: (config) => {
-        const tokens = this.getTokens();
-        if (tokens?.accessToken && config.headers) {
-          config.headers.Authorization = `${tokens.tokenType} ${tokens.accessToken}`;
-        }
-        return config;
-      },
-    });
-
-    // Add refresh token interceptor
-    this.apiClient.addResponseInterceptor({
-      onResponseError: async (error) => {
-        if (error.response?.status === 401) {
-          // Token expired, try to refresh
-          if (!this.refreshPromise) {
-            this.refreshPromise = this.refreshAccessToken();
-          }
-
-          await this.refreshPromise;
-          this.refreshPromise = null;
-
-          // Retry original request
-          const config = error.config;
-          if (config) {
-            const tokens = this.getTokens();
-            if (tokens?.accessToken && config.headers) {
-              config.headers.Authorization = `${tokens.tokenType} ${tokens.accessToken}`;
-            }
-            return this.apiClient.get(config.url!, config);
-          }
-        }
-        return Promise.reject(error);
-      },
-    });
-  }
 
   public static getInstance(): AuthService {
     if (!AuthService.instance) {
@@ -114,19 +71,19 @@ class AuthService {
   }
 
   async login(credentials: LoginCredentials): Promise<User> {
-    const response = await this.apiClient.post<{
+    const response = await api.post<{
       user: User;
       tokens: AuthTokens;
-    }>('/login', credentials);
+    }>('/api/auth/login', credentials);
 
-    return response.data.user;
+    return response.user;
   }
 
   async logout(): Promise<void> {
     try {
       const tokens = this.getTokens();
       if (tokens?.refreshToken) {
-        await this.apiClient.post('/logout', {
+        await api.post('/api/auth/logout', {
           refreshToken: tokens.refreshToken,
         });
       }
@@ -136,12 +93,12 @@ class AuthService {
   }
 
   async register(data: RegisterData): Promise<User> {
-    const response = await this.apiClient.post<{
+    const response = await api.post<{
       user: User;
       tokens: AuthTokens;
-    }>('/register', data);
+    }>('/api/auth/register', data);
 
-    return response.data.user;
+    return response.user;
   }
 
   async refreshAccessToken(): Promise<AuthTokens> {
@@ -150,38 +107,37 @@ class AuthService {
       throw new Error('No refresh token available');
     }
 
-    const response = await this.apiClient.post<AuthTokens>('/refresh', {
+    const response = await api.post<AuthTokens>('/api/auth/refresh', {
       refreshToken: tokens.refreshToken,
     });
 
-    return response.data;
+    return response;
   }
 
   async getCurrentUser(): Promise<User> {
-    const response = await this.apiClient.get<User>('/me');
-    return response.data;
+    return api.get<User>('/api/auth/me');
   }
 
   async updatePassword(currentPassword: string, newPassword: string): Promise<void> {
-    await this.apiClient.post('/change-password', {
+    await api.post('/api/auth/change-password', {
       currentPassword,
       newPassword,
     });
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    await this.apiClient.post('/forgot-password', { email });
+    await api.post('/api/auth/forgot-password', { email });
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    await this.apiClient.post('/reset-password', {
+    await api.post('/api/auth/reset-password', {
       token,
       newPassword,
     });
   }
 
   async verifyEmail(token: string): Promise<void> {
-    await this.apiClient.post('/verify-email', { token });
+    await api.post('/api/auth/verify-email', { token });
   }
 }
 

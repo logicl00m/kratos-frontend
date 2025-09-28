@@ -1,9 +1,9 @@
 /**
- * Simple API Client
- * A straightforward axios wrapper with auth and error handling
+ * Unified API Client
+ * Single source of truth for all API communications
  */
 
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosError } from 'axios';
+import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosError, type AxiosResponse } from 'axios';
 import { auth } from './auth-simple';
 
 // API Response format from backend
@@ -13,7 +13,7 @@ interface ApiResponse<T = any> {
   data?: T;
 }
 
-// API Error format
+// API Error class
 export class ApiError extends Error {
   status?: number;
   code?: string;
@@ -26,9 +26,17 @@ export class ApiError extends Error {
     this.code = code;
     this.details = details;
   }
+
+  isClientError(): boolean {
+    return this.status !== undefined && this.status >= 400 && this.status < 500;
+  }
+
+  isServerError(): boolean {
+    return this.status !== undefined && this.status >= 500;
+  }
 }
 
-class ApiClient {
+class UnifiedApiClient {
   private client: AxiosInstance;
   private baseURL: string;
 
@@ -41,114 +49,142 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true,
     });
 
     this.setupInterceptors();
   }
 
   private setupInterceptors() {
-    // Request interceptor: Add auth token and subject ID
+    // Request interceptor
     this.client.interceptors.request.use(
       (config) => {
-        // Add auth token
-        const token = auth.getAccessToken();
+        // Check for hardcoded token first (development)
+        const hardcodedToken = import.meta.env.VITE_HARDCODED_ACCESS_TOKEN;
+        const token = hardcodedToken || auth.getAccessToken();
+
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
 
         // Add subject ID
-        const subjectId = auth.getSubjectId();
+        const hardcodedSubject = import.meta.env.VITE_HARDCODED_SUBJECT_ID;
+        const subjectId = hardcodedSubject || auth.getSubjectId();
+
         if (subjectId) {
           config.headers['X-Subject'] = subjectId;
         }
 
+        // Log in development
+        if (import.meta.env.DEV) {
+          console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+            params: config.params,
+            data: config.data,
+          });
+        }
+
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(this.handleError(error))
     );
 
-    // Response interceptor: Extract data and handle errors
+    // Response interceptor
     this.client.interceptors.response.use(
       (response) => {
-        // If response has our standard format, extract data
+        // Log in development
+        if (import.meta.env.DEV) {
+          console.log(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+            status: response.status,
+            data: response.data,
+          });
+        }
+
+        // Extract data from standard API response format
         const responseData = response.data as ApiResponse;
 
-        // Check if it's a standard API response
         if (responseData && typeof responseData === 'object' && 'status' in responseData) {
           // Return the data portion directly
-          return responseData.data || responseData;
+          return { ...response, data: responseData.data || responseData };
         }
 
-        // Return raw data for non-standard responses
-        return response.data;
+        // Return response as-is for non-standard responses
+        return response;
       },
       (error: AxiosError) => {
-        // Handle network errors
-        if (!error.response) {
-          throw new ApiError('Network error', 0, 'NETWORK_ERROR');
-        }
+        const apiError = this.handleError(error);
 
         // Handle 401 Unauthorized
-        if (error.response.status === 401) {
+        if (apiError.status === 401) {
           auth.clearTokens();
-          // Optionally redirect to login
+
           if (import.meta.env.VITE_ENABLE_AUTH_REDIRECT === 'true') {
-            window.location.href = '/login';
+            if (!window.location.pathname.includes('/login')) {
+              window.location.href = '/login';
+            }
           }
         }
 
-        // Extract error message
-        const data = error.response.data as any;
-        const message = data?.message || error.message || 'Request failed';
-
-        throw new ApiError(
-          message,
-          error.response.status,
-          data?.status || error.code,
-          data
-        );
+        return Promise.reject(apiError);
       }
     );
   }
 
-  /**
-   * GET request
-   */
+  private handleError(error: any): ApiError {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) {
+        return new ApiError(
+          'Network error. Please check your connection.',
+          0,
+          'NETWORK_ERROR'
+        );
+      }
+
+      const data = error.response.data as any;
+      const message = data?.message || error.message || 'Request failed';
+
+      return new ApiError(
+        message,
+        error.response.status,
+        data?.code || error.code,
+        data
+      );
+    }
+
+    return new ApiError(
+      error?.message || 'An unexpected error occurred',
+      undefined,
+      'UNKNOWN_ERROR',
+      error
+    );
+  }
+
+  // Core HTTP methods
   async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.get(url, config);
+    const response = await this.client.get<T>(url, config);
+    return response.data;
   }
 
-  /**
-   * POST request
-   */
   async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.post(url, data, config);
+    const response = await this.client.post<T>(url, data, config);
+    return response.data;
   }
 
-  /**
-   * PUT request
-   */
   async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.put(url, data, config);
+    const response = await this.client.put<T>(url, data, config);
+    return response.data;
   }
 
-  /**
-   * PATCH request
-   */
   async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.patch(url, data, config);
+    const response = await this.client.patch<T>(url, data, config);
+    return response.data;
   }
 
-  /**
-   * DELETE request
-   */
   async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-    return this.client.delete(url, config);
+    const response = await this.client.delete<T>(url, config);
+    return response.data;
   }
 
-  /**
-   * Upload file
-   */
+  // Utility methods
   async uploadFile<T = any>(
     url: string,
     file: File,
@@ -157,7 +193,7 @@ class ApiClient {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.client.post(url, formData, {
+    return this.post<T>(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -170,15 +206,12 @@ class ApiClient {
     });
   }
 
-  /**
-   * Download file
-   */
   async downloadFile(url: string, filename?: string): Promise<void> {
     const response = await this.client.get(url, {
       responseType: 'blob',
     });
 
-    const blob = new Blob([response]);
+    const blob = new Blob([response.data]);
     const downloadUrl = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = downloadUrl;
@@ -188,10 +221,24 @@ class ApiClient {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(downloadUrl);
   }
+
+  // Create cancel token for request cancellation
+  createCancelToken() {
+    return axios.CancelToken.source();
+  }
+
+  isCancel(error: unknown): boolean {
+    return axios.isCancel(error);
+  }
+
+  // Get raw axios instance for advanced usage
+  getRawClient(): AxiosInstance {
+    return this.client;
+  }
 }
 
 // Export singleton instance
-export const apiClient = new ApiClient();
+export const apiClient = new UnifiedApiClient();
 
 // Export convenience methods
 export const api = {
@@ -216,3 +263,6 @@ export const api = {
   downloadFile: (url: string, filename?: string) =>
     apiClient.downloadFile(url, filename),
 };
+
+// Export for backward compatibility
+export default apiClient;
