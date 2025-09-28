@@ -204,7 +204,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
                     <span>Visible Fields ({fields.length})</span>
                   </div>
 
-                  <div style={{ display: "block" }}>
+                  <div className="dp-fields-container">
                     {Object.entries(fieldsByForm).map(
                       ([formName, formFields]) => (
                         <div key={formName} style={{ marginBottom: "12px" }}>

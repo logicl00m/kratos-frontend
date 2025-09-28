@@ -1,27 +1,117 @@
 /* Additional form viewer styles for dark mode */
 .form-viewer {
-  @apply bg-white text-gray-900;
+  background-color: #ffffff;
+  color: #111827;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.form-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.form-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.form-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.form-content::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 4px;
+}
+
+.form-content::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
 }
 
 .form-content .no-fields-message {
-  @apply text-gray-500 italic p-4 text-center;
+  color: #6b7280;
+  font-style: italic;
+  padding: 1rem;
+  text-align: center;
 }
 
 [data-theme="dark"] .form-viewer,
 .dark .form-viewer {
-  @apply bg-gray-800 text-gray-100;
+  background-color: #1f2937;
+  color: #f3f4f6;
+}
+
+[data-theme="dark"] .form-content,
+.dark .form-content {
+  scrollbar-color: #4b5563 transparent;
+}
+
+[data-theme="dark"] .form-content::-webkit-scrollbar-thumb,
+.dark .form-content::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+[data-theme="dark"] .form-content::-webkit-scrollbar-thumb:hover,
+.dark .form-content::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
 }
 
 [data-theme="dark"] .form-content .no-fields-message,
 .dark .form-content .no-fields-message {
-  @apply text-gray-400;
+  color: #9ca3af;
 }
 
 .text-red-500 {
-  @apply text-red-500;
+  color: #ef4444;
 }
 
 [data-theme="dark"] .text-red-500,
 .dark .text-red-500 {
-  @apply text-red-400;
+  color: #f87171;
+}
+
+/* Additional form group styles for better visibility */
+.form-group {
+  margin-bottom: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.field-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  max-height: 100px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.field-actions::-webkit-scrollbar {
+  width: 4px;
+}
+
+.field-actions::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.field-actions::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .field-actions,
+.dark .field-actions {
+  scrollbar-color: #4b5563 transparent;
+}
+
+[data-theme="dark"] .field-actions::-webkit-scrollbar-thumb,
+.dark .field-actions::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
 }
