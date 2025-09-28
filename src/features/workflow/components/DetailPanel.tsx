@@ -11,7 +11,10 @@ import {
   Folder,
 } from "lucide-react";
 import type { Node, Edge } from "reactflow";
-import type { StateFormField, WorkflowConfig } from "@features/workflow/types/workflow.types";
+import type {
+  StateFormField,
+  WorkflowConfig,
+} from "@features/workflow/types/workflow.types";
 import FormViewModal from "./FormViewModal";
 import "./DetailPanel.css";
 

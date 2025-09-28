@@ -38,6 +38,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Add standard colors that might not be available in v4 by default
+        white: "#ffffff",
+        black: "#000000",
       },
       borderRadius: {
         lg: "var(--radius)",

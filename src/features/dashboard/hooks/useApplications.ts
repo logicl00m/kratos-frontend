@@ -2,7 +2,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { applicationService } from '../services/applicationService';
+import { mockWorkflowData } from '../data/mockWorkflowData';
+import { transformWorkflowsToApplications } from '../utils/workflowTransformer';
+import { DASHBOARD_CONFIG } from '../config/dashboardConfig';
 
+/**
+ * Custom hook to fetch application data
+ * 
+ * This hook provides a unified interface for application data, 
+ * whether using mock data or real API data based on configuration.
+ * 
+ * To switch between mock and real data, change the `useMockData` value 
+ * in the DASHBOARD_CONFIG file.
+ */
 export const useApplications = () => {
   const [filters, setFilters] = useState({
     page: 1,
@@ -18,10 +30,38 @@ export const useApplications = () => {
     [filters]
   );
 
-  const { data, isLoading, error } = useQuery({
+  // Conditionally fetch data based on configuration
+  const queryResult = useQuery({
     queryKey,
-    queryFn: () => applicationService.getApplications(filters),
-    keepPreviousData: true // Important for pagination
+    queryFn: () => {
+      if (DASHBOARD_CONFIG.useMockData) {
+        // When using mock data, transform and return mock workflow data
+        // Simulate API delay for more realistic experience
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            // Transform mock workflow data to LoanApplication format
+            const transformedData = transformWorkflowsToApplications(mockWorkflowData);
+            resolve({
+              data: {
+                items: transformedData,
+                pagination: {
+                  page: 1,
+                  pageSize: 10,
+                  total: transformedData.length,
+                  totalPages: Math.ceil(transformedData.length / 10)
+                }
+              }
+            });
+          }, 300); // Simulate network delay
+        }) as Promise<any>;
+      } else {
+        // When not using mock data, make actual API call
+        return applicationService.getApplications(filters);
+      }
+    },
+    keepPreviousData: true, // Important for pagination
+    // Disable automatic refetching when using mock data
+    enabled: true // Always enable the query, the queryFn handles the choice
   });
 
   const updateFilter = (key, value) => {
@@ -33,10 +73,10 @@ export const useApplications = () => {
   };
 
   return {
-    applications: data?.data.items || [],
-    pagination: data?.data.pagination,
-    isLoading,
-    error,
+    applications: queryResult.data?.data.items || [],
+    pagination: queryResult.data?.data.pagination,
+    isLoading: queryResult.isLoading,
+    error: queryResult.error,
     filters,
     updateFilter
   };

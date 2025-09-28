@@ -1,19 +1,98 @@
-/* Additional form viewer styles for dark mode */
+/* Modern Form Viewer Styles - Enhanced for Light & Dark Themes */
+
 .form-viewer {
-  background-color: #ffffff;
-  color: #111827;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  color: #1e293b;
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
+/* Form Header Improvements */
+.form-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-bottom: 1px solid rgba(203, 213, 225, 0.5);
+  backdrop-filter: blur(10px);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  [data-theme="dark"] input[type="file"].form-input::-webkit-file-upload-button:hover,
+  .dark input[type="file"].form-input::-webkit-file-upload-button:hover {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    box-shadow: 0 2px 4px rgba(29, 78, 216, 0.4);
+  }
+  gap: 1rem;
+}
+
+.form-header h2 {
+  color: #0f172a;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.back-btn, .edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.back-btn {
+  background: rgba(71, 85, 105, 0.1);
+  color: #475569;
+  border: 1px solid rgba(71, 85, 105, 0.2);
+}
+
+.back-btn:hover {
+  background: rgba(71, 85, 105, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.edit-btn:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.status-badge {
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(30, 64, 175, 0.2);
+}
+
+/* Form Content Area */
 .form-content {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(241, 245, 249, 0.3) 100%);
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
 }
 
 .form-content::-webkit-scrollbar {
@@ -25,72 +104,102 @@
 }
 
 .form-content::-webkit-scrollbar-thumb {
-  background-color: #d1d5db;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.6) 0%, rgba(100, 116, 139, 0.4) 100%);
   border-radius: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .form-content::-webkit-scrollbar-thumb:hover {
-  background-color: #9ca3af;
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.8) 0%, rgba(71, 85, 105, 0.6) 100%);
 }
 
-.form-content .no-fields-message {
-  color: #6b7280;
-  font-style: italic;
-  padding: 1rem;
-  text-align: center;
-}
-
-[data-theme="dark"] .form-viewer,
-.dark .form-viewer {
-  background-color: #1f2937;
-  color: #f3f4f6;
-}
-
-[data-theme="dark"] .form-content,
-.dark .form-content {
-  scrollbar-color: #4b5563 transparent;
-}
-
-[data-theme="dark"] .form-content::-webkit-scrollbar-thumb,
-.dark .form-content::-webkit-scrollbar-thumb {
-  background-color: #4b5563;
-}
-
-[data-theme="dark"] .form-content::-webkit-scrollbar-thumb:hover,
-.dark .form-content::-webkit-scrollbar-thumb:hover {
-  background-color: #6b7280;
-}
-
-[data-theme="dark"] .form-content .no-fields-message,
-.dark .form-content .no-fields-message {
-  color: #9ca3af;
-}
-
-.text-red-500 {
-  color: #ef4444;
-}
-
-[data-theme="dark"] .text-red-500,
-.dark .text-red-500 {
-  color: #f87171;
-}
-
-/* Additional form group styles for better visibility */
+/* Form Groups - Modern Card Design */
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  /* Use theme tokens so this matches both light and dark themes */
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
   word-wrap: break-word;
   overflow-wrap: break-word;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
+.form-group:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .field-row {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.field-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 120px;
+}
+
+.field-value {
+  flex: 1;
+  min-width: 0; /* Important for text overflow */
+}
+
+.field-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.status-text {
+  color: #64748b;
+  font-weight: 500;
+  background: rgba(100, 116, 139, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.required-marker {
+  color: #ef4444;
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
+/* Field Actions Styling */
 .field-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.5rem;
-  max-height: 100px;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  max-height: 120px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+  padding: 0.25rem 0;
 }
 
 .field-actions::-webkit-scrollbar {
@@ -102,16 +211,478 @@
 }
 
 .field-actions::-webkit-scrollbar-thumb {
-  background-color: #d1d5db;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.5) 0%, rgba(100, 116, 139, 0.3) 100%);
   border-radius: 2px;
+}
+
+.action-tag {
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #4338ca;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border: 1px solid rgba(67, 56, 202, 0.2);
+  transition: all 0.2s ease;
+}
+
+.action-tag:hover {
+  background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%);
+  transform: scale(1.05);
+}
+
+/* Form Footer */
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-top: 1px solid rgba(226, 232, 240, 0.8);
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+
+.form-footer button {
+  padding: 0.625rem 1.25rem;
+  /* Border defined below to provide neutral default */
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  min-width: 80px;
+  /* Provide a neutral default for any dynamic btn-* actions */
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #475569;
+  border: 1px solid rgba(71, 85, 105, 0.2);
+}
+
+.form-footer button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #475569;
+  border: 1px solid rgba(71, 85, 105, 0.2);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  color: white;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.btn-reject {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-approve {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.btn-save:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-reject:hover {
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-approve:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+/* No Fields Message */
+.form-content .no-fields-message {
+  color: #64748b;
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(241, 245, 249, 0.6) 100%);
+  border: 2px dashed rgba(148, 163, 184, 0.3);
+  border-radius: 0.75rem;
+  margin: 1rem 0;
+}
+
+/* Error Text */
+.text-red-500 {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+/* Recommend Button */
+.recommend-btn {
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.recommend-btn:hover {
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+  transform: scale(1.05);
+}
+
+/* ==================== FORM INPUT STYLES ==================== */
+
+/* Base Input Styling */
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 0.5rem;
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(5px);
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.form-input:disabled, .form-textarea:disabled {
+  background: linear-gradient(135deg, rgba(241, 245, 249, 0.8) 0%, rgba(226, 232, 240, 0.6) 100%);
+  color: #64748b;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: #94a3b8;
+  opacity: 0.8;
+}
+
+/* Select Dropdown Specific Styling */
+select.form-input {
+  background-image: linear-gradient(45deg, transparent 50%, #64748b 50%), linear-gradient(135deg, #64748b 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(1em + 2px), calc(100% - 15px) calc(1em + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+select.form-input:focus {
+  background-image: linear-gradient(45deg, transparent 50%, #3b82f6 50%), linear-gradient(135deg, #3b82f6 50%, transparent 50%);
+}
+
+select.form-input option {
+  background: #ffffff;
+  color: #1e293b;
+  padding: 0.5rem;
+}
+/* Textarea Specific Styling */
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+  border-width: 1.5px; /* slightly stronger border for visibility */
+}
+
+/* File Input Specific Styling */
+input[type="file"].form-input {
+  padding: 0.5rem;
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.8) 100%);
+  cursor: pointer;
+}
+
+input[type="file"].form-input::-webkit-file-upload-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  margin-right: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="file"].form-input::-webkit-file-upload-button:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+
+
+/* ==================== DARK THEME STYLES ==================== */
+
+[data-theme="dark"] .form-viewer,
+.dark .form-viewer {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #f1f5f9;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .form-header,
+.dark .form-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+}
+
+[data-theme="dark"] .form-header h2,
+.dark .form-header h2 {
+  color: #f8fafc;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .back-btn,
+.dark .back-btn {
+  background: rgba(71, 85, 105, 0.3);
+  color: #cbd5e1;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+}
+
+[data-theme="dark"] .back-btn:hover,
+.dark .back-btn:hover {
+  background: rgba(71, 85, 105, 0.4);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .edit-btn,
+.dark .edit-btn {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+[data-theme="dark"] .edit-btn:hover,
+.dark .edit-btn:hover {
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.4);
+}
+
+[data-theme="dark"] .status-badge,
+.dark .status-badge {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.3) 0%, rgba(30, 58, 138, 0.4) 100%);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.3);
+}
+
+[data-theme="dark"] .form-content,
+.dark .form-content {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+  scrollbar-color: rgba(71, 85, 105, 0.6) transparent;
+}
+
+[data-theme="dark"] .form-content::-webkit-scrollbar-thumb,
+.dark .form-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(71, 85, 105, 0.8) 0%, rgba(51, 65, 85, 0.6) 100%);
+  border: 1px solid rgba(71, 85, 105, 0.4);
+}
+
+[data-theme="dark"] .form-content::-webkit-scrollbar-thumb:hover,
+.dark .form-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+}
+
+[data-theme="dark"] .form-group,
+.dark .form-group {
+  /* Use a richer surface so cards don't appear washed out in dark theme */
+  background: linear-gradient(150deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.88) 100%);
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  box-shadow: 0 8px 18px rgba(8, 15, 28, 0.45), 0 2px 6px rgba(15, 23, 42, 0.35);
+}
+
+[data-theme="dark"] .form-group:hover,
+.dark .form-group:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+
+[data-theme="dark"] .field-label,
+.dark .field-label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .status-text,
+.dark .status-text {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 [data-theme="dark"] .field-actions,
 .dark .field-actions {
-  scrollbar-color: #4b5563 transparent;
+  scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
 }
 
 [data-theme="dark"] .field-actions::-webkit-scrollbar-thumb,
 .dark .field-actions::-webkit-scrollbar-thumb {
-  background-color: #4b5563;
+  background: linear-gradient(135deg, rgba(71, 85, 105, 0.6) 0%, rgba(51, 65, 85, 0.4) 100%);
 }
+
+[data-theme="dark"] .action-tag,
+.dark .action-tag {
+  background: linear-gradient(135deg, rgba(67, 56, 202, 0.3) 0%, rgba(55, 48, 163, 0.4) 100%);
+  color: #a5b4fc;
+  border: 1px solid rgba(165, 180, 252, 0.3);
+}
+
+[data-theme="dark"] .action-tag:hover,
+.dark .action-tag:hover {
+  background: linear-gradient(135deg, rgba(55, 48, 163, 0.4) 0%, rgba(49, 46, 129, 0.5) 100%);
+}
+
+[data-theme="dark"] .form-footer,
+.dark .form-footer {
+  background: linear-gradient(135deg, #0b1220 0%, #162235 100%);
+  border-top: 1px solid rgba(71, 85, 105, 0.6);
+}
+
+[data-theme="dark"] .form-footer button,
+.dark .form-footer button {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.7) 0%, rgba(71, 85, 105, 0.6) 100%);
+  color: #e2e8f0;
+  border: 1px solid rgba(71, 85, 105, 0.6);
+}
+
+[data-theme="dark"] .btn-save,
+.dark .btn-save {
+  background: linear-gradient(135deg, rgba(71, 85, 105, 0.4) 0%, rgba(51, 65, 85, 0.6) 100%);
+  color: #cbd5e1;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+}
+
+[data-theme="dark"] .btn-save:hover,
+.dark .btn-save:hover {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.6) 0%, rgba(30, 41, 59, 0.8) 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .btn-submit:hover,
+.dark .btn-submit:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+[data-theme="dark"] .btn-reject:hover,
+.dark .btn-reject:hover {
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .btn-approve:hover,
+.dark .btn-approve:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="dark"] .form-content .no-fields-message,
+.dark .form-content .no-fields-message {
+  color: #94a3b8;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(51, 65, 85, 0.4) 100%);
+  border: 2px dashed rgba(71, 85, 105, 0.5);
+}
+
+[data-theme="dark"] .text-red-500,
+.dark .text-red-500 {
+  color: #f87171;
+}
+
+[data-theme="dark"] .recommend-btn,
+.dark .recommend-btn {
+  background: linear-gradient(135deg, #d97706 0%, #92400e 100%);
+}
+
+[data-theme="dark"] .recommend-btn:hover,
+.dark .recommend-btn:hover {
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+}
+
+/* ==================== DARK THEME FORM INPUT STYLES ==================== */
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-textarea,
+.dark .form-input,
+.dark .form-textarea {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.8) 100%);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  color: #f1f5f9;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-textarea:focus,
+.dark .form-input:focus,
+.dark .form-textarea:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: rgba(30, 41, 59, 0.95);
+}
+
+[data-theme="dark"] .form-input:disabled,
+[data-theme="dark"] .form-textarea:disabled,
+.dark .form-input:disabled,
+.dark .form-textarea:disabled {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.6) 0%, rgba(71, 85, 105, 0.4) 100%);
+  color: #94a3b8;
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] .form-textarea::placeholder,
+.dark .form-input::placeholder,
+.dark .form-textarea::placeholder {
+  color: #64748b;
+}
+
+/* Dark Theme Select Styling */
+[data-theme="dark"] select.form-input,
+.dark select.form-input {
+  background-image: linear-gradient(45deg, transparent 50%, #cbd5e1 50%), linear-gradient(135deg, #cbd5e1 50%, transparent 50%);
+}
+
+[data-theme="dark"] select.form-input:focus,
+.dark select.form-input:focus {
+  background-image: linear-gradient(45deg, transparent 50%, #60a5fa 50%), linear-gradient(135deg, #60a5fa 50%, transparent 50%);
+}
+
+[data-theme="dark"] select.form-input option,
+.dark select.form-input option {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+/* Dark Theme File Input */
+[data-theme="dark"] input[type="file"].form-input,
+.dark input[type="file"].form-input {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.8) 0%, rgba(71, 85, 105, 0.6) 100%);
+}
+
+[data-theme="dark"] input[type="file"].form-input::-webkit-file-upload-button,
+.dark input[type="file"].form-input::-webkit-file-upload-button {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] input[type="file"].form-input::-webkit-file-upload-button:hover,
+.dark input[type="file"].form-input::-webkit-file-upload-button:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  box-shadow: 0 2px 4px rgba(29, 78, 216, 0.4);
+}
+

@@ -6,6 +6,7 @@ import { useApplications } from "../hooks/useApplications";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { getStageColor, getStatusIcon } from "../utils/styleHelpers";
 import type { LoanApplication, WorkflowData } from "../types/dashboard.types";
+import { DASHBOARD_CONFIG } from "../config/dashboardConfig";
 import "./Dashboard.css";
 
 // Custom hook that matches the expected interface
@@ -21,7 +22,7 @@ const useDashboardApplications = () => {
     data,
     loading: isLoading,
     error,
-    isUsingFallback: false, // Set to true if using mock data instead of real API
+    isUsingFallback: DASHBOARD_CONFIG.useMockData, // Set to true if using mock data instead of real API
   };
 };
 
@@ -47,32 +48,11 @@ const Dashboard: React.FC<{
   const {
     data: statsData,
     loading: statsLoading,
-    isUsingFallback: statsUsingFallback,
   } = useDashboardStats();
 
-  // Get applications from API data
-  const rawApplications = applicationsResponse?.data || [];
-
-  // Transform API ApplicationInstance data to LoanApplication format
-  const applications: LoanApplication[] = rawApplications.map((app: any) => ({
-    id: app.id,
-    applicant:
-      app.data?.firstName && app.data?.lastName
-        ? `${app.data.firstName} ${app.data.lastName}`
-        : app.data?.applicantName || "Unknown Applicant",
-    amount: parseFloat(
-      app.data?.loanAmount?.toString()?.replace(/[^0-9.]/g, "") || "50000"
-    ),
-    product: app.data?.productType || "Personal Loan",
-    stage: app.currentState || "Application",
-    assignee: app.assignee || "Unassigned",
-    initiatedBy: app.data?.submittedBy || "System",
-    sla: "5 days",
-    slaStatus: (app.metadata?.slaStatus ||
-      "ontime") as LoanApplication["slaStatus"],
-    lastUpdate: app.metadata?.updatedAt || new Date().toISOString(),
-    flags: [],
-  }));
+  // Get applications from data source (either mock or API)
+  // The data from the hook is already transformed to LoanApplication format
+  const applications: LoanApplication[] = applicationsResponse?.data || [];
 
   const ownerOptions = useMemo(() => {
     const set = new Set<string>();
@@ -140,15 +120,15 @@ const Dashboard: React.FC<{
     }
   };
 
-  // Use real stats data when available
-  const stats = statsData || {
-    totalApplications: applications.length,
-    pendingApplications: applications.filter((a) => a.stage !== "Completed")
-      .length,
-    approvedApplications: applications.filter((a) => a.stage === "Completed")
-      .length,
-    rejectedApplications: 0,
-    slaMetrics: {
+  // Initialize stats with default values to prevent undefined property access
+  const stats = {
+    totalApplications: (statsData?.totalApplications || applications.length) || 0,
+    pendingApplications: (statsData?.pendingApplications || 
+                         applications.filter((a) => a.stage !== "Completed").length) || 0,
+    approvedApplications: (statsData?.approvedApplications || 
+                          applications.filter((a) => a.stage === "Completed").length) || 0,
+    rejectedApplications: statsData?.rejectedApplications || 0,
+    slaMetrics: statsData?.slaMetrics || {
       onTime: applications.filter((a) => a.slaStatus === "ontime").length,
       due: applications.filter((a) => a.slaStatus === "due").length,
       overdue: applications.filter((a) => a.slaStatus === "overdue").length,

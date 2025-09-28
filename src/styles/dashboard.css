@@ -188,6 +188,13 @@
   margin-bottom: 12px;
 }
 
+[data-theme="dark"] .field-row,
+.dark .field-row {
+  background: linear-gradient(140deg, rgba(30, 41, 59, 0.88) 0%, rgba(15, 23, 42, 0.92) 100%);
+  border: 1px solid rgba(46, 52, 71, 0.7);
+  box-shadow: 0 14px 28px rgba(2, 6, 23, 0.28);
+}
+
 .field-label {
   color: #475569;
   font-weight: 600;
