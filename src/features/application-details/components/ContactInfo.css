@@ -1,0 +1,64 @@
+/* ContactInfo.css - Modular styles for Contact Information Component */
+
+.contact-info {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.contact-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.contact-info-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.contact-info-field {
+  margin-bottom: 12px;
+}
+
+.contact-info-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.contact-info-value {
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.dark .contact-info {
+  background: var(--panel);
+  border-color: var(--stroke);
+}
+
+.dark .contact-info-title {
+  color: var(--text);
+}
+
+.dark .contact-info-label {
+  color: var(--text-secondary);
+}
+
+.dark .contact-info-value {
+  color: var(--text);
+}

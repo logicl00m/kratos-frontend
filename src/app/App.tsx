@@ -175,6 +175,7 @@ function App() {
             <WorkflowGraph
               nodes={nodes}
               edges={edges}
+              workflow={workflow}
               onNodeFormView={() => {}}
             />
             {!showEditor && (

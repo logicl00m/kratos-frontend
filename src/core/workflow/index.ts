@@ -100,6 +100,7 @@ export {
  */
 export function parseWorkflowToGraphLegacy(workflow: any, options?: any) {
   console.warn('parseWorkflowToGraphLegacy is deprecated. Use parseWorkflow() instead.');
+  // The function is exported from this module, so it should be available
   return parseWorkflowToGraph(workflow, options);
 }
 

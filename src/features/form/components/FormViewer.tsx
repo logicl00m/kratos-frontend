@@ -10,6 +10,9 @@ import type {
   State as WorkflowState,
 } from "../../workflow/types/workflow.types";
 
+// Import the CSS for proper styling and dark mode
+import "./FormViewer.css";
+
 interface LegacyFieldAction {
   Operation?: string;
   operation?: string;
@@ -89,6 +92,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
 }) => {
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [editMode, setEditMode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFieldChange = (
     fieldId: string,
@@ -169,7 +173,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
           <h2>{stateName}</h2>
         </div>
         <div className="form-content">
-          <p>Error: Invalid workflow configuration structure</p>
+          <p className="text-red-500">Error: Invalid workflow configuration structure</p>
         </div>
       </div>
     );
@@ -188,7 +192,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
           <h2>{stateName}</h2>
         </div>
         <div className="form-content">
-          <p>Error: Invalid workflow configuration structure</p>
+          <p className="text-red-500">Error: No forms defined in workflow configuration</p>
         </div>
       </div>
     );
@@ -210,7 +214,7 @@ const FormViewer: React.FC<FormViewerProps> = ({
           <h2>{stateName}</h2>
         </div>
         <div className="form-content">
-          <p>Error: State '{stateKey}' not found in workflow</p>
+          <p className="text-red-500">Error: State '{stateKey}' not found in workflow</p>
         </div>
       </div>
     );
@@ -222,22 +226,71 @@ const FormViewer: React.FC<FormViewerProps> = ({
       config?: WorkflowFieldOverride;
     }> = [];
 
-    stateConfig.forms?.forEach((stateForm) => {
-      if (stateForm.visibility === "hidden") return;
+    try {
+      // Handle both the new and legacy format - when no forms are defined at state level,
+      // extract fields directly from the form structure
+      if (stateConfig.forms && stateConfig.forms.length > 0) {
+        stateConfig.forms.forEach((stateForm) => {
+          if (stateForm.visibility === "hidden") return;
 
-      const formDef = stateForm.formName ? forms[stateForm.formName] : undefined;
-      if (!formDef) return;
+          const formDef = stateForm.formName ? forms[stateForm.formName] : undefined;
+          if (!formDef) {
+            console.warn(`Form '${stateForm.formName}' referenced in state '${stateKey}' not found`);
+            return;
+          }
 
-      formDef.fields.forEach((field) => {
-        const override = stateForm.fieldOverrides?.[field.id];
-        if (override?.status === "hidden") return;
+          formDef.fields.forEach((field) => {
+            // Handle the form format you specified where fieldActions might be strings or objects
+            let processedField = field;
+            if (Array.isArray(field.fieldActions) && 
+                field.fieldActions.length > 0 && 
+                typeof field.fieldActions[0] === 'string') {
+              // Convert string field actions to object format
+              processedField = {
+                ...field,
+                fieldActions: (field.fieldActions as string[]).map((op) => ({ operation: op }))
+              };
+            }
+            
+            const override = stateForm.fieldOverrides?.[field.id];
+            if (override?.status === "hidden") return;
 
-        visibleFields.push({
-          field,
-          config: override,
+            visibleFields.push({
+              field: processedField,
+              config: override,
+            });
+          });
         });
-      });
-    });
+      } else {
+        // For the case where a form might be defined in the expected JSON format
+        // where each form is a key in the forms object
+        Object.entries(forms).forEach(([formName, formObj]) => {
+          if (formObj.fields && Array.isArray(formObj.fields)) {
+            formObj.fields.forEach((field) => {
+              // Handle the form format you specified where fieldActions might be strings or objects
+              let processedField = field;
+              if (Array.isArray(field.fieldActions) && 
+                  field.fieldActions.length > 0 && 
+                  typeof field.fieldActions[0] === 'string') {
+                // Convert string field actions to object format
+                processedField = {
+                  ...field,
+                  fieldActions: (field.fieldActions as string[]).map((op) => ({ operation: op }))
+                };
+              }
+              
+              visibleFields.push({
+                field: processedField,
+                config: undefined,
+              });
+            });
+          }
+        });
+      }
+    } catch (err) {
+      console.error(`Error retrieving visible fields for state ${stateKey}:`, err);
+      setError("Error retrieving form fields: " + (err as Error).message);
+    }
 
     return visibleFields;
   };
@@ -276,6 +329,23 @@ const FormViewer: React.FC<FormViewerProps> = ({
 
   const visibleFields = getVisibleFields();
 
+  if (error) {
+    return (
+      <div className="form-viewer">
+        <div className="form-header">
+          <button className="back-btn" onClick={onBack}>
+            <ArrowLeft size={16} />
+            Back to Graph
+          </button>
+          <h2>{stateName}</h2>
+        </div>
+        <div className="form-content">
+          <p className="text-red-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="form-viewer">
       <div className="form-header">
@@ -294,54 +364,64 @@ const FormViewer: React.FC<FormViewerProps> = ({
       </div>
 
       <div className="form-content">
-        {visibleFields.map(({ field, config }) => {
-          const statusText = getFieldStatusDisplay(field.id, config);
-          const normalizedField = toFieldInputField(field);
+        {visibleFields.length === 0 ? (
+          <div className="no-fields-message">
+            <p>No fields found for this state.</p>
+          </div>
+        ) : (
+          visibleFields.map(({ field, config }) => {
+            const statusText = getFieldStatusDisplay(field.id, config);
+            const normalizedField = toFieldInputField(field);
 
-          return (
-            <div key={field.id} className="form-group">
-              <div className="field-row">
-                <label className="field-label">
-                  {field.name}
-                  {config?.required && (
-                    <span className="required-marker"> *</span>
-                  )}
-                </label>
-                <div className="field-value">
-                  <FieldInput
-                    field={normalizedField}
-                    value={formData[field.id]}
-                    disabled={!isFieldEditable(config)}
-                    onChange={(val) => handleFieldChange(field.id, val)}
-                  />
+            return (
+              <div key={field.id} className="form-group">
+                <div className="field-row">
+                  <label className="field-label">
+                    {field.name}
+                    {config?.required && (
+                      <span className="required-marker"> *</span>
+                    )}
+                  </label>
+                  <div className="field-value">
+                    <FieldInput
+                      field={normalizedField}
+                      value={formData[field.id]}
+                      disabled={!isFieldEditable(config)}
+                      onChange={(val) => handleFieldChange(field.id, val)}
+                    />
+                  </div>
+                  <div className="field-status">
+                    {statusText && (
+                      <span className="status-text">{statusText}</span>
+                    )}
+                    {config?.status === "actionable" && (
+                      <button className="recommend-btn">Action</button>
+                    )}
+                  </div>
                 </div>
-                <div className="field-status">
-                  {statusText && (
-                    <span className="status-text">{statusText}</span>
-                  )}
-                  {config?.status === "actionable" && (
-                    <button className="recommend-btn">Action</button>
-                  )}
-                </div>
-              </div>
 
-              {field.fieldActions && field.fieldActions.length > 0 && (
-                <div className="field-actions">
-                  {field.fieldActions.map((action, index) => {
-                    const key = action.operation
-                      ? `${field.id}-${action.operation}`
+                {Array.isArray(field.fieldActions) && field.fieldActions.map((action, index) => {
+                    // Handle both FieldAction objects and string actions
+                    let actionText = '';
+                    if (typeof action === 'string') {
+                      actionText = action;
+                    } else if (action && typeof action === 'object' && 'operation' in action) {
+                      actionText = action.operation || '';
+                    }
+                    
+                    const key = actionText
+                      ? `${field.id}-${actionText}`
                       : `${field.id}-action-${index}`;
                     return (
                       <span key={key} className="action-tag">
-                        {action.operation}
+                        {actionText}
                       </span>
                     );
                   })}
-                </div>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })
+        )}
       </div>
 
       <div className="form-footer">

@@ -6,6 +6,7 @@ import {
   Clock, 
   AlertCircle 
 } from "lucide-react";
+import "./StatsCard.css";
 
 interface StatsCardProps {
   title: string;

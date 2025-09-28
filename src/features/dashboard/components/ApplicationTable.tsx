@@ -2,6 +2,7 @@
 import React from "react";
 import type { LoanApplication } from "@features/dashboard/types/dashboard.types";
 import ApplicationRow from "./ApplicationRow";
+import "./ApplicationTable.css";
 
 interface ApplicationTableProps {
   applications: LoanApplication[];
@@ -37,18 +38,18 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
     "5%", // Action
   ];
   return (
-    <table className="dashboard-table">
+    <table className="application-table">
       <colgroup>
         {colWidths.map((w, i) => (
           <col key={`col-${i}-${String(w)}`} style={{ width: w }} />
         ))}
       </colgroup>
-      <thead className="dashboard-table-header">
-        <tr>
-          <th className="dashboard-table-header-cell">
+      <thead className="application-table-header">
+        <tr className="application-table-header-row">
+          <th className="application-table-header-cell">
             <input
               type="checkbox"
-              className="dashboard-table-header-checkbox"
+              className="application-table-checkbox"
               onChange={(e) => onSelectAll(e.target.checked)}
               checked={
                 selectedRows.length === applications.length &&
@@ -56,42 +57,42 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
               }
             />
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Application ID
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Applicant
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Amount
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Current Stage
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Product
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Assignee
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Initiated By
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             SLA Status
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Docs
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row">
+          <th className="application-table-header-cell">
             Last Update
           </th>
-          <th className="dashboard-table-header-cell dashboard-table-header-row text-center">
+          <th className="application-table-header-cell" style={{ textAlign: 'center' }}>
             Action
           </th>
         </tr>
       </thead>
-      <tbody className="dashboard-table-body">
+      <tbody className="application-table-body">
         {applications.map((app) => (
           <ApplicationRow
             key={app.id}

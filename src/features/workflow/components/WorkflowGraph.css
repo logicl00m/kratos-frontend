@@ -1,0 +1,144 @@
+/* WorkflowGraph.css - Modular styles for Workflow Graph Component */
+
+.workflow-graph {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+.workflow-graph-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.workflow-graph-controls {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+  background: var(--panel);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  box-shadow: var(--shadow-md);
+}
+
+.workflow-graph-btn {
+  padding: 8px 12px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  transition: background var(--transition-fast);
+}
+
+.workflow-graph-btn:hover {
+  background: var(--primary-hover);
+}
+
+.graph-node {
+  background: var(--panel);
+  border: 2px solid var(--stroke);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-width: 200px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.graph-node:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.graph-node-label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.graph-node-fields {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.graph-node-formatted-fields {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--stroke-light);
+}
+
+.graph-node-field {
+  padding: 2px 0;
+}
+
+.graph-node-field-name {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.graph-node-field-type {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.graph-node-actions {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--stroke-light);
+  font-size: 11px;
+}
+
+.graph-node-action {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.graph-node-action-name {
+  color: var(--text);
+}
+
+.graph-node-action-target {
+  color: var(--primary);
+}
+
+/* Dark mode styles */
+.dark .workflow-graph {
+  background: var(--bg);
+}
+
+.dark .workflow-graph-controls {
+  background: var(--panel);
+}
+
+.dark .graph-node {
+  background: var(--panel);
+  border-color: var(--stroke);
+}
+
+.dark .graph-node-label,
+.dark .graph-node-field-name {
+  color: var(--text);
+}
+
+.dark .graph-node-fields,
+.dark .graph-node-field-type {
+  color: var(--text-secondary);
+}
+
+.dark .graph-node-formatted-fields,
+.dark .graph-node-actions {
+  border-top-color: var(--stroke-light);
+}

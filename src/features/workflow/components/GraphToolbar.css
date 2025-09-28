@@ -1,2 +1,46 @@
-.graph-toolbar { background: white; padding: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; gap: 8px; align-items: center; }
-.gt-btn { display:flex; align-items:center; gap:4px; padding:6px 10px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:6px; cursor:pointer; font-size:12px; }
+.graph-toolbar {
+  background: var(--bg);
+  padding: 8px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--stroke);
+}
+
+.gt-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all var(--transition-fast);
+}
+
+.gt-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.dark .graph-toolbar {
+  background: var(--bg);
+  border-color: var(--stroke);
+}
+
+.dark .gt-btn {
+  background: var(--panel);
+  border-color: var(--stroke);
+  color: var(--text);
+}
+
+.dark .gt-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}

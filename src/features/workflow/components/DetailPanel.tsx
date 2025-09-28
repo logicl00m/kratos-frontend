@@ -1,5 +1,5 @@
 // src/features/workflow/components/DetailPanel.tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   ArrowRight,
@@ -11,13 +11,15 @@ import {
   Folder,
 } from "lucide-react";
 import type { Node, Edge } from "reactflow";
-import type { StateFormField } from "@features/workflow/types/workflow.types";
+import type { StateFormField, WorkflowConfig } from "@features/workflow/types/workflow.types";
+import FormViewModal from "./FormViewModal";
 import "./DetailPanel.css";
 
 interface DetailPanelProps {
   selectedNode: Node | null;
   selectedEdge: Edge | null;
   onClose: () => void;
+  workflow: WorkflowConfig;
   onViewForm?: (nodeId: string) => void;
 }
 
@@ -43,8 +45,25 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
   selectedNode,
   selectedEdge,
   onClose,
+  workflow,
   onViewForm,
 }) => {
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [currentNodeId, setCurrentNodeId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedNode) {
+      setShowFormModal(false);
+      setCurrentNodeId(null);
+    }
+  }, [selectedNode]);
+
+  const handleViewForm = (nodeId: string) => {
+    setCurrentNodeId(nodeId);
+    setShowFormModal(true);
+    onViewForm?.(nodeId);
+  };
+
   if (!selectedNode && !selectedEdge) return null;
 
   const nodeData: NodeData = (selectedNode?.data as NodeData) ?? {};
@@ -134,220 +153,229 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
   };
 
   return (
-    <div className="detail-panel">
-      <div className="detail-panel-header">
-        <h3 className="detail-panel-title">
-          {selectedNode ? "State Details" : "Action Details"}
-        </h3>
-        <button
-          onClick={onClose}
-          className="detail-panel-close"
-          aria-label="Close details"
-        >
-          <X size={18} />
-        </button>
-      </div>
+    <>
+      <div className="detail-panel">
+        <div className="detail-panel-header">
+          <h3 className="detail-panel-title">
+            {selectedNode ? "State Details" : "Action Details"}
+          </h3>
+          <button
+            onClick={onClose}
+            className="detail-panel-close"
+            aria-label="Close details"
+          >
+            <X size={18} />
+          </button>
+        </div>
 
-      <div className="detail-panel-body">
-        {selectedNode ? (
-          <section aria-label="State details">
-            {nodeData.hasForm ? (
-              <button
-                onClick={() =>
-                  onViewForm ? onViewForm(selectedNode.id) : undefined
-                }
-                className="dp-form-view-btn"
-              >
-                <Eye size={16} />
-                Form View
-              </button>
-            ) : null}
-
-            <div style={{ marginBottom: "16px" }}>
-              <div className="dp-section-label">State Name</div>
-              <div style={{ fontSize: "14px", fontWeight: 500 }}>
-                {safeString(nodeData.label)}
-              </div>
-            </div>
-
-            {nodeData.hasForm ? (
-              <div style={{ marginBottom: "16px" }}>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#6b7280",
-                    marginBottom: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
+        <div className="detail-panel-body">
+          {selectedNode ? (
+            <section aria-label="State details">
+              {nodeData.hasForm ? (
+                <button
+                  onClick={() => handleViewForm(selectedNode.id)}
+                  className="dp-form-view-btn"
                 >
-                  <FileText size={12} />
-                  <span>Visible Fields ({fields.length})</span>
+                  <Eye size={16} />
+                  Form View
+                </button>
+              ) : null}
+
+              <div style={{ marginBottom: "16px" }}>
+                <div className="dp-section-label">State Name</div>
+                <div style={{ fontSize: "14px", fontWeight: 500 }}>
+                  {safeString(nodeData.label)}
                 </div>
+              </div>
 
-                <div style={{ display: "block" }}>
-                  {Object.entries(fieldsByForm).map(
-                    ([formName, formFields]) => (
-                      <div key={formName} style={{ marginBottom: "12px" }}>
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            color: "#9ca3af",
-                            marginBottom: "6px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            fontWeight: 500,
-                          }}
-                        >
-                          <Folder size={10} />
-                          <span>{formName}</span>
-                        </div>
-                        {formFields.map((f, idx) => {
-                          const actions = getFieldActions(f);
-                          const key = f.id || f.name || `field-${idx}`;
-                          const status = f.stateConfig?.status || "readonly";
+              {nodeData.hasForm ? (
+                <div style={{ marginBottom: "16px" }}>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#6b7280",
+                      marginBottom: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <FileText size={12} />
+                    <span>Visible Fields ({fields.length})</span>
+                  </div>
 
-                          return (
-                            <div
-                              key={key}
-                              className="dp-field-card"
-                              style={{ marginLeft: "8px" }}
-                            >
-                              <div className="dp-field-name">
-                                {getFieldDisplayName(f)}
-                                {f.stateConfig?.required && (
-                                  <span
-                                    style={{
-                                      color: "#ef4444",
-                                      fontSize: "11px",
-                                      marginLeft: "4px",
-                                      fontWeight: "bold",
-                                    }}
-                                  >
-                                    *
-                                  </span>
-                                )}
-                              </div>
-                              <div className="dp-field-meta">
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "4px",
-                                    marginBottom: "2px",
-                                  }}
-                                >
-                                  {getStatusIcon(status)}
-                                  <span
-                                    style={{ color: getStatusColor(status) }}
-                                  >
-                                    {getStatusLabel(status)}
-                                  </span>
-                                  <span
-                                    style={{
-                                      fontSize: "10px",
-                                      color: "#9ca3af",
-                                    }}
-                                  >
-                                    - {getStatusDescription(status)}
-                                  </span>
+                  <div style={{ display: "block" }}>
+                    {Object.entries(fieldsByForm).map(
+                      ([formName, formFields]) => (
+                        <div key={formName} style={{ marginBottom: "12px" }}>
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              color: "#9ca3af",
+                              marginBottom: "6px",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              fontWeight: 500,
+                            }}
+                          >
+                            <Folder size={10} />
+                            <span>{formName}</span>
+                          </div>
+                          {formFields.map((f, idx) => {
+                            const actions = getFieldActions(f);
+                            const key = f.id || f.name || `field-${idx}`;
+                            const status = f.stateConfig?.status || "readonly";
+
+                            return (
+                              <div
+                                key={key}
+                                className="dp-field-card"
+                                style={{ marginLeft: "8px" }}
+                              >
+                                <div className="dp-field-name">
+                                  {getFieldDisplayName(f)}
+                                  {f.stateConfig?.required && (
+                                    <span
+                                      style={{
+                                        color: "#ef4444",
+                                        fontSize: "11px",
+                                        marginLeft: "4px",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      *
+                                    </span>
+                                  )}
                                 </div>
-                                <div>Type: {safeString(f.type)}</div>
-                                {f.data ? (
-                                  <div>
-                                    Source:{" "}
-                                    <code className="dp-code">
-                                      {safeString(f.data)}
-                                    </code>
+                                <div className="dp-field-meta">
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "4px",
+                                      marginBottom: "2px",
+                                    }}
+                                  >
+                                    {getStatusIcon(status)}
+                                    <span
+                                      style={{ color: getStatusColor(status) }}
+                                    >
+                                      {getStatusLabel(status)}
+                                    </span>
+                                    <span
+                                      style={{
+                                        fontSize: "10px",
+                                        color: "#9ca3af",
+                                      }}
+                                    >
+                                      - {getStatusDescription(status)}
+                                    </span>
                                   </div>
-                                ) : null}
-                                {actions.length > 0 && (
-                                  <div>Actions: {actions.join(", ")}</div>
-                                )}
+                                  <div>Type: {safeString(f.type)}</div>
+                                  {f.data ? (
+                                    <div>
+                                      Source:{" "}
+                                      <code className="dp-code">
+                                        {safeString(f.data)}
+                                      </code>
+                                    </div>
+                                  ) : null}
+                                  {actions.length > 0 && (
+                                    <div>Actions: {actions.join(", ")}</div>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )
-                  )}
+                            );
+                          })}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="dp-noform">No fields visible in this state</div>
+              )}
+            </section>
+          ) : null}
+
+          {selectedEdge ? (
+            <section aria-label="Action details">
+              <div style={{ marginBottom: "16px" }}>
+                <div className="dp-section-label">Action Name</div>
+                <div style={{ fontSize: "14px", fontWeight: 500 }}>
+                  {(typeof selectedEdge.label === "string" &&
+                    selectedEdge.label) ||
+                    "Unnamed Action"}
                 </div>
               </div>
-            ) : (
-              <div className="dp-noform">No fields visible in this state</div>
-            )}
-          </section>
-        ) : null}
 
-        {selectedEdge ? (
-          <section aria-label="Action details">
-            <div style={{ marginBottom: "16px" }}>
-              <div className="dp-section-label">Action Name</div>
-              <div style={{ fontSize: "14px", fontWeight: 500 }}>
-                {(typeof selectedEdge.label === "string" &&
-                  selectedEdge.label) ||
-                  "Unnamed Action"}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: "16px" }}>
-              <div className="dp-section-label">Flow</div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontSize: "13px",
-                }}
-              >
-                <span className="dp-flow-badge source">
-                  {selectedEdge.source}
-                </span>
-                <ArrowRight size={16} color="#6b7280" />
-                <span className="dp-flow-badge target">
-                  {selectedEdge.target}
-                </span>
-              </div>
-            </div>
-
-            {edgeData.operation ? (
               <div style={{ marginBottom: "16px" }}>
+                <div className="dp-section-label">Flow</div>
                 <div
                   style={{
-                    fontSize: "12px",
-                    color: "#6b7280",
-                    marginBottom: "4px",
                     display: "flex",
                     alignItems: "center",
-                    gap: 8,
+                    gap: "8px",
+                    fontSize: "13px",
                   }}
                 >
-                  <Settings size={12} />
-                  <span>Operations</span>
-                </div>
-
-                <div className="dp-ops-list">
-                  {splitOperations(edgeData.operation).map((op, idx, arr) => (
-                    <div
-                      key={`${op}-${idx}`}
-                      className="dp-op-item"
-                      style={{
-                        borderBottom:
-                          idx < arr.length - 1 ? "1px solid #e5e7eb" : "none",
-                      }}
-                    >
-                      • {op}
-                    </div>
-                  ))}
+                  <span className="dp-flow-badge source">
+                    {selectedEdge.source}
+                  </span>
+                  <ArrowRight size={16} color="#6b7280" />
+                  <span className="dp-flow-badge target">
+                    {selectedEdge.target}
+                  </span>
                 </div>
               </div>
-            ) : null}
-          </section>
-        ) : null}
+
+              {edgeData.operation ? (
+                <div style={{ marginBottom: "16px" }}>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#6b7280",
+                      marginBottom: "4px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Settings size={12} />
+                    <span>Operations</span>
+                  </div>
+
+                  <div className="dp-ops-list">
+                    {splitOperations(edgeData.operation).map((op, idx, arr) => (
+                      <div
+                        key={`${op}-${idx}`}
+                        className="dp-op-item"
+                        style={{
+                          borderBottom:
+                            idx < arr.length - 1 ? "1px solid #e5e7eb" : "none",
+                        }}
+                      >
+                        • {op}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </section>
+          ) : null}
+        </div>
       </div>
-    </div>
+
+      {showFormModal && currentNodeId && (
+        <FormViewModal
+          nodeId={currentNodeId}
+          workflow={workflow}
+          isOpen={showFormModal}
+          onClose={() => setShowFormModal(false)}
+        />
+      )}
+    </>
   );
 };
 

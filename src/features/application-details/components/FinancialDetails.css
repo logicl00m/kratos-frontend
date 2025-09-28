@@ -1,0 +1,64 @@
+/* FinancialDetails.css - Modular styles for Financial Details Component */
+
+.financial-details {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.financial-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.financial-details-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.financial-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.financial-details-field {
+  margin-bottom: 12px;
+}
+
+.financial-details-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.financial-details-value {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.dark .financial-details {
+  background: var(--panel);
+  border-color: var(--stroke);
+}
+
+.dark .financial-details-title {
+  color: var(--text);
+}
+
+.dark .financial-details-label {
+  color: var(--text-secondary);
+}
+
+.dark .financial-details-value {
+  color: var(--text);
+}

@@ -1,0 +1,80 @@
+/* ApplicationTable.css - Modular styles for Application Table Component */
+
+.application-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.application-table-header {
+  background: var(--panel-header);
+  border-bottom: 2px solid var(--stroke);
+}
+
+.application-table-header-row {
+  display: contents;
+}
+
+.application-table-header-cell {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--panel-header);
+}
+
+.application-table-header-cell--sortable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.application-table-header-cell--sortable:hover {
+  background-color: var(--hover-bg);
+}
+
+.application-table-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.application-table-body {
+  display: contents;
+}
+
+.application-table-row {
+  display: contents;
+  transition: all var(--transition-fast);
+}
+
+.application-table-cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--stroke-light);
+  color: var(--text);
+}
+
+/* Dark mode styles */
+.dark .application-table {
+  background: var(--panel);
+}
+
+.dark .application-table-header {
+  background: var(--panel-header);
+  border-bottom-color: var(--stroke);
+}
+
+.dark .application-table-header-cell {
+  background: var(--panel-header);
+  color: var(--text-secondary);
+}
+
+.dark .application-table-cell {
+  border-bottom-color: var(--stroke-light);
+  color: var(--text);
+}

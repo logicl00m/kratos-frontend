@@ -1,21 +1,29 @@
 // src/features/dashboard/components/Dashboard.tsx
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  useDashboardApplications,
-  useDashboardStats,
-} from "../../../lib/hooks/useApiWithFallback";
-import type {
-  WorkflowData,
-  LoanApplication,
-} from "@features/dashboard/types/dashboard.types";
-import {
-  getStageColor,
-  getStatusIcon,
-} from "@features/dashboard/utils/styleHelpers";
-import DashboardFilters from "./DashboardFilters";
+import DashboardHeader from "./DashboardHeader";
 import DashboardMain from "./DashboardMain";
+import { useApplications } from "../hooks/useApplications";
+import { useDashboardStats } from "../hooks/useDashboardStats";
+import { getStageColor, getStatusIcon } from "../utils/styleHelpers";
+import type { LoanApplication, WorkflowData } from "../types/dashboard.types";
 import "./Dashboard.css";
+
+// Custom hook that matches the expected interface
+const useDashboardApplications = () => {
+  const { applications, isLoading, error } = useApplications();
+
+  // Transform the data to match the expected structure
+  const data = {
+    data: applications,
+  };
+
+  return {
+    data,
+    loading: isLoading,
+    error,
+    isUsingFallback: false, // Set to true if using mock data instead of real API
+  };
+};
 
 const Dashboard: React.FC<{
   onApplicationClick?: (workflow: WorkflowData) => void;
@@ -125,8 +133,8 @@ const Dashboard: React.FC<{
           currentState: app.stage,
           currentStateEnteredAt: app.lastUpdate,
           forms: {},
-          states: {}
-        }
+          states: {},
+        },
       };
       onApplicationClick(workflow);
     }
@@ -148,39 +156,41 @@ const Dashboard: React.FC<{
     },
   };
 
-  const filterControls = (
-    <DashboardFilters
-      myQueueOnly={myQueueOnly}
-      selectedStage={selectedStage}
-      selectedStatus={selectedStatus}
-      selectedProduct={selectedProduct}
-      selectedOwner={selectedOwner}
-      ownerOptions={ownerOptions}
-      onMyQueueToggle={setMyQueueOnly}
-      onStageChange={setSelectedStage}
-      onStatusChange={setSelectedStatus}
-      onProductChange={setSelectedProduct}
-      onOwnerChange={setSelectedOwner}
-    />
-  );
-
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-xl">
-      <DashboardMain
-        stats={stats}
-        filteredApplications={filteredApplications}
-        selectedRows={selectedRows}
-        handleToggleAllSelection={handleToggleAllSelection}
-        handleToggleRow={handleToggleRow}
-        handleApplicationClick={handleApplicationClick}
-        getStageColor={getStageColor}
-        getStatusIcon={(s: string) =>
-          getStatusIcon(s as unknown as LoanApplication["slaStatus"])
-        }
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        filterControls={filterControls}
-      />
+    <div className="dashboard">
+      <div className="dashboard-header">
+        <DashboardHeader
+          searchTerm={searchTerm}
+          myQueueOnly={myQueueOnly}
+          selectedStage={selectedStage}
+          selectedStatus={selectedStatus}
+          selectedProduct={selectedProduct}
+          selectedOwner={selectedOwner}
+          ownerOptions={ownerOptions}
+          onSearchChange={setSearchTerm}
+          onMyQueueToggle={setMyQueueOnly}
+          onStageChange={setSelectedStage}
+          onStatusChange={setSelectedStatus}
+          onProductChange={setSelectedProduct}
+          onOwnerChange={setSelectedOwner}
+        />
+      </div>
+      <div className="dashboard-content">
+        <div className="dashboard-main-content">
+          <DashboardMain
+            stats={stats}
+            filteredApplications={filteredApplications}
+            selectedRows={selectedRows}
+            handleToggleAllSelection={handleToggleAllSelection}
+            handleToggleRow={handleToggleRow}
+            handleApplicationClick={handleApplicationClick}
+            getStageColor={getStageColor}
+            getStatusIcon={(s: string) =>
+              getStatusIcon(s as unknown as LoanApplication["slaStatus"])
+            }
+          />
+        </div>
+      </div>
     </div>
   );
 };

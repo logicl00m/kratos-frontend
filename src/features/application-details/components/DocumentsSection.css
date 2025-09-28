@@ -1,0 +1,108 @@
+/* DocumentsSection.css - Modular styles for Documents Section Component */
+
+.documents-section {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.documents-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.documents-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.document-card {
+  background: var(--bg);
+  border: 1px solid var(--stroke-light);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.document-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.document-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+.document-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+.document-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.document-action-btn {
+  background: none;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.document-action-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.dark .documents-section {
+  background: var(--panel);
+  border-color: var(--stroke);
+}
+
+.dark .document-card {
+  background: rgba(30, 30, 40, 0.5);
+  border-color: var(--stroke-light);
+}
+
+.dark .document-name {
+  color: var(--text);
+}
+
+.dark .document-action-btn {
+  border-color: var(--stroke-light);
+  color: var(--text);
+}
+
+.dark .document-action-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}

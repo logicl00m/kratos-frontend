@@ -6,7 +6,7 @@ export type FieldInputField = {
   name: string;
   type: string;
   data?: unknown;
-  fieldActions?: Array<{ operation: string }>;
+  fieldActions?: Array<{ operation: string }> | string[];
 };
 
 type Props = {

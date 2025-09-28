@@ -4,13 +4,16 @@ import { ReactFlowProvider } from "reactflow";
 import { vi } from "vitest";
 import type { RenderOptions } from "@testing-library/react";
 import type { LoanApplication } from "@features/dashboard/types/dashboard.types";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export const renderWithProviders = (
   ui: ReactElement,
   options?: Omit<RenderOptions, "wrapper">
 ) => {
   const Wrapper = ({ children }: { children?: ReactNode }) => (
-    <ReactFlowProvider>{children}</ReactFlowProvider>
+    <ThemeProvider>
+      <ReactFlowProvider>{children}</ReactFlowProvider>
+    </ThemeProvider>
   );
   return render(ui, { wrapper: Wrapper, ...options });
 };

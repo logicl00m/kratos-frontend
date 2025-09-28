@@ -1,0 +1,180 @@
+/* ApplicationRow.css - Modular styles for Application Row Component */
+
+.application-row {
+  border-bottom: 1px solid var(--stroke-light);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  position: relative;
+}
+
+.application-row:hover {
+  background-color: var(--hover-bg);
+}
+
+.application-row--selected {
+  background-color: var(--selected-bg);
+}
+
+.application-row-cell {
+  padding: 12px;
+  font-size: 14px;
+}
+
+.application-row-id {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.application-row-applicant {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.application-row-amount {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.application-row-stage-badge {
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.application-row-stage-badge--application {
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.application-row-stage-badge--review {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.application-row-stage-badge--approval {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+
+.application-row-product {
+  color: var(--text-secondary);
+}
+
+.application-row-assignee {
+  color: var(--text-secondary);
+}
+
+.application-row-initiated {
+  color: var(--text-secondary);
+}
+
+.application-row-sla-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.application-row-sla-badge {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.application-row-sla-badge--ontrack {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.application-row-sla-badge--atrisk {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+
+.application-row-sla-badge--late {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.application-row-docs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.application-row-docs-count {
+  display: inline-block;
+  min-width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  background: var(--primary-bg);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.application-row-update {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.application-row-action {
+  text-align: center;
+}
+
+.application-row-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.application-row-action-button:hover {
+  background: var(--primary-hover);
+}
+
+.application-row-action-icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Dark mode styles */
+.dark .application-row {
+  border-bottom-color: var(--stroke-light);
+}
+
+.dark .application-row:hover {
+  background-color: var(--hover-bg);
+}
+
+.dark .application-row--selected {
+  background-color: var(--selected-bg);
+}
+
+.dark .application-row-id,
+.dark .application-row-applicant,
+.dark .application-row-amount {
+  color: var(--text);
+}
+
+.dark .application-row-product,
+.dark .application-row-assignee,
+.dark .application-row-initiated {
+  color: var(--text-secondary);
+}
+
+.dark .application-row-update {
+  color: var(--text-secondary);
+}

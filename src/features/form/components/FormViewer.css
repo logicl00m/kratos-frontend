@@ -1,0 +1,27 @@
+/* Additional form viewer styles for dark mode */
+.form-viewer {
+  @apply bg-white text-gray-900;
+}
+
+.form-content .no-fields-message {
+  @apply text-gray-500 italic p-4 text-center;
+}
+
+[data-theme="dark"] .form-viewer,
+.dark .form-viewer {
+  @apply bg-gray-800 text-gray-100;
+}
+
+[data-theme="dark"] .form-content .no-fields-message,
+.dark .form-content .no-fields-message {
+  @apply text-gray-400;
+}
+
+.text-red-500 {
+  @apply text-red-500;
+}
+
+[data-theme="dark"] .text-red-500,
+.dark .text-red-500 {
+  @apply text-red-400;
+}

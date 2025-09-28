@@ -7,8 +7,8 @@
   height: 100%;
   width: 460px;
   max-height: 100%;
-  background: rgba(255, 255, 255, 0.98);
-  border-left: 1px solid #e2e8f0;
+  background: var(--panel);
+  border-left: 1px solid var(--stroke);
   box-shadow: -16px 0 32px rgba(15, 23, 42, 0.08);
   z-index: 10;
   display: flex;
@@ -18,27 +18,27 @@
 
 .rdp-header {
   padding: 24px 28px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--stroke);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-  background: rgba(248, 250, 252, 0.88);
+  background: var(--panel-header);
 }
 
 .rdp-title {
   margin: 0 0 10px 0;
   font-size: 22px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .rdp-close {
-  background: rgba(226, 232, 240, 0.6);
+  background: var(--muted-bg);
   border: none;
   cursor: pointer;
   padding: 8px;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 18px;
   width: 36px;
   height: 36px;
@@ -50,8 +50,8 @@
 }
 
 .rdp-close:hover {
-  background: rgba(99, 102, 241, 0.15);
-  color: #4338ca;
+  background: var(--primary);
+  color: white;
 }
 
 .rdp-body {
@@ -65,7 +65,7 @@
 }
 
 .rdp-body::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.45);
+  background: var(--scrollbar);
   border-radius: 999px;
 }
 
@@ -83,7 +83,7 @@
   gap: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 0.7px;
@@ -103,14 +103,14 @@
 
 .rdp-label {
   font-size: 12px;
-  color: #64748b;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
 
 .rdp-value {
   font-size: 15px;
-  color: #0f172a;
+  color: var(--text);
   font-weight: 600;
 }
 
@@ -123,28 +123,28 @@
 }
 
 .status-badge.status-active {
-  background: rgba(96, 165, 250, 0.18);
-  color: #1d4ed8;
+  background: var(--primary-bg);
+  color: var(--primary);
 }
 
 .status-badge.status-completed {
-  background: rgba(134, 239, 172, 0.22);
-  color: #047857;
+  background: var(--success-bg);
+  color: var(--success);
 }
 
 .status-badge.status-pending {
-  background: rgba(253, 230, 138, 0.26);
-  color: #b45309;
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
 .status-badge.status-rejected {
-  background: rgba(252, 165, 165, 0.24);
-  color: #b91c1c;
+  background: var(--error-bg);
+  color: var(--error);
 }
 
 .rdp-data-container {
-  background: rgba(248, 250, 252, 0.9);
-  border-radius: 14px;
+  background: var(--panel);
+  border-radius: var(--radius-lg);
   padding: 18px;
   display: grid;
   gap: 14px;
@@ -162,13 +162,13 @@
 
 .rdp-data-key {
   font-size: 12px;
-  color: #64748b;
+  color: var(--text-secondary);
   text-transform: capitalize;
 }
 
 .rdp-data-value {
   font-size: 14px;
-  color: #0f172a;
+  color: var(--text);
   word-break: break-word;
   font-weight: 500;
 }
@@ -185,7 +185,7 @@
   top: 12px;
   bottom: 12px;
   width: 2px;
-  background: #e2e8f0;
+  background: var(--stroke);
 }
 
 .rdp-history-item {
@@ -199,17 +199,17 @@
   top: 10px;
   width: 12px;
   height: 12px;
-  background: #6366f1;
+  background: var(--primary);
   border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+  border: 3px solid var(--bg);
+  box-shadow: 0 6px 16px var(--shadow-color);
 }
 
 .rdp-history-content {
-  background: white;
-  border-radius: 14px;
+  background: var(--panel);
+  border-radius: var(--radius-lg);
   padding: 16px 18px;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .rdp-history-header {
@@ -222,12 +222,12 @@
 .rdp-history-state {
   font-weight: 600;
   font-size: 15px;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .rdp-history-action {
   padding: 4px 10px;
-  background: #4338ca;
+  background: var(--primary);
   color: white;
   border-radius: 999px;
   font-size: 11px;
@@ -239,15 +239,15 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .rdp-history-comments {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--stroke);
   font-size: 13px;
-  color: #334155;
+  color: var(--text);
   font-style: italic;
 }
 
@@ -261,16 +261,16 @@
   display: flex;
   gap: 14px;
   padding: 16px 18px;
-  background: white;
-  border-radius: 14px;
-  border-left: 4px solid #6366f1;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  background: var(--panel);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid var(--primary);
+  box-shadow: var(--shadow-md);
 }
 
 .rdp-summary-icon {
   flex-shrink: 0;
   margin-top: 4px;
-  color: #6366f1;
+  color: var(--primary);
 }
 
 .rdp-summary-content {
@@ -284,13 +284,13 @@
 
 .rdp-summary-time {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .rdp-summary-state {
   font-size: 16px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text);
   margin-bottom: 6px;
 }
 
@@ -303,7 +303,7 @@
 
 .rdp-action-badge {
   padding: 4px 10px;
-  background: #4338ca;
+  background: var(--primary);
   color: white;
   border-radius: 999px;
   font-size: 11px;
@@ -314,16 +314,16 @@
 
 .rdp-summary-actor {
   font-size: 13px;
-  color: #475569;
+  color: var(--text-secondary);
 }
 
 .rdp-summary-notes {
   font-size: 13px;
-  color: #334155;
+  color: var(--text);
   font-style: italic;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--stroke);
 }
 
 .rdp-node-not-reached {
@@ -333,46 +333,46 @@
   gap: 16px;
   padding: 32px 24px;
   text-align: center;
-  background: rgba(248, 250, 252, 0.9);
-  border-radius: 16px;
+  background: var(--panel);
+  border-radius: var(--radius-lg);
 }
 
 .rdp-node-not-reached p {
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 14px;
   margin: 0;
 }
 
 .rdp-state-info {
   margin-top: 12px;
-  background: white;
-  border-radius: 12px;
+  background: var(--panel);
+  border-radius: var(--radius-md);
   padding: 16px;
   text-align: left;
-  box-shadow: inset 0 0 0 1px #e2e8f0;
+  box-shadow: inset 0 0 0 1px var(--stroke);
 }
 
 .rdp-state-info h4 {
   margin: 0 0 10px 0;
   font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
 
 .rdp-state-info p {
   font-size: 13px;
-  color: #475569;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .rdp-action-detail {
-  background: white;
-  border-radius: 14px;
+  background: var(--panel);
+  border-radius: var(--radius-lg);
   padding: 16px 18px;
   margin-bottom: 16px;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .rdp-action-header {
@@ -385,12 +385,12 @@
 .rdp-action-title {
   font-weight: 600;
   font-size: 15px;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .rdp-action-transition {
   font-size: 14px;
-  color: #4338ca;
+  color: var(--primary);
   margin-bottom: 8px;
   font-weight: 600;
 }
@@ -400,31 +400,168 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .rdp-action-notes {
   font-style: italic;
   font-size: 13px;
-  color: #334155;
+  color: var(--text);
   padding: 10px 12px;
-  background: rgba(226, 232, 240, 0.4);
-  border-left: 4px solid #3b82f6;
+  background: var(--muted-bg);
+  border-left: 4px solid var(--primary);
   margin-top: 10px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
 }
 
 .rdp-action-changes {
   font-size: 12px;
-  color: #64748b;
+  color: var(--text-secondary);
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--stroke);
 }
 
 .rdp-action-changes strong {
   display: block;
   margin-bottom: 6px;
-  color: #1e293b;
+  color: var(--text);
+}
+
+/* Dark mode styles */
+.dark .running-detail-panel {
+  background: var(--panel);
+  border-left-color: var(--stroke);
+}
+
+.dark .rdp-header {
+  background: var(--panel-header);
+  border-bottom-color: var(--stroke);
+}
+
+.dark .rdp-title {
+  color: var(--text);
+}
+
+.dark .rdp-close {
+  background: var(--muted-bg);
+  color: var(--text-secondary);
+}
+
+.dark .rdp-close:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.dark .rdp-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar);
+}
+
+.dark .rdp-section-title {
+  color: var(--text);
+}
+
+.dark .rdp-label {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-value {
+  color: var(--text);
+}
+
+.dark .rdp-data-key {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-data-value {
+  color: var(--text);
+}
+
+.dark .rdp-history::before {
+  background: var(--stroke);
+}
+
+.dark .rdp-history-content {
+  background: var(--panel);
+}
+
+.dark .rdp-history-state {
+  color: var(--text);
+}
+
+.dark .rdp-history-meta {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-history-comments {
+  border-top-color: var(--stroke);
+  color: var(--text);
+}
+
+.dark .rdp-summary-item {
+  background: var(--panel);
+}
+
+.dark .rdp-summary-time {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-summary-state {
+  color: var(--text);
+}
+
+.dark .rdp-summary-actor {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-summary-notes {
+  border-top-color: var(--stroke);
+  color: var(--text);
+}
+
+.dark .rdp-node-not-reached {
+  background: var(--panel);
+}
+
+.dark .rdp-node-not-reached p {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-state-info {
+  background: var(--panel);
+  box-shadow: inset 0 0 0 1px var(--stroke);
+}
+
+.dark .rdp-state-info h4 {
+  color: var(--text);
+}
+
+.dark .rdp-state-info p {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-action-detail {
+  background: var(--panel);
+}
+
+.dark .rdp-action-title {
+  color: var(--text);
+}
+
+.dark .rdp-action-meta {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-action-notes {
+  background: var(--muted-bg);
+  color: var(--text);
+}
+
+.dark .rdp-action-changes {
+  color: var(--text-secondary);
+}
+
+.dark .rdp-action-changes strong {
+  color: var(--text);
 }

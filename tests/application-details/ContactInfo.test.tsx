@@ -9,7 +9,8 @@ describe("ContactInfo", () => {
 
   it("renders applicant name", () => {
     render(<ContactInfo applicant="John Doe" />);
-    expect(screen.getByText(/Name: John Doe/)).toBeInTheDocument();
+    expect(screen.getByText("Full Name")).toBeInTheDocument();
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
   });
 
   it("renders contact information title", () => {
@@ -19,9 +20,9 @@ describe("ContactInfo", () => {
 
   it("renders contact details", () => {
     render(<ContactInfo applicant="John Doe" />);
-    expect(screen.getByText(/✉️/)).toBeInTheDocument();
-    expect(screen.getByText(/📞/)).toBeInTheDocument();
-    expect(screen.getByText(/john.doe@email.com/)).toBeInTheDocument();
-    expect(screen.getByText(/\(555\) 123-4567/)).toBeInTheDocument();
+    expect(screen.getByText("Email")).toBeInTheDocument();
+    expect(screen.getByText("Phone")).toBeInTheDocument();
+    expect(screen.getByText("john.doe@email.com")).toBeInTheDocument();
+    expect(screen.getByText("(555) 123-4567")).toBeInTheDocument();
   });
 });

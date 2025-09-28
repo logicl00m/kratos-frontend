@@ -57,6 +57,7 @@ class AuthService {
   private refreshPromise: Promise<void> | null = null;
 
   private constructor() {
+  }
 
   public static getInstance(): AuthService {
     if (!AuthService.instance) {

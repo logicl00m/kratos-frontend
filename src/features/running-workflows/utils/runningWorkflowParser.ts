@@ -286,7 +286,9 @@ export function getWorkflowFormData(data: WorkflowData | WorkflowDataWrapper): R
     
     const stateConfig = workflow.states[currentState];
 
-    const formRefs = stateConfig?.forms?.length
+    // If forms is explicitly set to empty array, don't use any forms
+    // If forms is undefined/null, fallback to all forms
+    const formRefs = stateConfig?.forms !== undefined
       ? stateConfig.forms
       : Object.keys(forms).map((name) => ({ formName: name }));
 

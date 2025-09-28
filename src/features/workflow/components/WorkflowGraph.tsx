@@ -1,26 +1,31 @@
 // src/features/workflow/components/WorkflowGraph.tsx
-import React, { useState, useCallback, useMemo } from "react";
-import ReactFlow, {
-  Controls,
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  ReactFlow,
   Background,
+  Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
-  ConnectionMode,
   Panel,
+  ConnectionMode,
+  type Node,
+  type Edge,
+  addEdge,
 } from "reactflow";
-import type { Node, Edge, Connection } from "reactflow";
+import type { Connection } from "reactflow";
 import "reactflow/dist/style.css";
 import StateNode from "./StateNode";
 import CustomEdge from "./CustomEdge";
 import DraggableEdge from "./DraggableEdge";
 import SmartStepEdge from "./SmartStepEdge";
 import OrthogonalEdge from "./OrthogonalEdge";
-import DetailPanel from "./DetailPanel";
-import { exportGraphToJson } from "@features/workflow/utils/graphExport";
-import { getLayoutedElements } from "@features/workflow/utils/autoLayout";
 import GraphToolbar from "./GraphToolbar";
+import DetailPanel from "./DetailPanel";
+import type { WorkflowConfig } from "../types/workflow.types";
+import { getLayoutedElements } from "../utils/autoLayout";
+import { exportGraphToJson } from "../utils/graphExport";
+import "./WorkflowGraph.css";
 
 const nodeTypes = {
   stateNode: StateNode,
@@ -36,12 +41,14 @@ const edgeTypes = {
 interface WorkflowGraphProps {
   nodes: Node[];
   edges: Edge[];
+  workflow: WorkflowConfig;
   onNodeFormView?: (nodeId: string) => void;
 }
 
 const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
   nodes: initialNodes,
   edges: initialEdges,
+  workflow,
   onNodeFormView,
 }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -233,6 +240,7 @@ const WorkflowGraph: React.FC<WorkflowGraphProps> = ({
       <DetailPanel
         selectedNode={selectedNode}
         selectedEdge={selectedEdge}
+        workflow={workflow}
         onClose={() => {
           setSelectedNode(null);
           setSelectedEdge(null);

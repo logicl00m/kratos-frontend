@@ -1,5 +1,7 @@
 import { http } from 'msw';
 
+const API_BASE_URL = 'https://kratos-api.local.fintech23.xyz';
+
 export const handlers = [
   http.get('/api/applications', () => {
     return Response.json([
@@ -15,7 +17,7 @@ export const handlers = [
   }),
 
   // Dashboard API handlers used by the app during tests
-  http.post('/api/v1/client/private/dashboard/stats', () => {
+  http.post(`${API_BASE_URL}/api/v1/client/private/dashboard/stats`, () => {
     return Response.json({
       success: true,
       data: {
@@ -28,7 +30,7 @@ export const handlers = [
     });
   }),
 
-  http.post('/api/v1/client/private/dashboard/applications', () => {
+  http.post(`${API_BASE_URL}/api/v1/client/private/dashboard/applications`, () => {
     return Response.json({
       success: true,
       data: [

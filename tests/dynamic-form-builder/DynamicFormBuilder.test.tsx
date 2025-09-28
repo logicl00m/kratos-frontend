@@ -1,13 +1,14 @@
-﻿import { render, screen, within, waitFor } from '@testing-library/react';
+﻿import { screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 import { describe, it, expect } from 'vitest';
 import { DynamicFormBuilder } from '@features/dynamic-form-builder';
+import { renderWithProviders } from '../test-utils';
 
 describe('DynamicFormBuilder', () => {
   const renderBuilder = async () => {
     await act(async () => {
-      render(<DynamicFormBuilder />);
+      renderWithProviders(<DynamicFormBuilder />);
     });
     return userEvent.setup();
   };

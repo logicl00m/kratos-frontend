@@ -1,0 +1,79 @@
+/* AuditTrail.css - Modular styles for Audit Trail Component */
+
+.audit-trail {
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+}
+
+.audit-trail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.audit-trail-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.audit-trail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.audit-trail-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--stroke-light);
+}
+
+.audit-trail-item:last-child {
+  border-bottom: none;
+}
+
+.audit-trail-timestamp {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.audit-trail-event {
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.audit-trail-user {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.dark .audit-trail {
+  background: var(--panel);
+  border-color: var(--stroke);
+}
+
+.dark .audit-trail-title {
+  color: var(--text);
+}
+
+.dark .audit-trail-item {
+  border-bottom-color: var(--stroke-light);
+}
+
+.dark .audit-trail-timestamp,
+.dark .audit-trail-user {
+  color: var(--text-secondary);
+}
+
+.dark .audit-trail-event {
+  color: var(--text);
+}

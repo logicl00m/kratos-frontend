@@ -1,0 +1,40 @@
+{
+  "applicationCore": {
+    "fields": [
+      {
+        "id": "borrower_legal_name",
+        "name": "Legal Name",
+        "type": "text",
+        "status": "default",
+        "data": "{{ data.borrower.legalName }}",
+        "fieldActions": [
+          "save",
+          "validate"
+        ]
+      },
+      {
+        "id": "borrower_birthdate",
+        "name": "Birthdate",
+        "type": "date",
+        "status": "default",
+        "data": "{{ data.borrower.birthdate }}",
+        "fieldActions": [
+          "save",
+          "validate"
+        ]
+      },
+      {
+        "id": "borrower_document",
+        "name": "Document Upload",
+        "type": "file",
+        "status": "default",
+        "data": "{{ data.borrower.documents[0] }}",
+        "fieldActions": [
+          "upload",
+          "replace",
+          "validate"
+        ]
+      }
+    ]
+  }
+}
