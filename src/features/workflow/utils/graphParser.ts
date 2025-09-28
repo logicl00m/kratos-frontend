@@ -1,47 +1,70 @@
 // src/features/workflow/utils/graphParser.ts
+/**
+ * BACKWARD COMPATIBILITY WRAPPER
+ *
+ * This file now uses the refactored parser system from @core/workflow
+ * while maintaining the same API for existing components.
+ */
+
 import type { Node, Edge } from "reactflow";
 import type { WorkflowConfig, StateFormField, Form, StateForm, FieldOverride } from "@features/workflow/types/workflow.types";
+import {
+  DesignWorkflowParser,
+  exportGraphToWorkflow as exportGraph,
+  extractStateFields
+} from "@core/workflow";
 
 export function parseWorkflowToGraph(workflow: WorkflowConfig): {
   nodes: Node[];
   edges: Edge[];
 } {
-  const nodes: Node[] = [];
-  const edges: Edge[] = [];
-
+  // Handle empty workflow
   if (!workflow?.workflow?.states) {
-    return { nodes, edges };
+    return { nodes: [], edges: [] };
   }
 
+  // Use the original implementation for edges to ensure compatibility
   const states = workflow.workflow.states;
   const forms = workflow.workflow.forms;
   const stateKeys = Object.keys(states);
 
-  // Create nodes
-  stateKeys.forEach((stateKey, index) => {
-    const state = states[stateKey];
-    
-    // Get all fields for this state from referenced forms
-    const stateFields = getStateFields(forms, state);
-    const hasForm = stateFields.length > 0;
-
-    nodes.push({
-      id: stateKey,
-      type: "stateNode",
-      position: {
-        x: 500 * (index % 3),  // Much wider spacing
-        y: 350 * Math.floor(index / 3),  // Much taller spacing
-      },
-      data: {
-        label: stateKey,
-        hasForm,
-        fields: stateFields,
-      },
-    });
+  // Create nodes using the new parser for consistency
+  const parser = new DesignWorkflowParser({
+    nodeStyle: 'detailed',
+    layout: {
+      algorithm: 'grid',
+      direction: 'horizontal',
+      spacing: {
+        horizontal: 500,  // Match original spacing
+        vertical: 350
+      }
+    },
+    features: {
+      includeFormData: true,
+      includeValidation: false
+    }
   });
 
-  // Create edges from actions with better routing for loops
-  const edgeCountMap = new Map<string, number>();
+  // Map to new format for node creation
+  const normalizedWorkflow = {
+    states: states || {},
+    forms: forms || {}
+  };
+
+  let nodes: Node[] = [];
+  try {
+    const result = parser.parse(normalizedWorkflow);
+    // Map nodes back to original stateNode type
+    nodes = result.nodes.map(node => ({
+      ...node,
+      type: 'stateNode'  // Keep original node type
+    }));
+  } catch (error) {
+    console.error('Error parsing nodes:', error);
+  }
+
+  // Create edges using the original logic for full compatibility
+  const edges: Edge[] = [];
   const directedEdgeMap = new Map<string, number>();
 
   stateKeys.forEach((stateKey) => {
@@ -60,72 +83,58 @@ export function parseWorkflowToGraph(workflow: WorkflowConfig): {
           // Track directed edges (A->B is different from B->A)
           const directedKey = `${stateKey}->${actionData.nextState}`;
           const reverseKey = `${actionData.nextState}->${stateKey}`;
-
-          // Check if reverse edge exists (for loops)
           const hasReverseEdge = directedEdgeMap.has(reverseKey);
-
-          // Count edges for this specific direction
           const directedCount = directedEdgeMap.get(directedKey) || 0;
           directedEdgeMap.set(directedKey, directedCount + 1);
 
-          let edgeType = "step"; // Use step edges by default for node avoidance
+          let edgeType = "step";
           const edgeStyle: any = {
             stroke,
             strokeWidth,
           };
 
-          // Handle self-loops (node pointing to itself)
+          // Handle self-loops
           if (stateKey === actionData.nextState) {
             edgeType = "bezier";
             edgeStyle.strokeDasharray = "3 3";
-            curvature = 0.8; // High curvature for self-loops
-          }
-          // Handle bidirectional edges (loops between different nodes)
-          else if (hasReverseEdge || directedCount > 0) {
-            // Use step edge for better control and no overlap
+          } else if (hasReverseEdge || directedCount > 0) {
             edgeType = "step";
-
-            // Add curvature offset for bidirectional edges
-            if (hasReverseEdge) {
-              // First edge of a bidirectional pair gets positive curvature
-              edgeStyle.stroke = stroke;
-            }
-
-            // Multiple edges in same direction
             if (directedCount > 0) {
               edgeStyle.strokeDasharray = directedCount > 1 ? "5 5" : "10 5";
             }
           }
 
-          // Calculate curvature and offsets for better edge separation
+          // Calculate curvature for better edge separation
           let curvature = 0;
           let offset = 0;
           let labelOffset = 0;
 
-          if (hasReverseEdge) {
-            // Offset edges that form loops
+          if (stateKey === actionData.nextState) {
+            curvature = 0.8;
+          } else if (hasReverseEdge) {
             curvature = 0.5;
             offset = 40;
             labelOffset = 30;
           }
 
           if (directedCount > 0) {
-            // Further offset for multiple edges in same direction
             offset = (directedCount - 1) * 30;
             labelOffset = directedCount * 40;
             curvature += directedCount * 0.2;
           }
 
           // Determine source handle based on action type
-          let sourceHandle = "other"; // default to bottom center
-          const targetHandle = "input"; // always use top input
+          let sourceHandle = "other";
+          const targetHandle = "input";
 
           if (actionName.toLowerCase().includes("reject")) {
-            sourceHandle = "reject"; // left handle
-          } else if (actionName.toLowerCase().includes("approve") ||
-                     actionName.toLowerCase().includes("finalize") ||
-                     actionName.toLowerCase().includes("accept")) {
-            sourceHandle = "approve"; // right handle
+            sourceHandle = "reject";
+          } else if (
+            actionName.toLowerCase().includes("approve") ||
+            actionName.toLowerCase().includes("finalize") ||
+            actionName.toLowerCase().includes("accept")
+          ) {
+            sourceHandle = "approve";
           }
 
           edges.push({
@@ -178,73 +187,43 @@ export function getStateFields(
   state: WorkflowConfig["workflow"]["states"][string]
 ): StateFormField[] {
   if (!forms || !state.forms) return [];
-  
-  const allFields: StateFormField[] = [];
-  
-  // Process each form referenced by this state
-  state.forms.forEach((stateForm: StateForm) => {
-    // Skip if entire form is hidden
-    if (stateForm.visibility === "hidden") return;
-    
-    const form = forms[stateForm.formName];
-    if (!form?.fields) return;
-    
-    // Process each field in the form
-    form.fields.forEach(field => {
-      const fieldOverride: FieldOverride = stateForm.fieldOverrides?.[field.id] || {};
-      
-      // Skip hidden fields
-      if (fieldOverride.status === "hidden") return;
-      
-      // Default to readonly if not specified
-      const status = fieldOverride.status || "readonly";
-      
-      allFields.push({
-        ...field,
-        formName: stateForm.formName,
-        stateConfig: {
-          status,
-          required: fieldOverride.required,
-        },
-      });
-    });
-  });
-  
-  return allFields;
+
+  // Use refactored utility
+  return extractStateFields(forms || {}, state);
 }
 
-// Updated default workflow using the new format
+// Re-export the default workflow for backward compatibility
 export function getDefaultWorkflow(): WorkflowConfig {
   return {
     workflow: {
       forms: {
         CoreDetails: {
           fields: [
-            { 
-              id: "applicant_legal_name", 
-              name: "Applicant Legal Name", 
-              type: "text", 
+            {
+              id: "applicant_legal_name",
+              name: "Applicant Legal Name",
+              type: "text",
               data: "{{ data.borrower.legalName }}",
               fieldActions: [{ operation: "save" }, { operation: "validate" }]
             },
-            { 
-              id: "requested_amount", 
-              name: "Requested Amount", 
-              type: "number", 
+            {
+              id: "requested_amount",
+              name: "Requested Amount",
+              type: "number",
               data: "{{ data.facility.requestedAmount }}",
               fieldActions: [{ operation: "save" }, { operation: "validate" }]
             },
-            { 
-              id: "proposal_details", 
-              name: "Proposal Details", 
-              type: "textarea", 
+            {
+              id: "proposal_details",
+              name: "Proposal Details",
+              type: "textarea",
               data: "{{ data.proposal.details }}",
               fieldActions: [{ operation: "save" }, { operation: "validate" }]
             },
-            { 
-              id: "supporting_documents", 
-              name: "Supporting Documents", 
-              type: "file", 
+            {
+              id: "supporting_documents",
+              name: "Supporting Documents",
+              type: "file",
               data: "{{ data.documents }}",
               fieldActions: [{ operation: "upload" }, { operation: "replace" }, { operation: "validate" }]
             }
@@ -252,17 +231,17 @@ export function getDefaultWorkflow(): WorkflowConfig {
         },
         ReviewOutputs: {
           fields: [
-            { 
-              id: "rm_decision", 
-              name: "RM Decision", 
-              type: "select", 
+            {
+              id: "rm_decision",
+              name: "RM Decision",
+              type: "select",
               data: "{{ data.rm.decision }}",
               fieldActions: [{ operation: "validate" }]
             },
-            { 
-              id: "final_memo", 
-              name: "Credit Memo", 
-              type: "file", 
+            {
+              id: "final_memo",
+              name: "Credit Memo",
+              type: "file",
               data: "{{ data.outputs.creditMemo }}",
               fieldActions: [{ operation: "download" }]
             }
