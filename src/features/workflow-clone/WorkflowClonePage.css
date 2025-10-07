@@ -1,0 +1,89 @@
+/* src/features/workflow-clone/WorkflowClonePage.css */
+
+.workflow-clone-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.workflow-graph-container {
+  display: flex;
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.json-editor-panel {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--stroke);
+  background: var(--panel);
+  height: 100%;
+  min-height: 0;
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--panel-header);
+  border-bottom: 1px solid var(--stroke);
+}
+
+.editor-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.editor-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.editor-toggle-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+.graph-main-panel {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  background: var(--bg);
+}
+
+.show-editor-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-fast);
+}
+
+.show-editor-btn:hover {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}

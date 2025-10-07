@@ -1,0 +1,94 @@
+/* FormViewModal.css - Modular styles for Form View Modal Component */
+
+.form-view-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.form-view-modal-content {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  min-height: 50vh;
+  background: var(--panel);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+}
+
+.form-view-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--stroke);
+  background: var(--panel-header);
+}
+
+.form-view-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-view-modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.form-view-modal-close:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+.form-view-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  min-height: 0;
+}
+
+/* Dark mode styles */
+.dark .form-view-modal {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .form-view-modal-content {
+  background: var(--panel);
+}
+
+.dark .form-view-modal-header {
+  border-bottom-color: var(--stroke);
+  background: var(--panel-header);
+}
+
+.dark .form-view-modal-title {
+  color: var(--text);
+}
+
+.dark .form-view-modal-close {
+  color: var(--text-secondary);
+}
+
+.dark .form-view-modal-close:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}

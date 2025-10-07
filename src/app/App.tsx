@@ -15,6 +15,7 @@ import {
 } from "@features/workflow/utils/graphParser";
 import type { WorkflowConfig } from "@features/workflow/types/workflow.types";
 import type { WorkflowData } from "@features/dashboard/types/dashboard.types";
+import WorkflowClonePage from "@features/workflow-clone/WorkflowClonePage";
 import "./App.css";
 import MainLayout from "@/common/layouts/MainLayout";
 
@@ -40,6 +41,7 @@ function App() {
       builder: "/builder",
       "form-builder": "/form-builder/new",
       viewer: "/viewer",
+      "workflow-clone": "/workflow-clone",
       applications: "/applications",
       analytics: "/analytics",
       users: "/users",
@@ -193,6 +195,12 @@ function App() {
     </MainLayout>
   );
 
+  const WorkflowClonePageComponent = (
+    <MainLayout title="Workflow Clone" onNavigate={handleNavigation}>
+      <WorkflowClonePage />
+    </MainLayout>
+  );
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -209,6 +217,7 @@ function App() {
       <Route path="/form-builder/new" element={FormBuilderRoute} />
       <Route path="/applications/details" element={ApplicationDetailsPage} />
       <Route path="/viewer" element={ViewerPage} />
+      <Route path="/workflow-clone" element={WorkflowClonePageComponent} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

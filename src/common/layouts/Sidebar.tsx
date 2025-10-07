@@ -65,6 +65,7 @@ const Sidebar = ({
     },
     { id: "form-builder", label: "Form Builder", icon: <FileText size={20} /> },
     { id: "viewer", label: "Workflow Viewer", icon: <Workflow size={20} /> },
+    { id: "workflow-clone", label: "Workflow Clone", icon: <Workflow size={20} /> },
     { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} /> },
     { id: "users", label: "Users", icon: <Users size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },
